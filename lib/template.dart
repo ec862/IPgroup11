@@ -67,6 +67,6 @@ class _TemplateState extends State<Template> {
           ],
         ),
       ),
-    );
+      debugShowCheckedModeBanner: false,);
   }
 }
