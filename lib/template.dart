@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:template/MovieScreen.dart';
 
 const Color BOTTOM_BAR_COLOR = Colors.redAccent;
 
@@ -28,7 +30,7 @@ class _TemplateState extends State<Template> {
           ],
         ),
 
-        body: Container(), //TODO
+        body: MovieScreen(), //TODO
 
         bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
