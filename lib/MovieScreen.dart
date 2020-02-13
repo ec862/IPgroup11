@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:template/MovieListZoomIn.dart';
 import 'package:template/RecommendMovie.dart';
+
+const Color BOTTOM_BAR_COLOR = Colors.redAccent;
 
 class MovieScreen extends StatefulWidget {
   @override
@@ -26,13 +29,67 @@ class _MovieScreenState extends State<MovieScreen> {
     rating = 5;
   }
 
+  int currentindex = 0; // home = 0
+
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: <Widget>[
-        getMoviePicture(context),
-        getMovieInfo(context),
-      ],
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.blue[900],
+        title: Text('Page Name'),
+        actions: <Widget>[
+          IconButton(
+            onPressed: () {
+              //TODO
+            },
+            icon: Icon(Icons.menu),
+          ),
+        ],
+      ),
+
+      body: ListView(
+        children: <Widget>[
+          getMoviePicture(context),
+          getMovieInfo(context),
+        ],
+      ), //TODO
+
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        iconSize: 30.0,
+        selectedFontSize: 0.0,
+        backgroundColor: BOTTOM_BAR_COLOR,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.white,
+        currentIndex: currentindex,
+        onTap: (index) {
+          setState(() {
+            currentindex = index;
+          });
+        },
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              backgroundColor: BOTTOM_BAR_COLOR,
+              title: Text('')),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.search),
+              backgroundColor: BOTTOM_BAR_COLOR,
+              title: Text('')),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.add_box),
+              backgroundColor: BOTTOM_BAR_COLOR,
+              title: Text('')),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.favorite),
+              backgroundColor: BOTTOM_BAR_COLOR,
+              title: Text('')),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              backgroundColor: BOTTOM_BAR_COLOR,
+              title: Text('')),
+        ],
+      ),
     );
   }
 
@@ -85,20 +142,48 @@ class _MovieScreenState extends State<MovieScreen> {
     String genreString = getStringsFromList(genres);
     return Column(
       children: <Widget>[
-        movieInfoContent("Genre", genreString),
+        movieInfoContent("Genre", genreString, onPress: () {
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+            return MovieListZoomIn(
+              movieName: "Avengers",
+              list: genres,
+            );
+          }));
+        }),
         fullDivider(),
-        movieInfoContent("Directors", directorString),
+        movieInfoContent("Directors", directorString, onPress: () {
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+            return MovieListZoomIn(
+              movieName: "Avengers",
+              list: directors,
+            );
+          }));
+        }),
         fullDivider(),
-        movieInfoContent("Actors", actorsString),
+        movieInfoContent("Actors", actorsString, onPress: () {
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+            return MovieListZoomIn(
+              movieName: "Avengers",
+              list: actors,
+            );
+          }));
+        }),
         fullDivider(),
-        movieInfoContent("Synopsis", synopsis),
+        movieInfoContent("Synopsis", synopsis, onPress: () {
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+            return MovieListZoomIn(
+              movieName: "Avengers",
+              list: [synopsis],
+            );
+          }));
+        }),
         fullDivider(),
         stars(4),
       ],
     );
   }
 
-  Widget movieInfoContent(String title, String subtitle) {
+  Widget movieInfoContent(String title, String subtitle, {Function onPress}) {
     return ListTile(
       title: Text.rich(
         TextSpan(children: [
@@ -119,7 +204,9 @@ class _MovieScreenState extends State<MovieScreen> {
         ]),
       ),
       trailing: Icon(Icons.keyboard_arrow_right),
-      onTap: () {},
+      onTap: () {
+        if (onPress != null) onPress();
+      },
     );
   }
 
@@ -175,6 +262,9 @@ class SelectOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Options"),
+      ),
       body: ListView(
         children: <Widget>[
           ListTile(

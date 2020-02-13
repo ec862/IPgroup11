@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'template.dart';
+import 'MovieScreen.dart';
 import 'package:flutter/cupertino.dart';
 
-void main() => runApp(Template());
-
+void main() => runApp(MaterialApp(home: MovieScreen()));

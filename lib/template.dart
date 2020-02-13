@@ -30,7 +30,7 @@ class _TemplateState extends State<Template> {
           ],
         ),
 
-        body: MovieScreen(), //TODO
+        body: Container(), //TODO
 
         bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
