@@ -25,7 +25,19 @@ class _MovieScreenState extends State<MovieScreen> {
     directors = ["Anthony Russo", "Joe Russo"];
     actors = ["RDJ", "Chris Evans", "Chris Hemsworth", "Chris Prat"];
     genres = ["Action", "Drama", "Romantic"];
-    synopsis = "Thanos the mad titan";
+    synopsis = "Avengers: Endgame picks up after the events "
+        "of Avengers: Infinity War, which saw the Avengers "
+        "divided and defeated. Thanos won the day and used "
+        "the Infinity Stones to snap away half of all life "
+        "in the universe. Only the original Avengers - "
+        "Iron Man, Captain America, Thor, Hulk, Black Widow, "
+        "and Hawkeye remain, along with some key allies like "
+        "War Machine, Ant-Man, Rocket Raccoon, Nebula, and "
+        "Captain Marvel. Each of the survivors deals with the "
+        "fallout from Thanos' decimation in different ways, but "
+        "when an opportunity presents itself to potentially save "
+        "those who vanished, they all come together and set out to "
+        "defeat Thanos, once and for all.";
     rating = 5;
   }
 
@@ -49,8 +61,8 @@ class _MovieScreenState extends State<MovieScreen> {
 
       body: ListView(
         children: <Widget>[
-          getMoviePicture(context),
-          getMovieInfo(context),
+          _getMoviePicture(context),
+          _getMovieInfo(context),
         ],
       ), //TODO
 
@@ -93,7 +105,7 @@ class _MovieScreenState extends State<MovieScreen> {
     );
   }
 
-  Widget getMoviePicture(context) {
+  Widget _getMoviePicture(context) {
     return Stack(
       children: <Widget>[
         Container(
@@ -136,13 +148,13 @@ class _MovieScreenState extends State<MovieScreen> {
     );
   }
 
-  Widget getMovieInfo(context) {
-    String directorString = getStringsFromList(directors);
-    String actorsString = getStringsFromList(actors, limit: 24);
-    String genreString = getStringsFromList(genres);
+  Widget _getMovieInfo(context) {
+    String directorString = _getStringsFromList(directors);
+    String actorsString = _getStringsFromList(actors, limit: 24);
+    String genreString = _getStringsFromList(genres);
     return Column(
       children: <Widget>[
-        movieInfoContent("Genre", genreString, onPress: () {
+        _movieInfoContent("Genre", genreString, onPress: () {
           Navigator.of(context).push(MaterialPageRoute(builder: (context) {
             return MovieListZoomIn(
               movieName: "Avengers",
@@ -150,8 +162,7 @@ class _MovieScreenState extends State<MovieScreen> {
             );
           }));
         }),
-        fullDivider(),
-        movieInfoContent("Directors", directorString, onPress: () {
+        _movieInfoContent("Directors", directorString, onPress: () {
           Navigator.of(context).push(MaterialPageRoute(builder: (context) {
             return MovieListZoomIn(
               movieName: "Avengers",
@@ -159,8 +170,7 @@ class _MovieScreenState extends State<MovieScreen> {
             );
           }));
         }),
-        fullDivider(),
-        movieInfoContent("Actors", actorsString, onPress: () {
+        _movieInfoContent("Actors", actorsString, onPress: () {
           Navigator.of(context).push(MaterialPageRoute(builder: (context) {
             return MovieListZoomIn(
               movieName: "Avengers",
@@ -168,8 +178,7 @@ class _MovieScreenState extends State<MovieScreen> {
             );
           }));
         }),
-        fullDivider(),
-        movieInfoContent("Synopsis", synopsis, onPress: () {
+        _movieInfoContent("Synopsis", _getShorterText(synopsis), onPress: () {
           Navigator.of(context).push(MaterialPageRoute(builder: (context) {
             return MovieListZoomIn(
               movieName: "Avengers",
@@ -177,40 +186,41 @@ class _MovieScreenState extends State<MovieScreen> {
             );
           }));
         }),
-        fullDivider(),
-        stars(4),
+        _stars(4),
       ],
     );
   }
 
-  Widget movieInfoContent(String title, String subtitle, {Function onPress}) {
-    return ListTile(
-      title: Text.rich(
-        TextSpan(children: [
-          TextSpan(
-            text: "$title: ",
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
+  Widget _movieInfoContent(String title, String subtitle, {Function onPress}) {
+    return Card(
+      child: ListTile(
+        title: Text.rich(
+          TextSpan(children: [
+            TextSpan(
+              text: "$title: ",
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          TextSpan(
-            text: subtitle,
-            style: TextStyle(
-              fontSize: 22,
-              fontStyle: FontStyle.italic,
+            TextSpan(
+              text: subtitle,
+              style: TextStyle(
+                fontSize: 22,
+                fontStyle: FontStyle.italic,
+              ),
             ),
-          ),
-        ]),
+          ]),
+        ),
+        trailing: Icon(Icons.keyboard_arrow_right),
+        onTap: () {
+          if (onPress != null) onPress();
+        },
       ),
-      trailing: Icon(Icons.keyboard_arrow_right),
-      onTap: () {
-        if (onPress != null) onPress();
-      },
     );
   }
 
-  Widget stars(int rating) {
+  Widget _stars(int rating) {
     return SizedBox(
       height: 50,
       child: ListView.builder(
@@ -228,22 +238,16 @@ class _MovieScreenState extends State<MovieScreen> {
     );
   }
 
-  Widget fullDivider() {
-    return Divider(
-      color: Colors.black,
-    );
-  }
-
-  String getShorterText(String text) {
+  String _getShorterText(String text) {
     String toReturn = text;
     if (text.length >= 18) {
-      toReturn.substring(0, 18);
+      toReturn = toReturn.substring(0, 18);
       toReturn += "...";
     }
     return toReturn;
   }
 
-  String getStringsFromList(List<String> list, {int limit}) {
+  String _getStringsFromList(List<String> list, {int limit}) {
     String toReturn = "";
     limit = limit ?? 20;
     for (int i = 0; i < list.length; i++) {
