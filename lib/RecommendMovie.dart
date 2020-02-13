@@ -28,6 +28,7 @@ class _RecommendMovieState extends State<RecommendMovie> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.blue[900],
         title: Text("Recommend"),
       ),
       body: ListView.builder(
@@ -67,6 +68,7 @@ class _RecommendMovieState extends State<RecommendMovie> {
           Navigator.of(context).pop();
         },
         label: Text("Send"),
+        backgroundColor: Colors.blue[900],
       ),
     );
   }

@@ -48,7 +48,7 @@ class _MovieScreenState extends State<MovieScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue[900],
-        title: Text('Page Name'),
+        title: Text('Avengers Endgame'),
         actions: <Widget>[
           IconButton(
             onPressed: () {
@@ -242,7 +242,7 @@ class _MovieScreenState extends State<MovieScreen> {
     String toReturn = text;
     if (text.length >= 18) {
       toReturn = toReturn.substring(0, 18);
-      toReturn += "...";
+      toReturn += " ...";
     }
     return toReturn;
   }
@@ -253,7 +253,7 @@ class _MovieScreenState extends State<MovieScreen> {
     for (int i = 0; i < list.length; i++) {
       toReturn += list[i];
       if (toReturn.length > limit) {
-        toReturn = toReturn.substring(0, limit) + "...";
+        toReturn = toReturn.substring(0, limit) + " ...";
         break;
       }
       toReturn += ", ";
@@ -267,6 +267,7 @@ class SelectOption extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.blue[900],
         title: Text("Options"),
       ),
       body: ListView(
