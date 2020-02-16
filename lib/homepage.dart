@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-const Color BOTTOM_BAR_COLOR = Colors.redAccent;
+import 'package:template/BottomBar.dart';
 
 class Homepage extends StatefulWidget {
   @override
@@ -8,12 +7,6 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-  int currentindex = 0; // home = 0
-  final List<String> _barPages = [
-    '/homepage',
-    '/friendsearchpage',
-    '/moviesearchpage'
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -45,43 +38,7 @@ class _HomepageState extends State<Homepage> {
 
       // **********END OF NON-TEMPLATE************
 
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        iconSize: 30.0,
-        selectedFontSize: 0.0,
-        backgroundColor: BOTTOM_BAR_COLOR,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.white,
-        currentIndex: currentindex,
-        onTap: (index) {
-          setState(() {
-            currentindex = index;
-          });
-        },
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              backgroundColor: BOTTOM_BAR_COLOR,
-              title: Text('')),
-
-          BottomNavigationBarItem(
-              icon: Icon(Icons.search),
-              backgroundColor: BOTTOM_BAR_COLOR,
-              title: Text('')),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.local_movies),
-              backgroundColor: BOTTOM_BAR_COLOR,
-              title: Text('')),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.favorite),
-              backgroundColor: BOTTOM_BAR_COLOR,
-              title: Text('')),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              backgroundColor: BOTTOM_BAR_COLOR,
-              title: Text('')),
-        ],
-      ),
+      bottomNavigationBar: BottomBar().createBar(context, 0),
     );
   }
 
@@ -112,48 +69,66 @@ class _HomepageState extends State<Homepage> {
               RaisedButton(
                   onPressed: () {},
                   splashColor: Colors.deepOrangeAccent,
-                  child: Text("See All Friend Recomendations",
+                  child: Text(
+                    "See All Friend Recomendations",
                     style: TextStyle(fontSize: 25),
-                    textAlign: TextAlign.center,),
+                    textAlign: TextAlign.center,
+                  ),
                   shape: RoundedRectangleBorder(
                       borderRadius: new BorderRadius.circular(8))),
             ],
           ),
         ),
-
         Divider(
           color: Colors.black,
           height: 15,
         ),
-
-        Text("Recent Recomendations",
-          style: TextStyle(fontSize: listSize / 3.4),),
-        SizedBox(height: 1,),
-
+        Text(
+          "Recent Recomendations",
+          style: TextStyle(fontSize: listSize / 3.4),
+        ),
+        SizedBox(
+          height: 1,
+        ),
         Expanded(
-            child: Align(alignment: Alignment.topCenter,
+            child: Align(
+                alignment: Alignment.topCenter,
                 child: new ListView.builder(
                   itemBuilder: (BuildContext context, int index) {
-                    return new Container(height: listSize,
-                        child: Card(child: ListTile(
-                            leading: Icon(Icons.movie, size: listSize / 1.75,),
-                            title: Text("Movie $index",
-                              style: TextStyle(fontSize: listSize / 3),),
-                            subtitle: Text("Rec. by AAA BBB",
-                                style: TextStyle(fontSize: listSize / 6.25)),
-                            trailing: Container(child: Ink(
-                              decoration: const ShapeDecoration(
-                                color: Colors.lightGreenAccent,
-                                shape: CircleBorder(),),
-                              child: IconButton(icon: Icon(Icons.add),
-                                color: Colors.black,
-                                onPressed: () {
-                                  print("here$index");
-                                },
-                                iconSize: listSize / 2.5,),),
-                            ))));
-                  }, itemCount: 4,)
-            ))
+                    return new Container(
+                        height: listSize,
+                        child: Card(
+                            child: ListTile(
+                                leading: Icon(
+                                  Icons.movie,
+                                  size: listSize / 1.75,
+                                ),
+                                title: Text(
+                                  "Movie $index",
+                                  style: TextStyle(fontSize: listSize / 3),
+                                ),
+                                subtitle: Text("Rec. by AAA BBB",
+                                    style:
+                                    TextStyle(fontSize: listSize / 6.25)),
+                                trailing: Container(
+                                  child: Ink(
+                                    decoration: const ShapeDecoration(
+                                      color: Colors.lightGreenAccent,
+                                      shape: CircleBorder(),
+                                    ),
+                                    child: IconButton(
+                                      icon: Icon(Icons.add),
+                                      color: Colors.black,
+                                      onPressed: () {
+                                        print("here$index");
+                                      },
+                                      iconSize: listSize / 2.5,
+                                    ),
+                                  ),
+                                ))));
+                  },
+                  itemCount: 4,
+                )))
       ],
     );
   }

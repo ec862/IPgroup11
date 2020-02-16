@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:template/friendsearchpage.dart';
 import 'package:template/homepage.dart';
-import 'package:template/moviesearchpage.dart';
+import 'package:template/searchpage.dart';
 
 void main() => runApp(App());
 
@@ -10,16 +9,17 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Title',
-      home: Homepage(),
+      initialRoute: Routes.bottomRoutes[0],
       debugShowCheckedModeBanner: false,
       routes: <String, WidgetBuilder>{
-        '/homepage': (BuildContext context) => new Homepage(),
+        Routes.bottomRoutes[0]: (BuildContext context) => new Homepage(),
+        Routes.bottomRoutes[1]: (BuildContext context) => new MovieSearchPage(),
         '/friendsearchpage': (BuildContext context) => new FriendSearchPage(),
-        '/moviesearchpage': (BuildContext context) => new MovieSearchPage(),
       },
     );
   }
 }
 
-
-
+class Routes {
+  static final bottomRoutes = ['/', '/moviesearchpage'];
+}
