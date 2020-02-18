@@ -10,59 +10,60 @@ final friendList = [
   "Matt Damon",
   "George Michael",
   "Django",
-  'Maragaret Rotella'
-      'Eboni Gehlert  '
-      "Michel Proctor",
-  "Stacy Dawn ",
+  'Maragaret Rotella',
+  'Eboni Gehlert',
+  "Michel Proctor",
+  "Stacy Dawn",
   'Golda Mccawley',
-  "Hattie Farina  ",
-  "Dori Gallant  ",
-  "Albertha Lawlor ",
-  " Suzette Meunier ",
-  " Malia Bartlow  ",
-  " Anissa Rutland  ",
-  "Margie Close  ",
-  " Melonie Montez ",
-  " Lauri Boyers  ",
-  " Ira Wheeler  ",
-  " Kristine Hennessee  ",
-  "Una Ressler  ",
-  " Elidia Rahim  ",
-  " Ayana Nussbaum  ",
-  " Bibi Brunson  ",
-  " Dayle Mccardle  ",
-  " Dong Goetz  ",
-  " Lael Waddle  ",
-  " Lavone Sowa  ",
-  " Brigid Schneiderman  ",
-  " Roxie Mondor  ",
-  " May Berardi  ",
-  " Chong Hanke  ",
-  " Rosalee Spain ",
-  " Latashia Escamilla  ",
-  " Nickie Spindler  ",
-  " Shaquana Schapiro  ",
-  " Ellis Koons  ",
-  ' Emory Owens  '
-      ' Amal Filice  ',
-  " Adina Ali  ",
-  " Julieann Heil ",
-  " Chelsea Hankey ",
-  " Penni Gains  ",
-  " Arla Brazee  ",
-  " Valda Lotz  ",
-  " Rossana Hodgin  ",
-  " Jacob Larrimore ",
-  " Caleb Dillahunt",
-  " Kathryn Deaner",
-  " Jaqueline Yip",
-  " Lucy Lucian ",
-  " Edra Blow  ",
-  " Ouida Center ",
+  "Hattie Farina",
+  "Dori Gallant",
+  "Albertha Lawlor",
+  "Suzette Meunier",
+  "Malia Bartlow",
+  "Anissa Rutland",
+  "Margie Close",
+  "Melonie Montez",
+  "Lauri Boyers",
+  "Ira Wheeler",
+  "Kristine Hennessee",
+  "Una Ressler",
+  "Elidia Rahim",
+  "Ayana Nussbaum",
+  "Bibi Brunson",
+  "Dayle Mccardle",
+  "Dong Goetz",
+  "Lael Waddle",
+  "Lavone Sowa",
+  "Brigid Schneiderman",
+  "Roxie Mondor",
+  "May Berardi",
+  "Chong Hanke",
+  "Rosalee Spain",
+  "Latashia Escamilla",
+  "Nickie Spindler",
+  "Shaquana Schapiro",
+  "Ellis Koons",
+  'Emory Owens',
+  'Amal Filice',
+  "Adina Ali",
+  "Julieann Heil",
+  "Chelsea Hankey",
+  "Penni Gains",
+  "Arla Brazee",
+  "Valda Lotz",
+  "Rossana Hodgin",
+  "Jacob Larrimore",
+  "Caleb Dillahunt",
+  "Kathryn Deaner",
+  "Jaqueline Yip",
+  "Lucy Lucian ",
+  "Edra Blow  ",
+  "Ouida Center ",
   "Emogene Marlin ",
 ];
 
 final movieList = [
+  "Shrek 2",
   "Dark Knight",
   "Despicable Me",
   "Shrek",
@@ -91,24 +92,24 @@ HashSet<String> friendHistorySet = new HashSet();
 HashSet<String> movieHistorySet = new HashSet();
 
 class MovieSearchPage extends StatefulWidget {
-  String title = "Movie Search Page";
-  String otherPage = '/friendsearchpage';
-  Icon otherIcon = Icon(Icons.people);
-  Icon icon = Icon(Icons.movie);
+  final String title = "Movie Search Page";
+  final String otherPage = '/friendsearchpage';
+  final Icon otherIcon = Icon(Icons.people);
+  final Icon icon = Icon(Icons.movie);
   HashSet<String> elementSet = movieHistorySet;
-  List<String> elementList = movieList;
+  final List<String> elementList = movieList;
 
   @override
   _MovieSearchPageState createState() => _MovieSearchPageState();
 }
 
 class FriendSearchPage extends StatefulWidget {
-  String title = "Friend Search Page";
-  String otherPage = '/moviesearchpage';
-  Icon otherIcon = Icon(Icons.movie);
-  Icon icon = Icon(Icons.people);
+  final String title = "Friend Search Page";
+  final String otherPage = '/moviesearchpage';
+  final Icon otherIcon = Icon(Icons.movie);
+  final Icon icon = Icon(Icons.people);
   HashSet<String> elementSet = friendHistorySet;
-  List<String> elementList = friendList;
+  final List<String> elementList = friendList;
 
   @override
   _FriendSearchPageState createState() => _FriendSearchPageState();
@@ -173,6 +174,8 @@ class _FriendSearchPageState extends State<FriendSearchPage> {
 }
 
 class CustomSearchDelegate extends SearchDelegate<String> {
+  bool queryClicked = false;
+
   List<String> suggestionList;
   List<String> elementList;
   Icon icon;
@@ -204,23 +207,28 @@ class CustomSearchDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) {
+    List<String> tempList = [];
+
+    if (queryClicked) {
+      tempList.add(query);
+    }
     suggestionList = query.isEmpty
         ? searchHistorySet.toList()
-        : elementList
-            .where((m) => m.toLowerCase().startsWith(query.toLowerCase()))
-            .toList();
+        : ((queryClicked) ? tempList : elementList
+        .where((m) => m.toLowerCase().startsWith(query.toLowerCase()))
+        .toList());
 
     if (suggestionList.length > 1) {
       return ListView.builder(
         itemBuilder: (context, index) => ListTile(
-              leading: icon,
-              title: Text(suggestionList[index]),
-              onTap: () {
-                query = suggestionList[index];
-                searchHistorySet.add(query);
-                return TestingPage.createPage(query);
-              },
-            ),
+          leading: icon,
+          title: Text(suggestionList[index]),
+          onTap: () {
+            query = suggestionList[index];
+            searchHistorySet.add(query);
+            queryClicked = true;
+          },
+        ),
         itemCount: suggestionList.length,
       );
     } else if (suggestionList.length == 1) {
@@ -235,19 +243,20 @@ class CustomSearchDelegate extends SearchDelegate<String> {
     suggestionList = query.isEmpty
         ? searchHistorySet.toList()
         : elementList
-            .where((m) => m.toLowerCase().startsWith(query.toLowerCase()))
-            .toList();
+        .where((m) => m.toLowerCase().startsWith(query.toLowerCase()))
+        .toList();
 
     return ListView.builder(
       itemBuilder: (context, index) => ListTile(
-            leading: icon,
-            title: Text(suggestionList[index]),
-            onTap: () {
-              query = suggestionList[index];
-              searchHistorySet.add(query);
-              showResults(context);
-            },
-          ),
+        leading: icon,
+        title: Text(suggestionList[index]),
+        onTap: () {
+          query = suggestionList[index];
+          searchHistorySet.add(query);
+          showResults(context);
+          queryClicked = true;
+        },
+      ),
       itemCount: suggestionList.length,
     );
   }
