@@ -211,6 +211,7 @@ class CustomSearchDelegate extends SearchDelegate<String> {
 
     if (queryClicked) {
       tempList.add(query);
+      print("here");
     }
     suggestionList = query.isEmpty
         ? searchHistorySet.toList()
