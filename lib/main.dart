@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:template/CheckRecomendations.dart';
-import 'package:flutter/cupertino.dart';
+import 'template.dart';
+import 'watchlist.dart';
+import 'followers.dart';
 
-void main() => runApp(MaterialApp(home: CheckRecomendations()));
+void main() => runApp(WatchList());
+
