@@ -5,7 +5,10 @@ class MovieListZoomIn extends StatelessWidget {
   final list;
   final movieName;
 
-  MovieListZoomIn({@required this.list, @required this.movieName});
+  MovieListZoomIn({
+    @required this.list,
+    @required this.movieName,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +20,10 @@ class MovieListZoomIn extends StatelessWidget {
         padding: EdgeInsets.all(8),
         itemCount: list.length,
         itemBuilder: (ctx, index) {
-          return Text(list[index], style: TextStyle(fontSize: 20, fontStyle: FontStyle.italic),);
+          return Text(
+            list[index],
+            style: TextStyle(fontSize: 20, fontStyle: FontStyle.italic),
+          );
         },
       ),
     );

@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:template/MovieListZoomIn.dart';
-import 'package:template/RecommendMovie.dart';
 
 const Color BOTTOM_BAR_COLOR = Colors.redAccent;
 
@@ -49,57 +48,12 @@ class _MovieScreenState extends State<MovieScreen> {
       appBar: AppBar(
         backgroundColor: Colors.blue[900],
         title: Text('Avengers Endgame'),
-        actions: <Widget>[
-          IconButton(
-            onPressed: () {
-              //TODO
-            },
-            icon: Icon(Icons.menu),
-          ),
-        ],
       ),
 
       body: ListView(
         children: <Widget>[
           _getMoviePicture(context),
           _getMovieInfo(context),
-        ],
-      ), //TODO
-
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        iconSize: 30.0,
-        selectedFontSize: 0.0,
-        backgroundColor: BOTTOM_BAR_COLOR,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.white,
-        currentIndex: currentindex,
-        onTap: (index) {
-          setState(() {
-            currentindex = index;
-          });
-        },
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              backgroundColor: BOTTOM_BAR_COLOR,
-              title: Text('')),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.search),
-              backgroundColor: BOTTOM_BAR_COLOR,
-              title: Text('')),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.add_box),
-              backgroundColor: BOTTOM_BAR_COLOR,
-              title: Text('')),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.favorite),
-              backgroundColor: BOTTOM_BAR_COLOR,
-              title: Text('')),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              backgroundColor: BOTTOM_BAR_COLOR,
-              title: Text('')),
         ],
       ),
     );

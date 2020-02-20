@@ -28,14 +28,6 @@ class _CheckRecomendationsState extends State<CheckRecomendations> {
         appBar: AppBar(
           backgroundColor: Colors.blue[900],
           title: Text('Check Recommendations'),
-          actions: <Widget>[
-            IconButton(
-              onPressed: () {
-                //TODO
-              },
-              icon: Icon(Icons.menu),
-            ),
-          ],
         ),
 
         body: ListView.builder(
@@ -54,17 +46,19 @@ class _CheckRecomendationsState extends State<CheckRecomendations> {
                     height: MediaQuery.of(context).size.width / 1.5,
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: AssetImage(movies[index].profilePic),
-                        fit: BoxFit.fitWidth
-                      ),
+                          image: AssetImage(movies[index].profilePic),
+                          fit: BoxFit.fitWidth),
                     ),
                   ),
                   ListTile(
-                    title: Text("${movies[index].movieName}"),
-                    subtitle: Text("${movies[index].synopsis}"),
+                    title: Text("${_getShorterText(movies[index].movieName)}"),
+                    subtitle: Text(
+                      "${_getShorterText(movies[index].synopsis)}",
+                    ),
                     trailing: Icon(Icons.keyboard_arrow_right),
-                    onTap: (){
-                      Navigator.of(context).push(MaterialPageRoute(builder: (ctx){
+                    onTap: () {
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(builder: (ctx) {
                         return MovieScreen();
                       }));
                     },
@@ -114,6 +108,16 @@ class _CheckRecomendationsState extends State<CheckRecomendations> {
       ),
     );
   }
+
+  String _getShorterText(String text) {
+    String toReturn = text;
+    int maxLen = 45;
+    if (text.length >= maxLen) {
+      toReturn = toReturn.substring(0, maxLen);
+      toReturn += " ...";
+    }
+    return toReturn;
+  }
 }
 
 class Movie {
@@ -130,6 +134,7 @@ class Movie {
     this.genres,
     this.directors,
     this.actors,
-    this.synopsis = "This is a movie about endgames",
+    this.synopsis = "The avengers have lost to thanos and they have to "
+        "find a way to bring them back to life",
   });
 }
