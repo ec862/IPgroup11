@@ -88,46 +88,48 @@ class _HomepageState extends State<Homepage> {
           height: 1,
         ),
         Expanded(
-            child: Align(
-                alignment: Alignment.topCenter,
-                child: new ListView.builder(
-                  itemBuilder: (BuildContext context, int index) {
-                    return new Container(
-                      height: listSize,
-                      child: Card(
-                        child: ListTile(
-                          leading: Icon(
-                            Icons.movie,
-                            size: listSize / 1.75,
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: new ListView.builder(
+              itemBuilder: (BuildContext context, int index) {
+                return new Container(
+                  height: listSize,
+                  child: Card(
+                    child: ListTile(
+                      leading: Icon(
+                        Icons.movie,
+                        size: listSize / 1.75,
+                      ),
+                      title: Text(
+                        "Movie $index",
+                        style: TextStyle(fontSize: listSize / 3),
+                      ),
+                      subtitle: Text("Rec. by AAA BBB",
+                          style: TextStyle(fontSize: listSize / 6.25)),
+                      trailing: Container(
+                        child: Ink(
+                          decoration: const ShapeDecoration(
+                            color: Colors.lightGreenAccent,
+                            shape: CircleBorder(),
                           ),
-                          title: Text(
-                            "Movie $index",
-                            style: TextStyle(fontSize: listSize / 3),
-                          ),
-                          subtitle: Text("Rec. by AAA BBB",
-                              style: TextStyle(fontSize: listSize / 6.25)),
-                          trailing: Container(
-                            child: Ink(
-                              decoration: const ShapeDecoration(
-                                color: Colors.lightGreenAccent,
-                                shape: CircleBorder(),
-                              ),
-                              child: IconButton(
-                                icon: Icon(Icons.add),
-                                color: Colors.black,
-                                onPressed: () {
-                                  print("here$index");
-                                },
-                                iconSize: listSize / 2.5,
-                              ),
-                            ),
+                          child: IconButton(
+                            icon: Icon(Icons.add),
+                            color: Colors.black,
+                            onPressed: () {
+                              print("here$index");
+                            },
+                            iconSize: listSize / 2.5,
                           ),
                         ),
                       ),
-                    );
-                  },
-                  itemCount: 4,
-                )))
+                    ),
+                  ),
+                );
+              },
+              itemCount: 4,
+            ),
+          ),
+        )
       ],
     );
   }
