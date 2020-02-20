@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:template/BottomBar.dart';
 import 'editProfile.dart';
-import 'otherProfile.dart';
-
-const Color BOTTOM_BAR_COLOR = Colors.redAccent;
 
 class Profile extends StatefulWidget {
   @override
@@ -11,7 +8,6 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,13 +26,6 @@ class _ProfileState extends State<Profile> {
                 width: 110,
                 height: 140,
               ),
-              /*Container(
-                  color: Colors.red,
-                  child: CircleAvatar(
-                    radius: 70,
-                    backgroundImage: AssetImage(''),
-                  ),
-                ),*/
               CircleAvatar(
                 radius: 70,
                 backgroundImage: NetworkImage(
@@ -59,25 +48,6 @@ class _ProfileState extends State<Profile> {
                   },
                 ),
               ),
-
-              /*Container(
-                  width: 50,
-                  alignment: Alignment.topRight,
-                  child: FloatingActionButton(
-                    backgroundColor: Color.fromRGBO(0, 0, 0, 0.5),
-                    elevation: 0,
-                    onPressed: () => {},
-                    tooltip: 'Edit',
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-
-                        Text("Edit"),
-                      ],
-                    ),
-                    //label: Text('Approve'),
-                  ),
-                ),*/
             ],
           ),
           Row(
@@ -85,6 +55,33 @@ class _ProfileState extends State<Profile> {
             children: <Widget>[
               Text('Frank Davis',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          Row(
+            children: <Widget>[
+              Spacer(),
+              RaisedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/followers');
+                },
+                child: Center(
+                  child: Text(
+                    "Followers \n 22".toUpperCase(),
+                  ),
+                ),
+              ),
+              Spacer(),
+              RaisedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/followings');
+                },
+                child: Center(
+                  child: Text(
+                    "Following \n 103".toUpperCase(),
+                  ),
+                ),
+              ),
+              Spacer()
             ],
           ),
           Row(
