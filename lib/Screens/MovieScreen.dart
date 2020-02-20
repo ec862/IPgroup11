@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:template/MovieListZoomIn.dart';
+import 'package:template/Screens/MovieListZoomIn.dart';
 
 import 'RecommendMovie.dart';
 
@@ -51,7 +51,6 @@ class _MovieScreenState extends State<MovieScreen> {
         backgroundColor: Colors.blue[900],
         title: Text('Avengers Endgame'),
       ),
-
       body: ListView(
         children: <Widget>[
           _getMoviePicture(context),
@@ -126,22 +125,30 @@ class _MovieScreenState extends State<MovieScreen> {
             );
           }));
         }),
-        _movieInfoContent("Actors", actorsString, onPress: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-            return MovieListZoomIn(
-              movieName: "Avengers",
-              list: actors,
-            );
-          }));
-        }),
-        _movieInfoContent("Synopsis", _getShorterText(synopsis), onPress: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-            return MovieListZoomIn(
-              movieName: "Avengers",
-              list: [synopsis],
-            );
-          }));
-        }),
+        _movieInfoContent(
+          "Actors",
+          actorsString,
+          onPress: () {
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+              return MovieListZoomIn(
+                movieName: "Avengers",
+                list: actors,
+              );
+            }));
+          },
+        ),
+        _movieInfoContent(
+          "Synopsis",
+          _getShorterText(synopsis),
+          onPress: () {
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+              return MovieListZoomIn(
+                movieName: "Avengers",
+                list: [synopsis],
+              );
+            }));
+          },
+        ),
         _stars(4),
       ],
     );

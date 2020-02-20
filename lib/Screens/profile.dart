@@ -1,25 +1,24 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:template/CustomView/BottomBar.dart';
+import 'editProfile.dart';
 
-const Color BOTTOM_BAR_COLOR = Colors.redAccent;
-
-class EditProfile extends StatefulWidget {
+class Profile extends StatefulWidget {
   @override
-  _EditProfileState createState() => _EditProfileState();
+  _ProfileState createState() => _ProfileState();
 }
 
-class _EditProfileState extends State<EditProfile> {
-  int currentindex = 0; // home = 0
-  var currentSelectedValue = 'Male';
-  var currentSelectedValueCat = 'Action';
-
+class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue[900],
-        title: Text('Edit Profile'),
+        title: Text('Profile'),
       ),
-      body: ListView(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -28,39 +27,10 @@ class _EditProfileState extends State<EditProfile> {
                 width: 110,
                 height: 140,
               ),
-              /*Container(
-                  color: Colors.red,
-                  child: CircleAvatar(
-                    radius: 70,
-                    backgroundImage: AssetImage(''),
-                  ),
-                ),*/
-              Stack(
-                children: <Widget>[
-                  Container(
-                    child: CircleAvatar(
-                      radius: 70,
-                      backgroundImage: NetworkImage(
-                          'https://images.unsplash.com/photo-1501549538842-2f24e2dd6520?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80'),
-                    ),
-                  ),
-                  Container(
-                    width: 50,
-                    child: FloatingActionButton(
-                      backgroundColor: Color.fromRGBO(0, 0, 0, 0.5),
-                      elevation: 0,
-                      onPressed: () => {},
-                      tooltip: 'Edit',
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Text("Edit"),
-                        ],
-                      ),
-                      //label: Text('Approve'),
-                    ),
-                  ),
-                ],
+              CircleAvatar(
+                radius: 70,
+                backgroundImage: NetworkImage(
+                    'https://images.unsplash.com/photo-1501549538842-2f24e2dd6520?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80'),
               ),
               Container(
                 width: 110,
@@ -68,38 +38,53 @@ class _EditProfileState extends State<EditProfile> {
                 alignment: Alignment.topRight,
                 child: IconButton(
                   icon: Icon(
-                    Icons.save,
+                    Icons.edit,
                   ),
-                  //elevation: 0,
                   onPressed: () {
-                    Navigator.pop(context);
+                    //Navigator.of(context).push(MaterialPageRoute(builder: (context) => EditProfile()),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => EditProfile()),
+                    );
                   },
                 ),
-
-                /*Icon(
-                    Icons.edit,
-                    size: 30,
-                  ),*/
               ),
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              //Text('Frank Davis', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              Flexible(
-                child: Container(
-                  width: 120,
-                  child: new TextField(
+              Text('Frank Davis',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          Row(
+            children: <Widget>[
+              Spacer(),
+              RaisedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/followers');
+                },
+                child: Center(
+                  child: Text(
+                    "Followers \n22".toUpperCase(),
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 18.0, height: 1.0, color: Colors.black),
-                    decoration: InputDecoration(
-                      hintText: 'Frank Davis',
-                    ),
                   ),
                 ),
               ),
+              Spacer(),
+              RaisedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/followings');
+                },
+                child: Center(
+                  child: Text(
+                    "Following \n103".toUpperCase(),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+              Spacer()
             ],
           ),
           Row(
@@ -113,22 +98,12 @@ class _EditProfileState extends State<EditProfile> {
                         fontWeight: FontWeight.bold,
                         color: Colors.grey[600])),
               ),
-              /*Container(
-                  width: 120,
-                  child: Text('Joker', textAlign: TextAlign.left, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                ),*/
-
               Container(
                 width: 120,
-                child: new TextField(
-                  //textAlign: TextAlign.center,
-                  style:
-                      TextStyle(fontSize: 18.0, height: 0, color: Colors.black),
-
-                  decoration: InputDecoration(
-                    hintText: 'Joker',
-                  ),
-                ),
+                child: Text('Joker',
+                    textAlign: TextAlign.left,
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -145,36 +120,11 @@ class _EditProfileState extends State<EditProfile> {
               ),
               Container(
                 width: 120,
-                child: DropdownButton<String>(
-                  value: currentSelectedValueCat,
-                  onChanged: (newVal) {
-                    setState(
-                      () {
-                        print(newVal);
-                        currentSelectedValueCat = newVal;
-                      },
-                    );
-                  },
-                  items: <String>[
-                    'Action',
-                    'Comedy',
-                    'Thriller',
-                    'Horror',
-                    'Family'
-                  ].map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-                //width: 120,
-                //child: Text('Male', textAlign: TextAlign.left, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                child: Text('Thriller',
+                    textAlign: TextAlign.left,
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
-              /*Container(
-                  width: 120,
-                  child: Text('Thriller', textAlign: TextAlign.left, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                ),*/
             ],
           ),
           Row(
@@ -210,10 +160,25 @@ class _EditProfileState extends State<EditProfile> {
               ),
               Container(
                 width: 120,
-                child: Text('10',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                child: Row(
+                  children: <Widget>[
+                    Text('10',
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    //Align
+
+                    SizedBox(
+                      height: 22.0,
+                      width: 22.0,
+                      child: new IconButton(
+                        padding: new EdgeInsets.all(0.0),
+                        icon: new Icon(Icons.arrow_forward_ios, size: 16.0),
+                        onPressed: () {},
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -270,26 +235,10 @@ class _EditProfileState extends State<EditProfile> {
               ),
               Container(
                 width: 120,
-                child: DropdownButton<String>(
-                  value: currentSelectedValue,
-                  onChanged: (newVal) {
-                    setState(
-                      () {
-                        print(newVal);
-                        currentSelectedValue = newVal;
-                      },
-                    );
-                  },
-                  items: <String>['Male', 'Female', 'Other', 'Not say']
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-                //width: 120,
-                //child: Text('Male', textAlign: TextAlign.left, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                child: Text('Male',
+                    textAlign: TextAlign.left,
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -315,6 +264,7 @@ class _EditProfileState extends State<EditProfile> {
           ),
         ],
       ),
+      bottomNavigationBar: BottomBar().createBar(context, 4),
     );
   }
 }

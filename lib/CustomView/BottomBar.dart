@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:template/main.dart';
+import 'package:template/Screens/main.dart';
 
 const Color BOTTOM_BAR_COLOR = Colors.redAccent;
 

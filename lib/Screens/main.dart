@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:template/CheckRecomendations.dart';
-import 'package:template/MovieScreen.dart';
-import 'package:template/RecommendMovie.dart';
-import 'package:template/followers.dart';
-import 'package:template/homepage.dart';
-import 'package:template/profile.dart';
-import 'package:template/searchpage.dart';
-import 'package:template/watchlist.dart';
+import 'package:template/Screens/CheckRecomendations.dart';
+import 'package:template/Screens/MovieScreen.dart';
+import 'package:template/Screens/followers.dart';
+import 'package:template/Screens/homepage.dart';
+import 'package:template/Screens/profile.dart';
+import 'package:template/Screens/searchpage.dart';
+import 'package:template/Screens/watchlist.dart';
 
 void main() => runApp(App());
 
@@ -24,14 +23,20 @@ class App extends StatelessWidget {
         Routes.bottomRoutes[3]: (BuildContext context) => new WatchList(),
         Routes.bottomRoutes[4]: (BuildContext context) => new Profile(),
         '/friendsearchpage': (BuildContext context) => new FriendSearchPage(),
-        '/moviepage' : (BuildContext context) => new MovieScreen(),
-        '/followers' : (BuildContext context) => new Followers(index: 0,),
-        '/followings' : (BuildContext context) => new Followers(index: 1,),
+        '/moviepage': (BuildContext context) => new MovieScreen(),
+        '/followers': (BuildContext context) => new Followers(index: 0),
+        '/followings': (BuildContext context) => new Followers(index: 1),
       },
     );
   }
 }
 
 class Routes {
-  static final bottomRoutes = ['/', '/moviesearchpage', '/checkrecomendations', '/watchlist', '/profile'];
+  static final bottomRoutes = [
+    '/',
+    '/moviesearchpage',
+    '/checkrecomendations',
+    '/watchlist',
+    '/profile'
+  ];
 }

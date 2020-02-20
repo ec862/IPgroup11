@@ -1,6 +1,6 @@
 import 'dart:collection';
 import 'package:flutter/material.dart';
-import 'package:template/BottomBar.dart';
+import 'package:template/CustomView/BottomBar.dart';
 
 final friendList = [
   "Elon Musk",
@@ -103,18 +103,6 @@ class MovieSearchPage extends StatefulWidget {
   _MovieSearchPageState createState() => _MovieSearchPageState();
 }
 
-class FriendSearchPage extends StatefulWidget {
-  final String title = "Friend Search Page";
-  final String otherPage = '/moviesearchpage';
-  final Icon otherIcon = Icon(Icons.movie);
-  final Icon icon = Icon(Icons.people);
-  HashSet<String> elementSet = friendHistorySet;
-  final List<String> elementList = friendList;
-
-  @override
-  _FriendSearchPageState createState() => _FriendSearchPageState();
-}
-
 class _MovieSearchPageState extends State<MovieSearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
@@ -123,14 +111,18 @@ class _MovieSearchPageState extends State<MovieSearchPage> {
         title: Text(widget.title),
         actions: <Widget>[
           IconButton(
-              icon: Icon(Icons.search),
-              onPressed: () {
-                showSearch(
-                  context: context,
-                  delegate: CustomSearchDelegate(
-                      widget.elementList, widget.icon, widget.elementSet),
-                );
-              }),
+            icon: Icon(Icons.search),
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: CustomSearchDelegate(
+                  widget.elementList,
+                  widget.icon,
+                  widget.elementSet,
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: widget.otherIcon,
             onPressed: () {
@@ -142,6 +134,18 @@ class _MovieSearchPageState extends State<MovieSearchPage> {
       bottomNavigationBar: BottomBar().createBar(context, 1),
     );
   }
+}
+
+class FriendSearchPage extends StatefulWidget {
+  final String title = "Friend Search Page";
+  final String otherPage = '/moviesearchpage';
+  final Icon otherIcon = Icon(Icons.movie);
+  final Icon icon = Icon(Icons.people);
+  HashSet<String> elementSet = friendHistorySet;
+  final List<String> elementList = friendList;
+
+  @override
+  _FriendSearchPageState createState() => _FriendSearchPageState();
 }
 
 class _FriendSearchPageState extends State<FriendSearchPage> {
@@ -157,7 +161,10 @@ class _FriendSearchPageState extends State<FriendSearchPage> {
                 showSearch(
                   context: context,
                   delegate: CustomSearchDelegate(
-                      widget.elementList, widget.icon, widget.elementSet),
+                    widget.elementList,
+                    widget.icon,
+                    widget.elementSet,
+                  ),
                 );
               }),
           IconButton(
@@ -215,9 +222,11 @@ class CustomSearchDelegate extends SearchDelegate<String> {
     }
     suggestionList = query.isEmpty
         ? searchHistorySet.toList()
-        : ((queryClicked) ? tempList : elementList
-        .where((m) => m.toLowerCase().startsWith(query.toLowerCase()))
-        .toList());
+        : ((queryClicked)
+            ? tempList
+            : elementList
+                .where((m) => m.toLowerCase().startsWith(query.toLowerCase()))
+                .toList());
 
     if (suggestionList.length > 1) {
       return ListView.builder(
@@ -244,8 +253,8 @@ class CustomSearchDelegate extends SearchDelegate<String> {
     suggestionList = query.isEmpty
         ? searchHistorySet.toList()
         : elementList
-        .where((m) => m.toLowerCase().startsWith(query.toLowerCase()))
-        .toList();
+            .where((m) => m.toLowerCase().startsWith(query.toLowerCase()))
+            .toList();
 
     return ListView.builder(
       itemBuilder: (context, index) => ListTile(
@@ -267,14 +276,16 @@ class TestingPage {
   static Center createPage(String title) {
     return Center(
       child: Container(
-          height: 300,
-          width: 300,
-          color: Colors.orange,
-          child: Center(
-              child: Text(
+        height: 300,
+        width: 300,
+        color: Colors.orange,
+        child: Center(
+          child: Text(
             title,
             style: TextStyle(fontSize: 30),
-          ))),
+          ),
+        ),
+      ),
     );
   }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:template/BottomBar.dart';
+import 'package:template/CustomView/BottomBar.dart';
 
 import 'main.dart';
 
