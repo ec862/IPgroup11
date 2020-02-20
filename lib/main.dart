@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:template/CheckRecomendations.dart';
+import 'package:template/RecommendMovie.dart';
 import 'package:template/homepage.dart';
 import 'package:template/searchpage.dart';
 
@@ -14,6 +16,7 @@ class App extends StatelessWidget {
       routes: <String, WidgetBuilder>{
         Routes.bottomRoutes[0]: (BuildContext context) => new Homepage(),
         Routes.bottomRoutes[1]: (BuildContext context) => new MovieSearchPage(),
+        Routes.bottomRoutes[2]: (BuildContext context) => new CheckRecomendations(),
         '/friendsearchpage': (BuildContext context) => new FriendSearchPage(),
       },
     );
@@ -21,5 +24,5 @@ class App extends StatelessWidget {
 }
 
 class Routes {
-  static final bottomRoutes = ['/', '/moviesearchpage'];
+  static final bottomRoutes = ['/', '/moviesearchpage', '/checkrecomendations'];
 }

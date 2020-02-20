@@ -1,36 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:template/BottomBar.dart';
 
+import 'main.dart';
+
 class Homepage extends StatefulWidget {
   @override
   _HomepageState createState() => _HomepageState();
 }
 
 class _HomepageState extends State<Homepage> {
-
   @override
   Widget build(BuildContext context) {
-    final double headPadding = MediaQuery
-        .of(context)
-        .size
-        .height / 28;
-    final double listSize = MediaQuery
-        .of(context)
-        .size
-        .height / 8.1;
+    final double headPadding = MediaQuery.of(context).size.height / 28;
+    final double listSize = MediaQuery.of(context).size.height / 8.1;
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue[900],
         title: Text('Home Page'),
-        actions: <Widget>[
-          IconButton(
-            onPressed: () {
-              //TODO
-            },
-            icon: Icon(Icons.menu),
-          ),
-        ],
       ),
 
       //*******START OF NON-TEMPLATE***************
@@ -52,14 +39,18 @@ class _HomepageState extends State<Homepage> {
             children: <Widget>[
               RaisedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/moviesearchpage');
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    Routes.bottomRoutes[1],
+                    ModalRoute.withName('/'),
+                  );
                 },
                 splashColor: Colors.deepOrangeAccent,
                 child: Container(
                     child: Text(
-                      "Recommend New Movie",
-                      style: TextStyle(fontSize: 25),
-                    )),
+                  "Recommend New Movie",
+                  style: TextStyle(fontSize: 25),
+                )),
                 shape: RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(8)),
               ),
@@ -67,7 +58,13 @@ class _HomepageState extends State<Homepage> {
                 height: 20,
               ),
               RaisedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      Routes.bottomRoutes[2],
+                      ModalRoute.withName('/'),
+                    );
+                  },
                   splashColor: Colors.deepOrangeAccent,
                   child: Text(
                     "See All Friend Recomendations",
@@ -96,36 +93,38 @@ class _HomepageState extends State<Homepage> {
                 child: new ListView.builder(
                   itemBuilder: (BuildContext context, int index) {
                     return new Container(
-                        height: listSize,
-                        child: Card(
-                            child: ListTile(
-                                leading: Icon(
-                                  Icons.movie,
-                                  size: listSize / 1.75,
-                                ),
-                                title: Text(
-                                  "Movie $index",
-                                  style: TextStyle(fontSize: listSize / 3),
-                                ),
-                                subtitle: Text("Rec. by AAA BBB",
-                                    style:
-                                    TextStyle(fontSize: listSize / 6.25)),
-                                trailing: Container(
-                                  child: Ink(
-                                    decoration: const ShapeDecoration(
-                                      color: Colors.lightGreenAccent,
-                                      shape: CircleBorder(),
-                                    ),
-                                    child: IconButton(
-                                      icon: Icon(Icons.add),
-                                      color: Colors.black,
-                                      onPressed: () {
-                                        print("here$index");
-                                      },
-                                      iconSize: listSize / 2.5,
-                                    ),
-                                  ),
-                                ))));
+                      height: listSize,
+                      child: Card(
+                        child: ListTile(
+                          leading: Icon(
+                            Icons.movie,
+                            size: listSize / 1.75,
+                          ),
+                          title: Text(
+                            "Movie $index",
+                            style: TextStyle(fontSize: listSize / 3),
+                          ),
+                          subtitle: Text("Rec. by AAA BBB",
+                              style: TextStyle(fontSize: listSize / 6.25)),
+                          trailing: Container(
+                            child: Ink(
+                              decoration: const ShapeDecoration(
+                                color: Colors.lightGreenAccent,
+                                shape: CircleBorder(),
+                              ),
+                              child: IconButton(
+                                icon: Icon(Icons.add),
+                                color: Colors.black,
+                                onPressed: () {
+                                  print("here$index");
+                                },
+                                iconSize: listSize / 2.5,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
                   },
                   itemCount: 4,
                 )))

@@ -19,30 +19,39 @@ class BottomBar {
       currentIndex: currentindex,
       onTap: (index) {
         if (index != currentIndex && index < Routes.bottomRoutes.length) {
-          Navigator.pushNamed(context, Routes.bottomRoutes[index]);
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            Routes.bottomRoutes[index],
+            ModalRoute.withName('/'),
+          );
         }
       },
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            backgroundColor: BOTTOM_BAR_COLOR,
-            title: Text('')),
+          icon: Icon(Icons.home),
+          backgroundColor: BOTTOM_BAR_COLOR,
+          title: Text(''),
+        ),
         BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            backgroundColor: BOTTOM_BAR_COLOR,
-            title: Text('')),
+          icon: Icon(Icons.search),
+          backgroundColor: BOTTOM_BAR_COLOR,
+          title: Text(''),
+        ),
         BottomNavigationBarItem(
-            icon: Icon(Icons.local_movies),
-            backgroundColor: BOTTOM_BAR_COLOR,
-            title: Text('')),
+          icon: Icon(Icons.movie_filter),
+          backgroundColor: BOTTOM_BAR_COLOR,
+          title: Text(''),
+        ),
         BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            backgroundColor: BOTTOM_BAR_COLOR,
-            title: Text('')),
+          icon: Icon(Icons.local_movies),
+          backgroundColor: BOTTOM_BAR_COLOR,
+          title: Text(''),
+        ),
         BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            backgroundColor: BOTTOM_BAR_COLOR,
-            title: Text('')),
+          icon: Icon(Icons.person),
+          backgroundColor: BOTTOM_BAR_COLOR,
+          title: Text(''),
+        ),
       ],
     );
   }

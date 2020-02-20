@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:template/MovieScreen.dart';
 
+import 'BottomBar.dart';
+
 const Color BOTTOM_BAR_COLOR = Colors.redAccent;
 
 class CheckRecomendations extends StatefulWidget {
@@ -23,89 +25,50 @@ class _CheckRecomendationsState extends State<CheckRecomendations> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.blue[900],
-          title: Text('Check Recommendations'),
-        ),
-
-        body: ListView.builder(
-          physics: BouncingScrollPhysics(),
-          itemCount: movies.length,
-          itemBuilder: (ctx, index) {
-            return Card(
-              margin: EdgeInsets.all(8),
-              elevation: 10,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.width / 1.5,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage(movies[index].profilePic),
-                          fit: BoxFit.fitWidth),
-                    ),
-                  ),
-                  ListTile(
-                    title: Text("${_getShorterText(movies[index].movieName)}"),
-                    subtitle: Text(
-                      "${_getShorterText(movies[index].synopsis)}",
-                    ),
-                    trailing: Icon(Icons.keyboard_arrow_right),
-                    onTap: () {
-                      Navigator.of(context)
-                          .push(MaterialPageRoute(builder: (ctx) {
-                        return MovieScreen();
-                      }));
-                    },
-                  ),
-                ],
-              ),
-            );
-          },
-        ), //TODO
-
-        bottomNavigationBar: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          iconSize: 30.0,
-          selectedFontSize: 0.0,
-          backgroundColor: BOTTOM_BAR_COLOR,
-          selectedItemColor: Colors.black,
-          unselectedItemColor: Colors.white,
-          currentIndex: currentindex,
-          onTap: (index) {
-            setState(() {
-              currentindex = index;
-            });
-          },
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                backgroundColor: BOTTOM_BAR_COLOR,
-                title: Text('')),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.search),
-                backgroundColor: BOTTOM_BAR_COLOR,
-                title: Text('')),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.add_box),
-                backgroundColor: BOTTOM_BAR_COLOR,
-                title: Text('')),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.favorite),
-                backgroundColor: BOTTOM_BAR_COLOR,
-                title: Text('')),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.person),
-                backgroundColor: BOTTOM_BAR_COLOR,
-                title: Text('')),
-          ],
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.blue[900],
+        title: Text('Check Recommendations'),
       ),
+      body: ListView.builder(
+        physics: BouncingScrollPhysics(),
+        itemCount: movies.length,
+        itemBuilder: (ctx, index) {
+          return Card(
+            margin: EdgeInsets.all(8),
+            elevation: 10,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.width / 1.5,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage(movies[index].profilePic),
+                        fit: BoxFit.fitWidth),
+                  ),
+                ),
+                ListTile(
+                  title: Text("${_getShorterText(movies[index].movieName)}"),
+                  subtitle: Text(
+                    "${_getShorterText(movies[index].synopsis)}",
+                  ),
+                  trailing: Icon(Icons.keyboard_arrow_right),
+                  onTap: () {
+                    Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (ctx) {
+                      return MovieScreen();
+                    }));
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+      bottomNavigationBar: BottomBar().createBar(context, 2),
     );
   }
 

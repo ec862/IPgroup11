@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:template/MovieListZoomIn.dart';
 
+import 'RecommendMovie.dart';
+
 const Color BOTTOM_BAR_COLOR = Colors.redAccent;
 
 class MovieScreen extends StatefulWidget {
