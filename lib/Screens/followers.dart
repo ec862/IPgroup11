@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import '../CustomView/followers_card.dart';
 
 class Followers extends StatefulWidget {
@@ -72,8 +73,7 @@ class _FollowersState extends State<Followers> {
                     viewProfile: () {}, name: "Nina Lowery", friend: false),
                 FollowersCard(
                     viewProfile: () {},
-                    name: "Daniele Frederick",
-                    friend: false),
+                    name: "Daniele Frederick", friend: false),
                 FollowersCard(
                     viewProfile: () {}, name: "Bridget Dotson", friend: false),
               ],
