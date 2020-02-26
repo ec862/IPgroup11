@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:smooth_star_rating/smooth_star_rating.dart';
+import 'package:template/CustomView/ExpandableText.dart';
+import 'package:template/CustomView/comment_view.dart';
 import 'package:template/Screens/MovieListZoomIn.dart';
 
 import 'RecommendMovie.dart';
@@ -42,20 +45,62 @@ class _MovieScreenState extends State<MovieScreen> {
     rating = 5;
   }
 
-  int currentindex = 0; // home = 0
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue[900],
-        title: Text('Avengers Endgame'),
-      ),
-      body: ListView(
-        children: <Widget>[
-          _getMoviePicture(context),
-          _getMovieInfo(context),
+      body: CustomScrollView(
+        physics: BouncingScrollPhysics(),
+        slivers: <Widget>[
+          SliverAppBar(
+            expandedHeight: 200,
+            floating: true,
+            pinned: true,
+            flexibleSpace: FlexibleSpaceBar(
+              title: Text("Avengers Endgame"),
+              background: _getMoviePicture(context),
+            ),
+          ),
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "Movie Details",
+                    style: TextStyle(fontSize: 25),
+                  ),
+                ),
+                _getMovieInfo(context),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "Friend Ratings",
+                    style: TextStyle(fontSize: 25),
+                  ),
+                ),
+                _getFriendRatings(),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(30, 5, 8, 5),
+                  child: InkWell(
+                    onTap: (){},
+                    child: Text(
+                      "Load More",
+                      style: TextStyle(color: Colors.blue),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return SelectOption();
+          }));
+        },
+        child: Icon(Icons.arrow_forward),
       ),
     );
   }
@@ -65,39 +110,18 @@ class _MovieScreenState extends State<MovieScreen> {
       children: <Widget>[
         Container(
           width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.width / 2,
+          height: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
             image: DecorationImage(
               image: AssetImage("asserts/no_picture.jpg"),
-              fit: BoxFit.fill,
+              fit: BoxFit.fitWidth,
             ),
           ),
         ),
         Positioned(
           bottom: 0,
           right: 0,
-          child: IconButton(
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                return SelectOption();
-              }));
-            },
-            padding: EdgeInsets.all(0),
-            iconSize: 70,
-            icon: Icon(
-              Icons.brightness_1,
-              color: Colors.pinkAccent,
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 20,
-          right: 20,
-          child: Icon(
-            Icons.arrow_forward,
-            size: 30,
-            color: Colors.white,
-          ),
+          child: _stars(4),
         ),
       ],
     );
@@ -149,7 +173,6 @@ class _MovieScreenState extends State<MovieScreen> {
             }));
           },
         ),
-        _stars(4),
       ],
     );
   }
@@ -158,22 +181,24 @@ class _MovieScreenState extends State<MovieScreen> {
     return Card(
       child: ListTile(
         title: Text.rich(
-          TextSpan(children: [
-            TextSpan(
-              text: "$title: ",
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
+          TextSpan(
+            children: [
+              TextSpan(
+                text: "$title: ",
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            TextSpan(
-              text: subtitle,
-              style: TextStyle(
-                fontSize: 22,
-                fontStyle: FontStyle.italic,
+              TextSpan(
+                text: subtitle,
+                style: TextStyle(
+                  fontSize: 22,
+                  fontStyle: FontStyle.italic,
+                ),
               ),
-            ),
-          ]),
+            ],
+          ),
         ),
         trailing: Icon(Icons.keyboard_arrow_right),
         onTap: () {
@@ -183,21 +208,12 @@ class _MovieScreenState extends State<MovieScreen> {
     );
   }
 
-  Widget _stars(int rating) {
-    return SizedBox(
-      height: 50,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        shrinkWrap: true,
-        itemBuilder: (context, index) {
-          return Icon(
-            index > (rating - 1) ? Icons.star_border : Icons.star,
-            size: 50,
-            color: Colors.amberAccent,
-          );
-        },
-        itemCount: 5,
-      ),
+  Widget _stars(double rating) {
+    return SmoothStarRating(
+      starCount: 5,
+      rating: rating,
+      color: Colors.green,
+      borderColor: Colors.green,
     );
   }
 
@@ -222,6 +238,40 @@ class _MovieScreenState extends State<MovieScreen> {
       toReturn += ", ";
     }
     return toReturn;
+  }
+
+  Widget _getFriendRatings() {
+    return Column(
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: CommentView(
+            rating: 4,
+            image: "asserts/no_picture_avatar.jpg",
+            name: "Josh Radnor",
+            text: "I enjoyed this movie but was a bit dull at times",
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: CommentView(
+            rating: 4,
+            image: "asserts/no_picture_avatar.jpg",
+            name: "Josh Radnor",
+            text: "I enjoyed this movie but was a bit dull at times",
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: CommentView(
+            rating: 4,
+            image: "asserts/no_picture_avatar.jpg",
+            name: "Josh Radnor",
+            text: "I enjoyed this movie but was a bit dull at times",
+          ),
+        ),
+      ],
+    );
   }
 }
 

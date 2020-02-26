@@ -12,14 +12,13 @@ class CheckRecomendations extends StatefulWidget {
 }
 
 class _CheckRecomendationsState extends State<CheckRecomendations> {
-  int currentindex = 0; // home = 0
-  List<Movie> movies = [];
+  List<RecommendationInfo> movies = [];
 
   @override
   void initState() {
     super.initState();
     for (int i = 0; i < 5; i++) {
-      movies.add(Movie());
+      movies.add(RecommendationInfo());
     }
   }
 
@@ -53,7 +52,7 @@ class _CheckRecomendationsState extends State<CheckRecomendations> {
                 ListTile(
                   title: Text("${_getShorterText(movies[index].movieName)}"),
                   subtitle: Text(
-                    "${_getShorterText(movies[index].synopsis)}",
+                    "Recommended by: ${_getShorterText(movies[index].recBy)}".toUpperCase(),
                   ),
                   trailing: Icon(Icons.keyboard_arrow_right),
                   onTap: () {
@@ -75,6 +74,9 @@ class _CheckRecomendationsState extends State<CheckRecomendations> {
   String _getShorterText(String text) {
     String toReturn = text;
     int maxLen = 45;
+    if (text == null)
+      return "";
+
     if (text.length >= maxLen) {
       toReturn = toReturn.substring(0, maxLen);
       toReturn += " ...";
@@ -83,21 +85,14 @@ class _CheckRecomendationsState extends State<CheckRecomendations> {
   }
 }
 
-class Movie {
+class RecommendationInfo {
   String profilePic;
   String movieName;
-  List<dynamic> genres = [];
-  List<dynamic> directors = [];
-  List<dynamic> actors = [];
-  String synopsis;
+  String recBy;
 
-  Movie({
+  RecommendationInfo({
     this.profilePic = "asserts/AvengersPoster.jpg",
     this.movieName = "AVENGERS ENDGAME",
-    this.genres,
-    this.directors,
-    this.actors,
-    this.synopsis = "The avengers have lost to thanos and they have to "
-        "find a way to bring them back to life",
+    this.recBy = "Mike George",
   });
 }
