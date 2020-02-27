@@ -21,7 +21,7 @@ class BottomBar {
 
         // change when login stuff done
         if (index == 0){
-          Navigator.popUntil(context, ModalRoute.withName('/') );
+          Navigator.popUntil(context, ModalRoute.withName('/'));
           return;
         }
 
