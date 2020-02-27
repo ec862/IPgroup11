@@ -1,6 +1,8 @@
 import 'dart:collection';
+import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:template/CustomView/BottomBar.dart';
 
 final friendList = [
@@ -112,8 +114,8 @@ class _SearchPageState extends State<SearchPage> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.search),
-            onPressed: () {
-              showSearch(
+            onPressed: () async {
+              String queryJson = await showSearch(
                 context: context,
                 delegate: CustomSearchDelegate(
                   widget.movieElementList,
@@ -122,6 +124,15 @@ class _SearchPageState extends State<SearchPage> {
                   widget.friendElementSet,
                 ),
               );
+              SearchPageObject searchOb = SearchPageObject.fromJson(queryJson);
+
+              if (searchOb.isMovie) {
+                Navigator.pushNamed(context, '/moviepage');
+              }
+              else {
+                Navigator.pushNamed(context, '/profile');
+              }
+
             },
           ),
         ],
@@ -169,11 +180,6 @@ class CustomSearchDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) {
-    if (queryClickedFriend) {
-      return null; // GO TO FRIEND PROFILE
-    } else if (queryClickedMovie) {
-      return null; // GO TO MOVIE PAGE
-    }
 
     movieSuggestionList = query.isEmpty
         ? movieHistorySet.toList()
@@ -203,25 +209,28 @@ class CustomSearchDelegate extends SearchDelegate<String> {
             );
           }
           else if (index < 1 + msLength) {
+            SearchPageObject m = new SearchPageObject(
+                true, movieSuggestionList[index - 1]);
             return ListTile(
               leading: Icon(Icons.movie),
-              title: Text(movieSuggestionList[index - 1]),
+              title: Text(m.queryString),
               onTap: () {
-                query = movieSuggestionList[index - 1];
+                query = m.queryString;
                 movieHistorySet.add(query);
-                queryClickedMovie = true;
+                close(context, m.toJson());
               },
             );
           }
           else {
+            SearchPageObject p = new SearchPageObject(
+                true, friendSuggestionList[index - msLength - 2]);
             return ListTile(
                 leading: Icon(Icons.people),
-                title: Text(friendSuggestionList[index - msLength - 2]),
+                title: Text(p.queryString),
                 onTap: () {
-                  query = friendSuggestionList[index - msLength - 2];
+                  query = p.queryString;
                   friendHistorySet.add(query);
-                  showResults(context);
-                  queryClickedFriend = true;
+                  close(context, p.toJson());
                 });
           }
         },
@@ -248,9 +257,6 @@ class CustomSearchDelegate extends SearchDelegate<String> {
             .toList();
 
     int fsLength = friendSuggestionList.length;
-    print(msLength);
-    print(movieSuggestionList.toString());
-    print(friendSuggestionList.toString());
 
     return ListView.builder(
       itemBuilder: (context, index) {
@@ -275,30 +281,55 @@ class CustomSearchDelegate extends SearchDelegate<String> {
           );
         }
         else if (index < 1 + msLength) {
+          SearchPageObject m = new SearchPageObject(
+              true, movieSuggestionList[index - 1]);
+
           return ListTile(
             leading: Icon(Icons.movie),
-            title: Text(movieSuggestionList[index - 1]),
+            title: Text(m.queryString),
             onTap: () {
-              query = movieSuggestionList[index - 1];
+              query = m.queryString;
               movieHistorySet.add(query);
-              showResults(context);
-              queryClickedMovie = true;
+              close(context, m.toJson());
             },
           );
         }
         else {
+          SearchPageObject p = new SearchPageObject(
+              true, friendSuggestionList[index - msLength - 2]);
           return ListTile(
               leading: Icon(Icons.people),
-              title: Text(friendSuggestionList[index - msLength - 2]),
+              title: Text(p.queryString),
               onTap: () {
-                query = friendSuggestionList[index - msLength - 2];
+                query = p.queryString;
                 friendHistorySet.add(query);
-                showResults(context);
-                queryClickedFriend = true;
+                close(context, p.toString());
               });
         }
       },
       itemCount: 2 + msLength + fsLength,
     );
+  }
+}
+
+class SearchPageObject {
+  bool isMovie;
+  String queryString;
+
+  SearchPageObject(bool s, String queryS) {
+    isMovie = s;
+    queryString = queryS;
+  }
+
+  String toJson() {
+    return json.encode({
+      "isMovie": this.isMovie,
+      "querryString": this.queryString
+    });
+  }
+
+  static SearchPageObject fromJson(String maps) {
+    var result = json.decode(maps);
+    return SearchPageObject(result["isMovie"], result["querryString"]);
   }
 }
