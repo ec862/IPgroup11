@@ -2,7 +2,6 @@ import 'dart:collection';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:template/CustomView/BottomBar.dart';
 
 final friendList = [
@@ -128,11 +127,9 @@ class _SearchPageState extends State<SearchPage> {
 
               if (searchOb.isMovie) {
                 Navigator.pushNamed(context, '/moviepage');
-              }
-              else {
+              } else {
                 Navigator.pushNamed(context, '/profile');
               }
-
             },
           ),
         ],
@@ -180,69 +177,15 @@ class CustomSearchDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) {
-
-    movieSuggestionList = query.isEmpty
-        ? movieHistorySet.toList()
-        : movieElementList
-        .where((m) => m.toLowerCase().startsWith(query.toLowerCase()))
-        .toList();
-
-    friendSuggestionList = query.isEmpty
-        ? friendHistorySet.toList()
-        : friendElementList
-        .where((m) => m.toLowerCase().startsWith(query.toLowerCase()))
-        .toList();
-    int fsLength = friendSuggestionList.length;
-    int msLength = movieSuggestionList.length;
-
-    if (msLength + fsLength >= 1) {
-      return ListView.builder(
-        itemBuilder: (context, index) {
-          if (index == 0) {
-            return ListTile(
-              title: Text("Movies"),
-            );
-          }
-          else if (index == msLength + 1) {
-            return ListTile(
-              title: Text("People"),
-            );
-          }
-          else if (index < 1 + msLength) {
-            SearchPageObject m = new SearchPageObject(
-                true, movieSuggestionList[index - 1]);
-            return ListTile(
-              leading: Icon(Icons.movie),
-              title: Text(m.queryString),
-              onTap: () {
-                query = m.queryString;
-                movieHistorySet.add(query);
-                close(context, m.toJson());
-              },
-            );
-          }
-          else {
-            SearchPageObject p = new SearchPageObject(
-                true, friendSuggestionList[index - msLength - 2]);
-            return ListTile(
-                leading: Icon(Icons.people),
-                title: Text(p.queryString),
-                onTap: () {
-                  query = p.queryString;
-                  friendHistorySet.add(query);
-                  close(context, p.toJson());
-                });
-          }
-        },
-        itemCount: 2 + msLength + fsLength,
-      );
-    } else {
-      return ListTile(title: Text("No results", textAlign: TextAlign.center,),);
-    }
+    return createSearchScreen(context);
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
+    return createSearchScreen(context);
+  }
+
+  Widget createSearchScreen(BuildContext context) {
     movieSuggestionList = query.isEmpty
         ? movieHistorySet.toList()
         : movieElementList
@@ -253,83 +196,79 @@ class CustomSearchDelegate extends SearchDelegate<String> {
     friendSuggestionList = query.isEmpty
         ? friendHistorySet.toList()
         : friendElementList
-            .where((m) => m.toLowerCase().startsWith(query.toLowerCase()))
-            .toList();
+        .where((m) => m.toLowerCase().startsWith(query.toLowerCase()))
+        .toList();
 
     int fsLength = friendSuggestionList.length;
 
-    return ListView.builder(
-      itemBuilder: (context, index) {
-        if (msLength + fsLength == 0) {
-          if (index == 0) {
-            return ListTile(
-              title: Text("No results", textAlign: TextAlign.center,),);
-          }
-          else {
-            return null;
-          }
-        }
+    SearchPageObject o;
 
-        if (index == 0) {
+    if (msLength + fsLength >= 1) {
+      return ListView.builder(
+        itemBuilder: (context, index) {
+          if (index == 0 || index == msLength + 1) {
+            bool x = (index > 0) ? (fsLength > 0) : (msLength > 0);
+            return (x
+                ? ListTile(
+              title: Text(((index > 0) ? "People" : "Movies"),
+                  style: TextStyle(fontSize: 21)),
+            )
+                : SizedBox(
+              height: 1,
+            ));
+          } else if (index < 1 + msLength) {
+            o = new SearchPageObject(
+                true, movieSuggestionList[index - 1], Icon(Icons.movie));
+          } else {
+            o = new SearchPageObject(false,
+                friendSuggestionList[index - msLength - 2], Icon(Icons.people));
+          }
           return ListTile(
-            title: Text("Movies"),
-          );
-        }
-        else if (index == msLength + 1) {
-          return ListTile(
-            title: Text("People"),
-          );
-        }
-        else if (index < 1 + msLength) {
-          SearchPageObject m = new SearchPageObject(
-              true, movieSuggestionList[index - 1]);
-
-          return ListTile(
-            leading: Icon(Icons.movie),
-            title: Text(m.queryString),
-            onTap: () {
-              query = m.queryString;
-              movieHistorySet.add(query);
-              close(context, m.toJson());
-            },
-          );
-        }
-        else {
-          SearchPageObject p = new SearchPageObject(
-              true, friendSuggestionList[index - msLength - 2]);
-          return ListTile(
-              leading: Icon(Icons.people),
-              title: Text(p.queryString),
+              leading: o.icon,
+              title: Text(
+                o.queryString,
+                style: TextStyle(fontSize: 18),
+              ),
               onTap: () {
-                query = p.queryString;
-                friendHistorySet.add(query);
-                close(context, p.toString());
+                query = o.queryString;
+                (o.isMovie)
+                    ? movieHistorySet.add(query)
+                    : friendHistorySet.add(query);
+                close(context, o.toJson());
               });
-        }
-      },
-      itemCount: 2 + msLength + fsLength,
-    );
+        },
+        itemCount: 2 + msLength + fsLength,
+      );
+    } else {
+      return ListTile(
+        title: Text(
+          "No results",
+          textAlign: TextAlign.center,
+        ),
+      );
+    }
   }
 }
 
 class SearchPageObject {
   bool isMovie;
   String queryString;
+  Icon icon;
 
-  SearchPageObject(bool s, String queryS) {
+  SearchPageObject(bool s, String queryS, Icon i) {
     isMovie = s;
     queryString = queryS;
+    icon = i;
   }
 
   String toJson() {
-    return json.encode({
-      "isMovie": this.isMovie,
-      "querryString": this.queryString
-    });
+    return json
+        .encode({"isMovie": this.isMovie, "querryString": this.queryString});
   }
 
   static SearchPageObject fromJson(String maps) {
     var result = json.decode(maps);
-    return SearchPageObject(result["isMovie"], result["querryString"]);
+    return SearchPageObject(
+        result["isMovie"], result["querryString"], Icon(Icons.title));
   }
 }
