@@ -18,11 +18,10 @@ class App extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       routes: <String, WidgetBuilder>{
         Routes.bottomRoutes[0]: (BuildContext context) => new Homepage(),
-        Routes.bottomRoutes[1]: (BuildContext context) => new MovieSearchPage(),
+        Routes.bottomRoutes[1]: (BuildContext context) => new SearchPage(),
         Routes.bottomRoutes[2]: (BuildContext context) => new CheckRecomendations(),
         Routes.bottomRoutes[3]: (BuildContext context) => new WatchList(),
         Routes.bottomRoutes[4]: (BuildContext context) => new Profile(),
-        '/friendsearchpage': (BuildContext context) => new FriendSearchPage(),
         '/moviepage': (BuildContext context) => new MovieScreen(),
         '/followers': (BuildContext context) => new Followers(index: 0),
         '/followings': (BuildContext context) => new Followers(index: 1),
@@ -34,7 +33,7 @@ class App extends StatelessWidget {
 class Routes {
   static final bottomRoutes = [
     '/',
-    '/moviesearchpage',
+    '/searchpage',
     '/checkrecomendations',
     '/watchlist',
     '/profile'
