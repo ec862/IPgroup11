@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import '../CustomView/followers_card.dart';
+import '../../CustomView/followers_card.dart';
 
 class Followers extends StatefulWidget {
   final int index;

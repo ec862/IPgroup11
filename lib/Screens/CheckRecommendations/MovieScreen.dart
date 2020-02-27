@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:template/CustomView/ExpandableText.dart';
 import 'package:template/CustomView/comment_view.dart';
-import 'package:template/Screens/MovieListZoomIn.dart';
+import 'package:template/Screens/CheckRecommendations/MovieListZoomIn.dart';
 
 import 'RecommendMovie.dart';
 

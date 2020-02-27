@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:template/CustomView/BottomBar.dart';
-import '../CustomView/watch_card.dart';
+import '../../CustomView/watch_card.dart';
 
 const Color BOTTOM_BAR_COLOR = Colors.redAccent;
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:template/CustomView/BottomBar.dart';
 
-import 'main.dart';
+import '../main.dart';
 
 class Homepage extends StatefulWidget {
   @override
