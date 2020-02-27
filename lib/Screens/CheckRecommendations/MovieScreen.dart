@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
-import 'package:template/CustomView/ExpandableText.dart';
 import 'package:template/CustomView/comment_view.dart';
 import 'package:template/Screens/CheckRecommendations/MovieListZoomIn.dart';
 
@@ -52,6 +51,7 @@ class _MovieScreenState extends State<MovieScreen> {
         physics: BouncingScrollPhysics(),
         slivers: <Widget>[
           SliverAppBar(
+            backgroundColor: Colors.blue[900],
             expandedHeight: 200,
             floating: true,
             pinned: true,
@@ -101,6 +101,7 @@ class _MovieScreenState extends State<MovieScreen> {
           }));
         },
         child: Icon(Icons.arrow_forward),
+        backgroundColor: Colors.blue[900],
       ),
     );
   }

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:template/Screens/CheckRecomendations.dart';
-import 'package:template/Screens/MovieScreen.dart';
-import 'package:template/Screens/followers.dart';
-import 'package:template/Screens/homepage.dart';
-import 'package:template/Screens/profile.dart';
-import 'package:template/Screens/searchpage.dart';
-import 'package:template/Screens/watchlist.dart';
+import 'package:flutter_page_transition/flutter_page_transition.dart';
+import 'package:template/Screens/CheckRecommendations/CheckRecomendations.dart';
+import 'package:template/Screens/CheckRecommendations/MovieScreen.dart';
+import 'package:template/Screens/Home/homepage.dart';
+import 'package:template/Screens/Profile/followers.dart';
+import 'package:template/Screens/Profile/profile.dart';
+import 'package:template/Screens/SearchTab/searchpage.dart';
+import 'package:template/Screens/WatchList/watchlist.dart';
 
 void main() => runApp(App());
 
@@ -20,11 +21,11 @@ class App extends StatelessWidget {
             settings: routeSettings,
             pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
               switch (routeSettings.name){
-                case Routes.bottomRoutes[0] : return new Homepage();
-                case Routes.bottomRoutes[1]: return new MovieSearchPage();
-                case Routes.bottomRoutes[2]: return new CheckRecomendations();
-                case Routes.bottomRoutes[3]: return new WatchList();
-                case Routes.bottomRoutes[4]: return new Profile();
+                case '/' : return new Homepage();
+                case '/searchpage': return new SearchPage();
+                case '/checkrecomendations': return new CheckRecomendations();
+                case '/watchlist': return new WatchList();
+                case '/profile': return new Profile();
                 case '/moviepage': return new MovieScreen();
                 case '/followers': return new Followers(index: 0);
                 case '/followings': return new Followers(index: 1);
@@ -46,17 +47,6 @@ class App extends StatelessWidget {
         );
       },
       debugShowCheckedModeBanner: false,
-      routes: <String, WidgetBuilder>{
-        Routes.bottomRoutes[0]: (BuildContext context) => new Homepage(),
-        Routes.bottomRoutes[1]: (BuildContext context) => new MovieSearchPage(),
-        Routes.bottomRoutes[2]: (BuildContext context) => new CheckRecomendations(),
-        Routes.bottomRoutes[3]: (BuildContext context) => new WatchList(),
-        Routes.bottomRoutes[4]: (BuildContext context) => new Profile(),
-        '/friendsearchpage': (BuildContext context) => new FriendSearchPage(),
-        '/moviepage': (BuildContext context) => new MovieScreen(),
-        '/followers': (BuildContext context) => new Followers(index: 0),
-        '/followings': (BuildContext context) => new Followers(index: 1),
-      },
     );
   }
 }
@@ -70,3 +60,17 @@ class Routes {
     '/profile'
   ];
 }
+
+/*
+routes: <String, WidgetBuilder>{
+        Routes.bottomRoutes[0]: (BuildContext context) => new Homepage(),
+        Routes.bottomRoutes[1]: (BuildContext context) => new SearchPage(),
+        Routes.bottomRoutes[2]: (BuildContext context) => new CheckRecomendations(),
+        Routes.bottomRoutes[3]: (BuildContext context) => new WatchList(),
+        Routes.bottomRoutes[4]: (BuildContext context) => new Profile(),
+        '/friendsearchpage': (BuildContext context) => new FriendSearchPage(),
+        '/moviepage': (BuildContext context) => new MovieScreen(),
+        '/followers': (BuildContext context) => new Followers(index: 0),
+        '/followings': (BuildContext context) => new Followers(index: 1),
+      }
+ */
