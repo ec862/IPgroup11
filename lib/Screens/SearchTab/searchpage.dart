@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:template/CustomView/BottomBar.dart';
 
@@ -91,19 +92,18 @@ final movieList = [
 HashSet<String> friendHistorySet = new HashSet();
 HashSet<String> movieHistorySet = new HashSet();
 
-class MovieSearchPage extends StatefulWidget {
-  final String title = "Movie Search Page";
-  final String otherPage = '/friendsearchpage';
-  final Icon otherIcon = Icon(Icons.people);
-  final Icon icon = Icon(Icons.movie);
-  HashSet<String> elementSet = movieHistorySet;
-  final List<String> elementList = movieList;
+class SearchPage extends StatefulWidget {
+  final String title = "Search Page";
+  HashSet<String> movieElementSet = movieHistorySet;
+  final List<String> movieElementList = movieList;
+  HashSet<String> friendElementSet = friendHistorySet;
+  final List<String> friendElementList = friendList;
 
   @override
-  _MovieSearchPageState createState() => _MovieSearchPageState();
+  _SearchPageState createState() => _SearchPageState();
 }
 
-class _MovieSearchPageState extends State<MovieSearchPage> {
+class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -116,63 +116,14 @@ class _MovieSearchPageState extends State<MovieSearchPage> {
               showSearch(
                 context: context,
                 delegate: CustomSearchDelegate(
-                  widget.elementList,
-                  widget.icon,
-                  widget.elementSet,
+                  widget.movieElementList,
+                  widget.friendElementList,
+                  widget.movieElementSet,
+                  widget.friendElementSet,
                 ),
               );
             },
           ),
-          IconButton(
-            icon: widget.otherIcon,
-            onPressed: () {
-              Navigator.popAndPushNamed(context, widget.otherPage);
-            },
-          )
-        ],
-      ),
-      bottomNavigationBar: BottomBar().createBar(context, 1),
-    );
-  }
-}
-
-class FriendSearchPage extends StatefulWidget {
-  final String title = "Friend Search Page";
-  final String otherPage = '/moviesearchpage';
-  final Icon otherIcon = Icon(Icons.movie);
-  final Icon icon = Icon(Icons.people);
-  HashSet<String> elementSet = friendHistorySet;
-  final List<String> elementList = friendList;
-
-  @override
-  _FriendSearchPageState createState() => _FriendSearchPageState();
-}
-
-class _FriendSearchPageState extends State<FriendSearchPage> {
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue[900],
-        title: Text(widget.title),
-        actions: <Widget>[
-          IconButton(
-              icon: Icon(Icons.search),
-              onPressed: () {
-                showSearch(
-                  context: context,
-                  delegate: CustomSearchDelegate(
-                    widget.elementList,
-                    widget.icon,
-                    widget.elementSet,
-                  ),
-                );
-              }),
-          IconButton(
-            icon: widget.otherIcon,
-            onPressed: () {
-              Navigator.popAndPushNamed(context, widget.otherPage);
-            },
-          )
         ],
       ),
       bottomNavigationBar: BottomBar().createBar(context, 1),
@@ -181,14 +132,18 @@ class _FriendSearchPageState extends State<FriendSearchPage> {
 }
 
 class CustomSearchDelegate extends SearchDelegate<String> {
-  bool queryClicked = false;
+  bool queryClickedMovie = false;
+  bool queryClickedFriend = false;
 
-  List<String> suggestionList;
-  List<String> elementList;
-  Icon icon;
-  HashSet<String> searchHistorySet;
+  List<String> movieSuggestionList;
+  List<String> friendSuggestionList;
+  List<String> movieElementList;
+  HashSet<String> movieHistorySet;
+  List<String> friendElementList;
+  HashSet<String> friendHistorySet;
 
-  CustomSearchDelegate(this.elementList, this.icon, this.searchHistorySet);
+  CustomSearchDelegate(this.movieElementList, this.friendElementList,
+      this.movieHistorySet, this.friendHistorySet);
 
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -214,78 +169,136 @@ class CustomSearchDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) {
-    List<String> tempList = [];
-
-    if (queryClicked) {
-      tempList.add(query);
-      print("here");
+    if (queryClickedFriend) {
+      return null; // GO TO FRIEND PROFILE
+    } else if (queryClickedMovie) {
+      return null; // GO TO MOVIE PAGE
     }
-    suggestionList = query.isEmpty
-        ? searchHistorySet.toList()
-        : ((queryClicked)
-            ? tempList
-            : elementList
-                .where((m) => m.toLowerCase().startsWith(query.toLowerCase()))
-                .toList());
 
-    if (suggestionList.length > 1) {
+    movieSuggestionList = query.isEmpty
+        ? movieHistorySet.toList()
+        : movieElementList
+        .where((m) => m.toLowerCase().startsWith(query.toLowerCase()))
+        .toList();
+
+    friendSuggestionList = query.isEmpty
+        ? friendHistorySet.toList()
+        : friendElementList
+        .where((m) => m.toLowerCase().startsWith(query.toLowerCase()))
+        .toList();
+    int fsLength = friendSuggestionList.length;
+    int msLength = movieSuggestionList.length;
+
+    if (msLength + fsLength >= 1) {
       return ListView.builder(
-        itemBuilder: (context, index) => ListTile(
-          leading: icon,
-          title: Text(suggestionList[index]),
-          onTap: () {
-            query = suggestionList[index];
-            searchHistorySet.add(query);
-            queryClicked = true;
-          },
-        ),
-        itemCount: suggestionList.length,
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return ListTile(
+              title: Text("Movies"),
+            );
+          }
+          else if (index == msLength + 1) {
+            return ListTile(
+              title: Text("People"),
+            );
+          }
+          else if (index < 1 + msLength) {
+            return ListTile(
+              leading: Icon(Icons.movie),
+              title: Text(movieSuggestionList[index - 1]),
+              onTap: () {
+                query = movieSuggestionList[index - 1];
+                movieHistorySet.add(query);
+                queryClickedMovie = true;
+              },
+            );
+          }
+          else {
+            return ListTile(
+                leading: Icon(Icons.people),
+                title: Text(friendSuggestionList[index - msLength - 2]),
+                onTap: () {
+                  query = friendSuggestionList[index - msLength - 2];
+                  friendHistorySet.add(query);
+                  showResults(context);
+                  queryClickedFriend = true;
+                });
+          }
+        },
+        itemCount: 2 + msLength + fsLength,
       );
-    } else if (suggestionList.length == 1) {
-      return TestingPage.createPage(query);
     } else {
-      return TestingPage.createPage("No results");
+      return ListTile(title: Text("No results", textAlign: TextAlign.center,),);
     }
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    suggestionList = query.isEmpty
-        ? searchHistorySet.toList()
-        : elementList
+    movieSuggestionList = query.isEmpty
+        ? movieHistorySet.toList()
+        : movieElementList
+        .where((m) => m.toLowerCase().startsWith(query.toLowerCase()))
+        .toList();
+    int msLength = movieSuggestionList.length;
+
+    friendSuggestionList = query.isEmpty
+        ? friendHistorySet.toList()
+        : friendElementList
             .where((m) => m.toLowerCase().startsWith(query.toLowerCase()))
             .toList();
 
-    return ListView.builder(
-      itemBuilder: (context, index) => ListTile(
-        leading: icon,
-        title: Text(suggestionList[index]),
-        onTap: () {
-          query = suggestionList[index];
-          searchHistorySet.add(query);
-          showResults(context);
-          queryClicked = true;
-        },
-      ),
-      itemCount: suggestionList.length,
-    );
-  }
-}
+    int fsLength = friendSuggestionList.length;
+    print(msLength);
+    print(movieSuggestionList.toString());
+    print(friendSuggestionList.toString());
 
-class TestingPage {
-  static Center createPage(String title) {
-    return Center(
-      child: Container(
-        height: 300,
-        width: 300,
-        color: Colors.orange,
-        child: Center(
-          child: Text(
-            title,
-            style: TextStyle(fontSize: 30),
-          ),
-        ),
-      ),
+    return ListView.builder(
+      itemBuilder: (context, index) {
+        if (msLength + fsLength == 0) {
+          if (index == 0) {
+            return ListTile(
+              title: Text("No results", textAlign: TextAlign.center,),);
+          }
+          else {
+            return null;
+          }
+        }
+
+        if (index == 0) {
+          return ListTile(
+            title: Text("Movies"),
+          );
+        }
+        else if (index == msLength + 1) {
+          return ListTile(
+            title: Text("People"),
+          );
+        }
+        else if (index < 1 + msLength) {
+          return ListTile(
+            leading: Icon(Icons.movie),
+            title: Text(movieSuggestionList[index - 1]),
+            onTap: () {
+              query = movieSuggestionList[index - 1];
+              movieHistorySet.add(query);
+              showResults(context);
+              queryClickedMovie = true;
+            },
+          );
+        }
+        else {
+          return ListTile(
+              leading: Icon(Icons.people),
+              title: Text(friendSuggestionList[index - msLength - 2]),
+              onTap: () {
+                query = friendSuggestionList[index - msLength - 2];
+                friendHistorySet.add(query);
+                showResults(context);
+                queryClickedFriend = true;
+              });
+        }
+      },
+      itemCount: 2 + msLength + fsLength,
     );
   }
 }
