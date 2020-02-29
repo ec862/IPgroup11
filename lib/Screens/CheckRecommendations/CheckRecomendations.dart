@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:template/Models/Arguments.dart';
-import 'package:template/Screens/CheckRecommendations/MovieScreen.dart';
+import 'package:http/http.dart' as http;
+import 'package:template/Services/ImageServices.dart';
 
 import '../../CustomView/BottomBar.dart';
 
@@ -18,9 +21,13 @@ class _CheckRecomendationsState extends State<CheckRecomendations> {
   @override
   void initState() {
     super.initState();
-    for (int i = 0; i < 5; i++) {
-      movies.add(RecommendationInfo());
-    }
+    movies.add(RecommendationInfo());
+    movies.add(RecommendationInfo(id: "tt3896198"));
+    movies.add(RecommendationInfo(id: "tt5052448"));
+    movies.add(RecommendationInfo(id: "tt0848228"));
+    movies.add(RecommendationInfo(id: "tt0974015"));
+    movies.add(RecommendationInfo(id: "tt0369610"));
+    movies.add(RecommendationInfo(id: "tt4881806"));
   }
 
   @override
@@ -34,40 +41,64 @@ class _CheckRecomendationsState extends State<CheckRecomendations> {
         physics: BouncingScrollPhysics(),
         itemCount: movies.length,
         itemBuilder: (ctx, index) {
-          return Card(
-            margin: EdgeInsets.all(8),
-            elevation: 10,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.width / 1.5,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage(movies[index].profilePic),
-                      fit: BoxFit.fitWidth,
-                    ),
-                  ),
-                ),
-                ListTile(
-                  title: Text("${_getShorterText(movies[index].movieName)}"),
-                  subtitle: Text(
-                    "Recommended by: ${_getShorterText(movies[index].recBy)}"
-                        .toUpperCase(),
-                  ),
-                  trailing: Icon(Icons.keyboard_arrow_right),
-                  onTap: () {
-                    Navigator.pushNamed(context, '/moviepage', arguments: MovieScreenArguments());
-                  },
-                ),
-              ],
-            ),
-          );
+          return MovieContent(movies[index]);
         },
       ),
       bottomNavigationBar: BottomBar().createBar(context, 2),
+    );
+  }
+}
+
+class MovieContent extends StatefulWidget {
+  RecommendationInfo info;
+  MovieContent(this.info);
+  @override
+  _MovieContentState createState() => _MovieContentState();
+}
+
+class _MovieContentState extends State<MovieContent> {
+  bool dataRetrieved = false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (dataRetrieved != true)
+      getMovieDetails(widget.info.id);
+    return Card(
+      margin: EdgeInsets.all(8),
+      elevation: 10,
+      child: InkWell(
+        onTap: (){
+          Navigator.pushNamed(
+            context,
+            '/moviepage',
+            arguments: MovieScreenArguments(id: widget.info.id),
+          );
+        },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.width * 1,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: ImageServices.moviePoster(widget.info.profilePic),
+                  fit: BoxFit.fitWidth,
+                ),
+              ),
+            ),
+            ListTile(
+              title: Text("${_getShorterText(widget.info.movieName)}"),
+              subtitle: Text(
+                "Recommended by: ${_getShorterText(widget.info.recBy)}"
+                    .toUpperCase(),
+              ),
+              trailing: Icon(Icons.keyboard_arrow_right),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -82,16 +113,27 @@ class _CheckRecomendationsState extends State<CheckRecomendations> {
     }
     return toReturn;
   }
+
+  void getMovieDetails(String id) async{
+    dynamic response = await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
+    var data = json.decode(response.body);
+    widget.info.movieName = data["Title"];
+    widget.info.profilePic = data["Poster"];
+    print(widget.info.profilePic);
+    dataRetrieved = true;
+    setState(() {});
+  }
 }
 
 class RecommendationInfo {
   String profilePic;
   String movieName;
   String recBy;
+  String id;
 
-  RecommendationInfo({
-    this.profilePic = "asserts/AvengersPoster.jpg",
-    this.movieName = "AVENGERS ENDGAME",
-    this.recBy = "Mike George",
-  });
+  RecommendationInfo(
+      {this.profilePic = "Waiting...",
+      this.movieName = "Waiting...",
+      this.recBy = "Waiting...",
+      this.id = "tt4154796"});
 }

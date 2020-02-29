@@ -7,6 +7,7 @@ import 'package:template/CustomView/comment_view.dart';
 import 'package:template/Models/Arguments.dart';
 import 'package:template/Screens/CheckRecommendations/MovieListZoomIn.dart';
 import 'package:http/http.dart' as http;
+import 'package:template/Services/ImageServices.dart';
 
 import 'RecommendMovie.dart';
 
@@ -22,31 +23,21 @@ class _MovieScreenState extends State<MovieScreen> {
   List<String> actors = [];
   List<String> genres = [];
   String synopsis;
-  int rating;
+  double rating;
   MovieScreenArguments args;
   bool dataRetrieved = false;
   String name;
+  String profileUrl;
 
   @override
   void initState() {
     super.initState();
     name = "Loading...";
-    directors = ["Anthony Russo", "Joe Russo"];
-    actors = ["RDJ", "Chris Evans", "Chris Hemsworth", "Chris Prat"];
-    genres = ["Action", "Drama", "Romantic"];
-    synopsis = "Avengers: Endgame picks up after the events "
-        "of Avengers: Infinity War, which saw the Avengers "
-        "divided and defeated. Thanos won the day and used "
-        "the Infinity Stones to snap away half of all life "
-        "in the universe. Only the original Avengers - "
-        "Iron Man, Captain America, Thor, Hulk, Black Widow, "
-        "and Hawkeye remain, along with some key allies like "
-        "War Machine, Ant-Man, Rocket Raccoon, Nebula, and "
-        "Captain Marvel. Each of the survivors deals with the "
-        "fallout from Thanos' decimation in different ways, but "
-        "when an opportunity presents itself to potentially save "
-        "those who vanished, they all come together and set out to "
-        "defeat Thanos, once and for all.";
+    directors = [""];
+    actors = [""];
+    genres = [""];
+    synopsis = "";
+    profileUrl = "waiting..";
     rating = 5;
   }
 
@@ -62,7 +53,7 @@ class _MovieScreenState extends State<MovieScreen> {
         slivers: <Widget>[
           SliverAppBar(
             backgroundColor: Colors.blue[900],
-            expandedHeight: 200,
+            expandedHeight: 300,
             floating: true,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
@@ -124,7 +115,7 @@ class _MovieScreenState extends State<MovieScreen> {
           height: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage("asserts/no_picture.jpg"),
+              image: ImageServices.moviePoster(profileUrl),
               fit: BoxFit.fitWidth,
             ),
           ),
@@ -132,7 +123,7 @@ class _MovieScreenState extends State<MovieScreen> {
         Positioned(
           bottom: 0,
           right: 0,
-          child: _stars(4),
+          child: _stars(rating),
         ),
       ],
     );
@@ -294,6 +285,10 @@ class _MovieScreenState extends State<MovieScreen> {
     genres = data["Genre"].split(",");
     synopsis = data["Plot"];
     name = data["Title"];
+    profileUrl = data["Poster"];
+    rating = double.parse(data["imdbRating"]);
+    rating = rating/2;
+    print(rating);
     print(actors[0]);
     dataRetrieved = true;
     setState(() {});
