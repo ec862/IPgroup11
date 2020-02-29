@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:template/Models/Arguments.dart';
 import 'package:template/Screens/CheckRecommendations/MovieScreen.dart';
 
 import '../../CustomView/BottomBar.dart';
@@ -45,21 +46,20 @@ class _CheckRecomendationsState extends State<CheckRecomendations> {
                   height: MediaQuery.of(context).size.width / 1.5,
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                        image: AssetImage(movies[index].profilePic),
-                        fit: BoxFit.fitWidth),
+                      image: AssetImage(movies[index].profilePic),
+                      fit: BoxFit.fitWidth,
+                    ),
                   ),
                 ),
                 ListTile(
                   title: Text("${_getShorterText(movies[index].movieName)}"),
                   subtitle: Text(
-                    "Recommended by: ${_getShorterText(movies[index].recBy)}".toUpperCase(),
+                    "Recommended by: ${_getShorterText(movies[index].recBy)}"
+                        .toUpperCase(),
                   ),
                   trailing: Icon(Icons.keyboard_arrow_right),
                   onTap: () {
-                    Navigator.of(context)
-                        .push(MaterialPageRoute(builder: (ctx) {
-                      return MovieScreen();
-                    }));
+                    Navigator.pushNamed(context, '/moviepage', arguments: MovieScreenArguments());
                   },
                 ),
               ],
@@ -74,8 +74,7 @@ class _CheckRecomendationsState extends State<CheckRecomendations> {
   String _getShorterText(String text) {
     String toReturn = text;
     int maxLen = 45;
-    if (text == null)
-      return "";
+    if (text == null) return "";
 
     if (text.length >= maxLen) {
       toReturn = toReturn.substring(0, maxLen);

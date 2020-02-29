@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:template/CustomView/comment_view.dart';
+import 'package:template/Models/Arguments.dart';
 import 'package:template/Screens/CheckRecommendations/MovieListZoomIn.dart';
+import 'package:http/http.dart' as http;
 
 import 'RecommendMovie.dart';
 
@@ -14,17 +18,19 @@ class MovieScreen extends StatefulWidget {
 }
 
 class _MovieScreenState extends State<MovieScreen> {
-  String genre;
   List<String> directors = [];
   List<String> actors = [];
   List<String> genres = [];
   String synopsis;
   int rating;
+  MovieScreenArguments args;
+  bool dataRetrieved = false;
+  String name;
 
   @override
   void initState() {
     super.initState();
-    genre = "Avengers";
+    name = "Loading...";
     directors = ["Anthony Russo", "Joe Russo"];
     actors = ["RDJ", "Chris Evans", "Chris Hemsworth", "Chris Prat"];
     genres = ["Action", "Drama", "Romantic"];
@@ -46,6 +52,10 @@ class _MovieScreenState extends State<MovieScreen> {
 
   @override
   Widget build(BuildContext context) {
+    args = ModalRoute.of(context).settings.arguments;
+    if (dataRetrieved != true && args != null)
+      getMovieDetails(args.id);
+
     return Scaffold(
       body: CustomScrollView(
         physics: BouncingScrollPhysics(),
@@ -56,7 +66,7 @@ class _MovieScreenState extends State<MovieScreen> {
             floating: true,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
-              title: Text("Avengers Endgame"),
+              title: Text(name),
               background: _getMoviePicture(context),
             ),
           ),
@@ -273,6 +283,20 @@ class _MovieScreenState extends State<MovieScreen> {
         ),
       ],
     );
+  }
+
+  void getMovieDetails(String id) async{
+    args = ModalRoute.of(context).settings.arguments;
+    dynamic response = await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
+    var data = json.decode(response.body);
+    actors = data["Actors"].split(",");
+    directors = data["Director"].split(",");
+    genres = data["Genre"].split(",");
+    synopsis = data["Plot"];
+    name = data["Title"];
+    print(actors[0]);
+    dataRetrieved = true;
+    setState(() {});
   }
 }
 
