@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:template/Screens/SearchTab/searchpage.dart';
 import 'package:template/Screens/main.dart';
 
 const Color BOTTOM_BAR_COLOR = Colors.redAccent;
@@ -24,8 +25,10 @@ class BottomBar {
           Navigator.popUntil(context, ModalRoute.withName('/'));
           return;
         }
-
-        if (index != currentIndex && index < Routes.bottomRoutes.length) {
+        else if (index == 1) {
+          showSearch(context: context, delegate: CustomSearchDelegate(),);
+        }
+        else if (index != currentIndex && index < Routes.bottomRoutes.length) {
           Navigator.pushNamedAndRemoveUntil(
             context,
             Routes.bottomRoutes[index],

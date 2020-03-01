@@ -2,7 +2,6 @@ import 'dart:collection';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:template/CustomView/BottomBar.dart';
 import 'package:http/http.dart' as http;
 import 'package:template/Models/Arguments.dart';
 
@@ -95,51 +94,19 @@ final movieList = [
 HashSet<String> friendHistorySet = new HashSet();
 LinkedHashSet<MovieObject> movieHistorySet =
     new LinkedHashSet(); // history of clicks, keeping their MovieObjects
-Set data;
-String lastQuery = "zzz";
-
-class SearchPage extends StatefulWidget {
-  final String title = "Search Page";
-
-  @override
-  _SearchPageState createState() => _SearchPageState();
-}
-
-class _SearchPageState extends State<SearchPage> {
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue[900],
-        title: Text(widget.title),
-        actions: <Widget>[
-          IconButton(
-              icon: Icon(Icons.search),
-              onPressed: () {
-                showSearch(
-                  context: context,
-                  delegate: CustomSearchDelegate(),
-                );
-              })
-        ],
-      ),
-      bottomNavigationBar: BottomBar().createBar(context, 1),
-    );
-  }
-}
+List data = new List();
+String lastQuery = "zzzz";
+Widget lastWidget;
 
 class MovieSearch {
   Future getMovieData(String movieSearch) async {
-    if (movieSearch == lastQuery) {
-      return data;
-    }
-    lastQuery = movieSearch;
-    final String url =
-        "http://www.omdbapi.com/?apikey=80246e40&type=movie&page=1&s=" +
+    StringBuffer url = new StringBuffer(
+        "http://www.omdbapi.com/?apikey=80246e40&type=movie&s=" +
             movieSearch.replaceAll(" ", "*") +
-            "*";
-    var res = await http.get(Uri.parse(url));
-    var resBody = json.decode(res.body);
+            "*");
 
+    var res = await http.get(Uri.parse(url.toString()));
+    var resBody = json.decode(res.body);
     if (resBody["Response"] == "False") {
       if (resBody["Error"] == "Too many results.") {
         return -1;
@@ -149,12 +116,40 @@ class MovieSearch {
         return -3;
       }
     }
-    List lData = resBody["Search"];
-    data = Set();
 
+    if (movieSearch == lastQuery) {
+      return data;
+    }
+    lastQuery = movieSearch;
+
+    List lData = resBody["Search"];
+    data = new List();
+    int results = int.parse(resBody["totalResults"]);
+    int pageNumber;
+    int maxPage = 5;
+    if (results > maxPage * 10) {
+      pageNumber = maxPage;
+    } else {
+      pageNumber = results ~/ 10 + ((results % 10 == 0) ? 0 : 1);
+    }
+    StringBuffer tempUrl;
+
+    for (int i = 2; i <= pageNumber; i++) {
+      tempUrl = new StringBuffer(url);
+      tempUrl.write("&page=");
+      tempUrl.write(i.toString());
+      res = await http.get(Uri.parse(tempUrl.toString()));
+      resBody = json.decode(res.body);
+      if (resBody["Response"] != "False") {
+        lData.insertAll(lData.length, resBody["Search"]);
+      } else {
+        break;
+      }
+    }
     for (int i = 0; i < lData.length; i++) {
-      MovieObject m = new MovieObject(lData[i]["Title"], lData[i]["imdbID"],
-          lData[i]["Year"], lData[i]["Poster"]);
+      var temp = lData[i];
+      MovieObject m = new MovieObject(
+          temp["Title"], temp["imdbID"], temp["Year"], temp["Poster"]);
       data.add(m);
     }
     return data;
@@ -208,22 +203,22 @@ class CustomSearchDelegate extends SearchDelegate<String> {
   Widget createSearch(BuildContext context, String query) {
     if (query == "" || query == null) {
       return createRecentSearch(context);
+    } else if (query == lastQuery) {
+      return lastWidget;
     } else {
+      print("here" + query);
       return FutureBuilder(
         builder: (context, projectSnap) {
           if (projectSnap.connectionState != ConnectionState.done) {
-            return Center(
-              child: Container(
-                child: Text("Loading..."),
-              ),
-            );
+            print("here66");
+            return Center(child: CircularProgressIndicator());
           } else if (projectSnap.data == -1 ||
               projectSnap.data == -2 ||
               projectSnap.data == -3 ||
               projectSnap.data == -4) {
             String s;
             bool recent = false;
-
+            print("here3");
             switch (projectSnap.data) {
               case -1:
                 {
@@ -242,21 +237,25 @@ class CustomSearchDelegate extends SearchDelegate<String> {
                 }
             }
             if (recent) {
+              print("here3");
               return createRecentSearch(context);
+            } else {
+              lastWidget = Center(
+                child: Container(
+                  child: Text(s),
+                ),
+              );
+              return lastWidget;
             }
-            return Center(
-              child: Container(
-                child: Text(s),
-              ),
-            );
           } else if (projectSnap.hasError) {
-            return Center(
+            lastWidget = Center(
               child: Container(
                 child: Text("Error with query"),
               ),
             );
+            return lastWidget;
           } else {
-            return ListView.builder(
+            lastWidget = ListView.builder(
               itemCount: projectSnap.data.length,
               itemBuilder: (context, index) {
                 MovieObject m = projectSnap.data.elementAt(index);
@@ -281,6 +280,7 @@ class CustomSearchDelegate extends SearchDelegate<String> {
                 );
               },
             );
+            return lastWidget;
           }
         },
         future: MovieSearch().getMovieData(query),

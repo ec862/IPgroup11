@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:template/CustomView/BottomBar.dart';
+import 'package:template/Screens/SearchTab/searchpage.dart';
 
 import '../main.dart';
 
@@ -39,11 +40,8 @@ class _HomepageState extends State<Homepage> {
             children: <Widget>[
               RaisedButton(
                 onPressed: () {
-                  Navigator.pushNamedAndRemoveUntil(
-                    context,
-                    Routes.bottomRoutes[1],
-                    ModalRoute.withName('/'),
-                  );
+                  showSearch(
+                    context: context, delegate: CustomSearchDelegate(),);
                 },
                 splashColor: Colors.deepOrangeAccent,
                 child: Container(

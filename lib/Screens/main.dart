@@ -22,7 +22,6 @@ class App extends StatelessWidget {
             pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
               switch (routeSettings.name){
                 case '/' : return new Homepage();
-                case '/searchpage': return new SearchPage();
                 case '/checkrecomendations': return new CheckRecomendations();
                 case '/watchlist': return new WatchList();
                 case '/profile': return new Profile();
