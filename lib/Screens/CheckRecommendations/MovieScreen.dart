@@ -1,14 +1,12 @@
 import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:template/CustomView/comment_view.dart';
 import 'package:template/Models/Arguments.dart';
-import 'package:template/Screens/CheckRecommendations/MovieListZoomIn.dart';
 import 'package:http/http.dart' as http;
 import 'package:template/Services/ImageServices.dart';
-
+import 'dart:math';
 import 'RecommendMovie.dart';
 
 const Color BOTTOM_BAR_COLOR = Colors.redAccent;
@@ -141,83 +139,32 @@ class _MovieScreenState extends State<MovieScreen> {
   }
 
   Widget _getMovieInfo(context) {
-    String directorString = _getStringsFromList(directors);
+    String directorString = _getStringsFromList(directors, limit: 20);
     String actorsString = _getStringsFromList(actors, limit: 24);
-    String genreString = _getStringsFromList(genres);
+    String genreString = _getStringsFromList(genres, limit: 24);
     return Column(
       children: <Widget>[
-        _movieInfoContent("Genre", genreString, onPress: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-            return MovieListZoomIn(
-              movieName: "Avengers",
-              list: genres,
-            );
-          }));
-        }),
-        _movieInfoContent("Directors", directorString, onPress: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-            return MovieListZoomIn(
-              movieName: "Avengers",
-              list: directors,
-            );
-          }));
-        }),
-        _movieInfoContent(
-          "Actors",
-          actorsString,
-          onPress: () {
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-              return MovieListZoomIn(
-                movieName: "Avengers",
-                list: actors,
-              );
-            }));
-          },
+        MovieInfoContent(
+          title: "Genre",
+          shortTitle: genreString,
+          fullTitle: _getStringsFromList(genres),
         ),
-        _movieInfoContent(
-          "Synopsis",
-          _getShorterText(synopsis),
-          onPress: () {
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-              return MovieListZoomIn(
-                movieName: "Avengers",
-                list: [synopsis],
-              );
-            }));
-          },
+        MovieInfoContent(
+          title: "Directors",
+          shortTitle: directorString,
+          fullTitle: _getStringsFromList(directors),
+        ),
+        MovieInfoContent(
+          title: "Actors",
+          shortTitle: actorsString,
+          fullTitle: _getStringsFromList(actors),
+        ),
+        MovieInfoContent(
+          title: "Synopsis",
+          shortTitle: _getShorterText(synopsis),
+          fullTitle: synopsis,
         ),
       ],
-    );
-  }
-
-  Widget _movieInfoContent(String title, String subtitle, {Function onPress}) {
-    return Card(
-      child: ListTile(
-        title: Text.rich(
-          TextSpan(
-            children: [
-              TextSpan(
-                text: "$title: ",
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              TextSpan(
-                text: subtitle,
-                style: TextStyle(
-                  fontSize: 22,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            ],
-          ),
-        ),
-        trailing: Icon(Icons.keyboard_arrow_right),
-        onTap: () {
-          if (onPress != null) onPress();
-        },
-      ),
     );
   }
 
@@ -241,7 +188,14 @@ class _MovieScreenState extends State<MovieScreen> {
 
   String _getStringsFromList(List<String> list, {int limit}) {
     String toReturn = "";
-    limit = limit ?? 20;
+    if (limit == null) {
+      for (int i = 0; i < list.length; i++) {
+        toReturn += list[i];
+        if (i < list.length - 1) toReturn += ", ";
+      }
+      return toReturn;
+    }
+
     for (int i = 0; i < list.length; i++) {
       toReturn += list[i];
       if (toReturn.length > limit) {
@@ -377,5 +331,92 @@ class ProfileFullScreen extends StatelessWidget {
       ),
       backgroundColor: Colors.black,
     );
+  }
+}
+
+class MovieInfoContent extends StatefulWidget {
+  String title;
+  String fullTitle;
+  String shortTitle;
+  Function onPress;
+
+  MovieInfoContent(
+      {@required this.title,
+      @required this.shortTitle,
+      @required this.fullTitle});
+
+  @override
+  _MovieInfoContentState createState() => _MovieInfoContentState();
+}
+
+class _MovieInfoContentState extends State<MovieInfoContent>
+    with SingleTickerProviderStateMixin {
+  bool expanded = false;
+  AnimationController _animationController;
+  Animation _arrowAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 200),
+      reverseDuration: Duration(milliseconds: 200),
+    );
+    _arrowAnimation = Tween(begin: 0.0, end: pi).animate(_animationController);
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: ListTile(
+        title: Text.rich(
+          TextSpan(
+            children: [
+              TextSpan(
+                text:
+                    "${expanded ? "${widget.title}:\n" : "${widget.title}:\n"}",
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              TextSpan(
+                text: "${expanded ? widget.fullTitle : widget.shortTitle}",
+                style: TextStyle(
+                  fontSize: 22,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
+          ),
+        ),
+        trailing: AnimatedBuilder(
+            animation: _animationController,
+            builder: (context, child) {
+              return Transform.rotate(
+                angle: _arrowAnimation.value,
+                child: Icon(Icons.keyboard_arrow_up),
+              );
+            }),
+        /*Icon(
+            expanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right),*/
+        onTap: () {
+          setState(() {
+            expanded = !expanded;
+            expanded
+                ? _animationController.forward()
+                : _animationController.reverse();
+          });
+        },
+      ),
+    );
+    ;
   }
 }
