@@ -44,8 +44,7 @@ class _MovieScreenState extends State<MovieScreen> {
   @override
   Widget build(BuildContext context) {
     args = ModalRoute.of(context).settings.arguments;
-    if (dataRetrieved != true && args != null)
-      getMovieDetails(args.id);
+    if (dataRetrieved != true && args != null) getMovieDetails(args.id);
 
     return Scaffold(
       body: CustomScrollView(
@@ -83,7 +82,7 @@ class _MovieScreenState extends State<MovieScreen> {
                 Padding(
                   padding: EdgeInsets.fromLTRB(30, 5, 8, 5),
                   child: InkWell(
-                    onTap: (){},
+                    onTap: () {},
                     child: Text(
                       "Load More",
                       style: TextStyle(color: Colors.blue),
@@ -110,13 +109,25 @@ class _MovieScreenState extends State<MovieScreen> {
   Widget _getMoviePicture(context) {
     return Stack(
       children: <Widget>[
-        Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.width,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: ImageServices.moviePoster(profileUrl),
-              fit: BoxFit.fitWidth,
+        Hero(
+          tag: "poster",
+          child: InkWell(
+            onTap: () {
+              Navigator.of(context).push(PageRouteBuilder(
+                  pageBuilder: (a, b, c) {
+                    return ProfileFullScreen(profileUrl);
+                  },
+                  transitionDuration: Duration(milliseconds: 200)));
+            },
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: ImageServices.moviePoster(profileUrl),
+                  fit: BoxFit.fitWidth,
+                ),
+              ),
             ),
           ),
         ),
@@ -276,9 +287,10 @@ class _MovieScreenState extends State<MovieScreen> {
     );
   }
 
-  void getMovieDetails(String id) async{
+  void getMovieDetails(String id) async {
     args = ModalRoute.of(context).settings.arguments;
-    dynamic response = await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
+    dynamic response =
+        await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
     var data = json.decode(response.body);
     actors = data["Actors"].split(",");
     directors = data["Director"].split(",");
@@ -287,7 +299,7 @@ class _MovieScreenState extends State<MovieScreen> {
     name = data["Title"];
     profileUrl = data["Poster"];
     rating = double.parse(data["imdbRating"]);
-    rating = rating/2;
+    rating = rating / 2;
     print(rating);
     print(actors[0]);
     dataRetrieved = true;
@@ -334,6 +346,36 @@ class SelectOption extends StatelessWidget {
   Widget fullDivider() {
     return Divider(
       color: Colors.black,
+    );
+  }
+}
+
+class ProfileFullScreen extends StatelessWidget {
+  final posterUrl;
+
+  ProfileFullScreen(this.posterUrl);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+      ),
+      body: Center(
+        child: Hero(
+          tag: "poster",
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            decoration: BoxDecoration(
+                image: DecorationImage(
+              image: ImageServices.moviePoster(posterUrl),
+              fit: BoxFit.fitWidth,
+            )),
+          ),
+        ),
+      ),
+      backgroundColor: Colors.black,
     );
   }
 }

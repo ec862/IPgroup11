@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:template/CustomView/BottomBar.dart';
 import 'package:http/http.dart' as http;
+import 'package:template/Models/Arguments.dart';
 
 final friendList = [
   "Elon Musk",
@@ -93,7 +94,7 @@ final movieList = [
 
 HashSet<String> friendHistorySet = new HashSet();
 LinkedHashSet<MovieObject> movieHistorySet =
-new LinkedHashSet(); // history of clicks, keeping their MovieObjects
+    new LinkedHashSet(); // history of clicks, keeping their MovieObjects
 Set data;
 String lastQuery = "zzz";
 
@@ -119,7 +120,11 @@ class _SearchPageState extends State<SearchPage> {
                 delegate: CustomSearchDelegate(),
               );
               MovieObject movieOb = MovieObject.fromJson(queryJson);
-              Navigator.pushNamed(context, '/moviepage');
+              Navigator.pushNamed(
+                context,
+                '/moviepage',
+                arguments: MovieScreenArguments(id: movieOb.movieID),
+              );
             },
           ),
         ],
@@ -182,8 +187,8 @@ class CustomSearchDelegate extends SearchDelegate<String> {
       return ListView.builder(
         itemCount: movieHistorySet.length,
         itemBuilder: (context, index) {
-          MovieObject m = movieHistorySet.elementAt(
-              movieHistorySet.length - 1 - index);
+          MovieObject m =
+              movieHistorySet.elementAt(movieHistorySet.length - 1 - index);
           return ListTile(
             title: Text(m.movieTitle, style: TextStyle(fontSize: 21)),
             subtitle: Text(
@@ -206,9 +211,7 @@ class CustomSearchDelegate extends SearchDelegate<String> {
   Widget createSearch(BuildContext context, String query) {
     if (query == "" || query == null) {
       return createRecentSearch(context);
-    }
-
-    else {
+    } else {
       return FutureBuilder(
         builder: (context, projectSnap) {
           if (projectSnap.connectionState != ConnectionState.done) {
