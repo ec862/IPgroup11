@@ -113,20 +113,13 @@ class _SearchPageState extends State<SearchPage> {
         title: Text(widget.title),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () async {
-              String queryJson = await showSearch(
-                context: context,
-                delegate: CustomSearchDelegate(),
-              );
-              MovieObject movieOb = MovieObject.fromJson(queryJson);
-              Navigator.pushNamed(
-                context,
-                '/moviepage',
-                arguments: MovieScreenArguments(id: movieOb.movieID),
-              );
-            },
-          ),
+              icon: Icon(Icons.search),
+              onPressed: () {
+                showSearch(
+                  context: context,
+                  delegate: CustomSearchDelegate(),
+                );
+              })
         ],
       ),
       bottomNavigationBar: BottomBar().createBar(context, 1),
@@ -195,7 +188,11 @@ class CustomSearchDelegate extends SearchDelegate<String> {
               m.movieYear,
             ),
             onTap: () {
-              close(context, m.toJson());
+              Navigator.pushNamed(
+                context,
+                '/moviepage',
+                arguments: MovieScreenArguments(id: m.movieID),
+              );
             },
             leading: Image.network(
               m.movieImageURL,
@@ -270,7 +267,11 @@ class CustomSearchDelegate extends SearchDelegate<String> {
                   ),
                   onTap: () {
                     addToMovieSet(m);
-                    close(context, m.toJson());
+                    Navigator.pushNamed(
+                      context,
+                      '/moviepage',
+                      arguments: MovieScreenArguments(id: m.movieID),
+                    );
                   },
                   leading: Image.network(
                     m.movieImageURL,
