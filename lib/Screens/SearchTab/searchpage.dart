@@ -206,19 +206,15 @@ class CustomSearchDelegate extends SearchDelegate<String> {
     } else if (query == lastQuery) {
       return lastWidget;
     } else {
-      print("here" + query);
       return FutureBuilder(
         builder: (context, projectSnap) {
           if (projectSnap.connectionState != ConnectionState.done) {
-            print("here66");
             return Center(child: CircularProgressIndicator());
           } else if (projectSnap.data == -1 ||
               projectSnap.data == -2 ||
               projectSnap.data == -3 ||
               projectSnap.data == -4) {
             String s;
-            bool recent = false;
-            print("here3");
             switch (projectSnap.data) {
               case -1:
                 {
@@ -236,17 +232,12 @@ class CustomSearchDelegate extends SearchDelegate<String> {
                   break;
                 }
             }
-            if (recent) {
-              print("here3");
-              return createRecentSearch(context);
-            } else {
-              lastWidget = Center(
-                child: Container(
-                  child: Text(s),
-                ),
-              );
-              return lastWidget;
-            }
+            lastWidget = Center(
+              child: Container(
+                child: Text(s),
+              ),
+            );
+            return lastWidget;
           } else if (projectSnap.hasError) {
             lastWidget = Center(
               child: Container(
