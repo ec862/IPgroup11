@@ -80,7 +80,7 @@ class _MovieContentState extends State<MovieContent> {
           children: <Widget>[
             Container(
               width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.width * 1,
+              height: MediaQuery.of(context).size.width / 1.5,
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: ImageServices.moviePoster(widget.info.profilePic),

@@ -10,7 +10,6 @@ class WatchList extends StatefulWidget {
 }
 
 class _WatchListState extends State<WatchList> {
-  int currentindex = 0; // home = 0
 
   @override
   Widget build(BuildContext context) {

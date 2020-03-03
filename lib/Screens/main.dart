@@ -5,10 +5,18 @@ import 'package:template/Screens/CheckRecommendations/MovieScreen.dart';
 import 'package:template/Screens/Home/homepage.dart';
 import 'package:template/Screens/Profile/followers.dart';
 import 'package:template/Screens/Profile/profile.dart';
-import 'package:template/Screens/SearchTab/searchpage.dart';
 import 'package:template/Screens/WatchList/watchlist.dart';
+import 'package:template/loginScreen2.dart';
 
-void main() => runApp(App());
+void main() => runApp(Entry());
+
+class Entry extends StatelessWidget{
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(home: LoginPage());
+  }
+
+}
 
 class App extends StatelessWidget {
   @override

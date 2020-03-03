@@ -1,25 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-//void main() => runApp(MaterialApp(
-//  initialRoute: '/',
-//  routes: {
-//    '/': (context) => LoginPage(),
-//    '/second': (context) => ForgotPage(),
-//  },
-//));
-//
-
-//
-//class MyApp extends StatelessWidget {
-//  @override
-//  Widget build(BuildContext context) {
-//    return MaterialApp(
-//      debugShowCheckedModeBanner: false,
-//      home: LoginPage(),
-//    );
-//  }
-//}
+import 'package:template/Screens/main.dart';
 
 enum AuthMode { LOGIN, SIGNUP }
 
@@ -187,7 +168,12 @@ class _LoginPageState extends State<LoginPage> {
                             left: 38, right: 38, top: 15, bottom: 15),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5)),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context)
+                              .pushReplacement(MaterialPageRoute(builder: (ctx) {
+                            return App();
+                          }));
+                        },
                       )
                     ],
                   )
