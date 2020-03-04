@@ -6,7 +6,7 @@ class DatabaseServices {
 
   Future setUsername({String uid, String username}) async{
     try {
-      return await Firestore.instance.collection("Users").document(uid).setData(
+      return await Firestore.instance.collection("Users").document(uid).updateData(
         {
           'user_name': username
         },
@@ -14,7 +14,6 @@ class DatabaseServices {
         print("Done");
       });
     } catch (e) {
-      print(e);
       try {
         return await Firestore.instance.collection("Users").document(uid).setData(
           {
