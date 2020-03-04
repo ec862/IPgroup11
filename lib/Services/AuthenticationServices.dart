@@ -2,28 +2,23 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:template/Models/User.dart';
 
-import 'DatabaseServices.dart';
-
 class Authentication {
   FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<FirebaseUser> signUp({String email, String password, String username}) async {
+  Future<FirebaseUser> signUp(
+      {String email, String password, String username}) async {
     try {
-      FirebaseUser user = (await _auth.createUserWithEmailAndPassword(
-              email: email, password: password)).user;
-
-      try {
-        user.sendEmailVerification();
-      }catch(e){
-        user.sendEmailVerification();
-      }
-
-      DatabaseServices().setUsername(
-        uid: user.uid,
-        username: username,
-      );
-      _showToast("Verification email sent to your email please check your emails");
-      return user;
+      AuthResult user = await _auth
+          .createUserWithEmailAndPassword(email: email, password: password)
+          .then((AuthResult res) {
+        res.user.sendEmailVerification();
+        _auth.signOut();
+        _showToast(
+          "Verification email sent to your email please check your emails",
+        );
+        return res;
+      });
+      return user.user;
     } catch (signupError) {
       if (signupError.toString().contains("Given String is empty or null")) {
         _showToast("Please enter text in fields");
@@ -40,27 +35,28 @@ class Authentication {
       } else {
         _showToast("Please enter an email");
       }
+      print(signupError);
       return null;
     }
   }
 
-  Future <FirebaseUser> signIn({String email, String password}) async{
+  Future<FirebaseUser> signIn({String email, String password}) async {
     try {
       AuthResult res = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
       FirebaseUser user = res.user;
       return user;
-    }catch(e){
+    } catch (e) {
       return null;
     }
   }
 
-  Future signOut(){
+  Future signOut() {
     _auth.signOut();
     User.userdata.uid = null;
   }
-  
-  void _showToast(txt){
+
+  void _showToast(txt) {
     Fluttertoast.showToast(
       msg: txt,
       toastLength: Toast.LENGTH_SHORT,
@@ -69,16 +65,16 @@ class Authentication {
     );
   }
 
-  void ForgotPassword({email}) async{
+  void ForgotPassword({email}) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
       _showToast("Email sent");
-    }catch(e){
+    } catch (e) {
       _showToast("Error");
     }
   }
 
-  Stream<FirebaseUser> get user{
-    return _auth.onAuthStateChanged;
+  Future<FirebaseUser> get user {
+    return _auth.currentUser();
   }
 }

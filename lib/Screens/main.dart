@@ -1,60 +1,23 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_page_transition/flutter_page_transition.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:provider/provider.dart';
 import 'package:template/Screens/CheckRecommendations/CheckRecomendations.dart';
 import 'package:template/Screens/CheckRecommendations/MovieScreen.dart';
 import 'package:template/Screens/Home/homepage.dart';
 import 'package:template/Screens/Profile/followers.dart';
 import 'package:template/Screens/Profile/profile.dart';
 import 'package:template/Screens/WatchList/watchlist.dart';
-import 'package:template/Services/AuthenticationServices.dart';
 import 'package:template/loginScreen2.dart';
 
-void main() => runApp(App());
+void main() => runApp(AuthScreen());
 
-class App extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return StreamProvider.value(
-      value: Authentication().user,
-      child: MaterialApp(
-        home: Wrapper(),
-      ),
-    );
-  }
-}
-
-class Wrapper extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    FirebaseUser user = Provider.of(context);
-    if (user == null) return OpenAuthScreen();
-
-    if (user.isEmailVerified) {
-      return OpenMainApp();
-    } else {
-      Fluttertoast.showToast(
-        msg: "Please verify your email",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIos: 1,
-      );
-      Authentication().signOut();
-      return OpenAuthScreen();
-    }
-  }
-}
-
-class OpenAuthScreen extends StatelessWidget {
+class AuthScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(home: LoginPage());
   }
 }
 
-class OpenMainApp extends StatelessWidget {
+class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

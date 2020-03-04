@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:template/CustomView/BottomBar.dart';
+import 'package:template/Screens/main.dart';
 import 'package:template/Services/AuthenticationServices.dart';
 import 'editProfile.dart';
 
@@ -266,6 +267,10 @@ class _ProfileState extends State<Profile> {
           InkWell(
             onTap: () {
               Authentication().signOut();
+              Navigator.popUntil(context, ModalRoute.withName('/'));
+              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){
+                return AuthScreen();
+              }));
             },
             child: Text(
               "LOGOUT",

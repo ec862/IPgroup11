@@ -24,65 +24,43 @@ class _LoginPageState extends State<LoginPage> {
   // Set initial mode to login
   AuthMode _authMode = AuthMode.LOGIN;
   DateTime selectedDate = DateTime.now();
-  TextEditingController _date = new TextEditingController();
   var dateFormat = DateFormat('d-MM-yyyy');
+  final _signUpFormKey = GlobalKey<FormState>();
+  final _signInFormKey = GlobalKey<FormState>();
 
-  TextEditingController signup_email_controller;
-  TextEditingController signup_password_controller;
-  TextEditingController signup_username_controller;
-  String email = "";
-  String password = "";
-  String username = "";
+  String signUpEmail = "";
+  String signUpPassword = "";
+  String signUpUsername = "";
+  String signUpConfirmPassword = "";
 
-  TextEditingController signin_email_controller;
-  TextEditingController signin_password_controller;
-  String signin_email = "";
-  String signin_password = "";
+  String signInEmail = "";
+  String signInPassword = "";
 
-  @override
-  void initState() {
-    super.initState();
-    signup_email_controller = TextEditingController();
-    signup_password_controller = TextEditingController();
-    signup_username_controller = TextEditingController();
-    signin_email_controller = TextEditingController();
-    signin_password_controller = TextEditingController();
+  void getCurrentUser() async {
+    FirebaseUser user = await Authentication().user;
+    if (user == null) return;
 
-    signup_email_controller.addListener(() {
-      email = signup_email_controller.text;
-    });
-    signup_password_controller.addListener(() {
-      password = signup_password_controller.text;
-    });
-
-    signin_email_controller.addListener(() {
-      signin_email = signin_email_controller.text;
-    });
-    signin_password_controller.addListener(() {
-      signin_password = signin_password_controller.text;
-    });
-    signup_username_controller.addListener(() {
-      username = signup_username_controller.text;
-    });
-  }
-
-  Future _selectDate() async {
-    final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime(1903, 1),
-        lastDate: DateTime.now());
-    if (picked != null && picked != selectedDate)
-      setState(() {
-        selectedDate = picked;
-        _date.value =
-            TextEditingValue(text: ('${dateFormat.format(picked)}').toString());
-      });
+    if (user.isEmailVerified) {
+      User.userdata.uid = user.uid;
+      Navigator.of(context)
+          .pushReplacement(MaterialPageRoute(builder: (context) {
+        return MainApp();
+      }));
+    } else {
+      Fluttertoast.showToast(
+        msg: "Please verify your email",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIos: 1,
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
+    getCurrentUser();
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Stack(
@@ -148,87 +126,103 @@ class _LoginPageState extends State<LoginPage> {
             elevation: 8,
             child: Padding(
               padding: const EdgeInsets.all(30.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: Text(
-                      "Login",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 28,
-                        fontWeight: FontWeight.w600,
+              child: Form(
+                key: _signInFormKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                        "Login",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  TextFormField(
-                    controller: signin_email_controller,
-                    decoration: InputDecoration(
-                      labelText: "Your Email",
-                      hasFloatingPlaceholder: true,
+                    SizedBox(
+                      height: 15,
                     ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  TextFormField(
-                    controller: signin_password_controller,
-                    decoration: InputDecoration(
-                      labelText: "Password",
-                      hasFloatingPlaceholder: true,
+                    TextFormField(
+                      validator: (val) => val.isEmpty ? 'Enter email' : null,
+                      decoration: InputDecoration(
+                        labelText: "Your Email",
+                        hasFloatingPlaceholder: true,
+                      ),
+                      onChanged: (val) {
+                        signInEmail = val;
+                        _signInFormKey.currentState.validate();
+                      },
                     ),
-                    obscureText: true,
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      MaterialButton(
-                        onPressed: () {
-                          //Navigator.pushNamed(context, '/second');
-                          Navigator.of(context)
-                              .push(MaterialPageRoute(builder: (context) {
-                            return ForgotPage();
-                          }));
-                        },
-                        child: Text("Forgot Password?"),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        labelText: "Password",
+                        hasFloatingPlaceholder: true,
                       ),
-                      Expanded(
-                        child: Container(),
-                      ),
-                      FlatButton(
-                        child: Text("Login"),
-                        color: Color(0xFF4B9DFE),
-                        textColor: Colors.white,
-                        padding: EdgeInsets.only(
-                            left: 38, right: 38, top: 15, bottom: 15),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5)),
-                        onPressed: () async {
-                          // login
-                          FirebaseUser user = await Authentication().signIn(
-                            email: signin_email,
-                            password: signin_password,
-                          );
-                          if (user == null) {
-                            Fluttertoast.showToast(
-                              msg: "Wrong Email/ Password",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.CENTER,
-                              timeInSecForIos: 1,
+                      onChanged: (val) {
+                        signInPassword = val;
+                        _signInFormKey.currentState.validate();
+                      },
+                      obscureText: true,
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        MaterialButton(
+                          onPressed: () {
+                            //Navigator.pushNamed(context, '/second');
+                            Navigator.of(context)
+                                .push(MaterialPageRoute(builder: (context) {
+                              return ForgotPage();
+                            }));
+                          },
+                          child: Text("Forgot Password?"),
+                        ),
+                        Expanded(
+                          child: Container(),
+                        ),
+                        FlatButton(
+                          child: Text("Login"),
+                          color: Color(0xFF4B9DFE),
+                          textColor: Colors.white,
+                          padding: EdgeInsets.only(
+                              left: 38, right: 38, top: 15, bottom: 15),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5)),
+                          onPressed: () async {
+                            // login
+                            FirebaseUser user = await Authentication().signIn(
+                              email: signInEmail,
+                              password: signInPassword,
                             );
-                          }
-                        },
-                      )
-                    ],
-                  )
-                ],
+                            if (user == null) {
+                              Fluttertoast.showToast(
+                                msg: "Wrong Email/ Password",
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.CENTER,
+                                timeInSecForIos: 1,
+                              );
+                            } else {
+                              User.userdata.uid = user.uid;
+                              return Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(builder: (context) {
+                                return MainApp();
+                              }));
+                            }
+                          },
+                        )
+                      ],
+                    )
+                  ],
+                ),
               ),
             ),
           ),
@@ -272,98 +266,130 @@ class _LoginPageState extends State<LoginPage> {
             elevation: 8,
             child: Padding(
               padding: const EdgeInsets.all(30.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: Text(
-                      "Create Account",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 28,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  TextFormField(
-                    controller: signup_username_controller,
-                    decoration: InputDecoration(
-                      labelText: "Username",
-                      hasFloatingPlaceholder: true,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  TextFormField(
-                    controller: signup_email_controller,
-                    decoration: InputDecoration(
-                      labelText: "Email",
-                      hasFloatingPlaceholder: true,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  GestureDetector(
-                    onTap: () => _selectDate(),
-                    child: AbsorbPointer(
-                      child: TextFormField(
-                        controller: _date,
-                        //keyboardType: TextInputType.datetime,
-                        decoration: InputDecoration(
-                          labelText: "Date of Birth",
-                          hasFloatingPlaceholder: true,
+              child: Form(
+                key: _signUpFormKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                        "Create Account",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
-                  ),
-                  TextFormField(
-                    controller: signup_password_controller,
-                    decoration: InputDecoration(
-                      labelText: "Password",
-                      hasFloatingPlaceholder: true,
+                    SizedBox(
+                      height: 15,
                     ),
-                    obscureText: true,
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    "Password must be at least 8 characters and include a special character and number",
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                  new Text(''),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      Expanded(
-                        child: Container(),
+                    TextFormField(
+                      validator: (val) => val.isEmpty ? 'Enter username' : null,
+                      decoration: InputDecoration(
+                        labelText: "Username",
+                        hasFloatingPlaceholder: true,
                       ),
-                      FlatButton(
-                        child: Text("Sign Up"),
-                        color: Color(0xFF4B9DFE),
-                        textColor: Colors.white,
-                        padding: EdgeInsets.only(
-                            left: 38, right: 38, top: 15, bottom: 15),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5)),
-                        onPressed: () async {
-                          // sign up
-                          FirebaseUser result = await Authentication()
-                              .signUp(email: email, password: password);
-                          if (result != null) {
-                            User.userdata.uid = result.uid;
-                          }
-                        },
+                      onChanged: (val) {
+                        signUpUsername = val;
+                        _signUpFormKey.currentState.validate();
+                      },
+                    ),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    TextFormField(
+                      validator: (val) => val.isEmpty ? 'Enter email' : null,
+                      decoration: InputDecoration(
+                        labelText: "Email",
+                        hasFloatingPlaceholder: true,
                       ),
-                    ],
-                  ),
-                ],
+                      onChanged: (val) {
+                        signUpEmail = val;
+                        _signUpFormKey.currentState.validate();
+                      },
+                    ),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    TextFormField(
+                      validator: (val) =>
+                          val.length < 6 ? 'password too short' : null,
+                      decoration: InputDecoration(
+                        labelText: "Password",
+                        hasFloatingPlaceholder: true,
+                      ),
+                      onChanged: (val) {
+                        signUpPassword = val;
+                        _signUpFormKey.currentState.validate();
+                      },
+                      obscureText: true,
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    TextFormField(
+                      validator: (val) =>
+                          val.length < 6 ? 'password too short' : null,
+                      decoration: InputDecoration(
+                        labelText: "Confirm Password",
+                        hasFloatingPlaceholder: true,
+                      ),
+                      onChanged: (val) {
+                        signUpConfirmPassword = val;
+                        _signUpFormKey.currentState.validate();
+                      },
+                      obscureText: true,
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      "Password must be at least 8 characters and include a special character and number",
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                    new Text(''),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        Expanded(
+                          child: Container(),
+                        ),
+                        FlatButton(
+                          child: Text("Sign Up"),
+                          color: Color(0xFF4B9DFE),
+                          textColor: Colors.white,
+                          padding: EdgeInsets.only(
+                              left: 38, right: 38, top: 15, bottom: 15),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5)),
+                          onPressed: () async {
+                            // sign up
+                            if (_signUpFormKey.currentState.validate()) {
+                              if (signUpPassword == signUpConfirmPassword) {
+                                dynamic result = await Authentication().signUp(
+                                    email: signUpEmail,
+                                    password: signUpPassword);
+                                if (result != null) {
+                                  await DatabaseServices().setUsername(
+                                      uid: result.uid,
+                                      username: signUpUsername);
+                                  User.userdata.uid = result.uid;
+                                }
+                              } else {
+                                Fluttertoast.showToast(
+                                  msg: "Passwords do not match",
+                                  gravity: ToastGravity.CENTER,
+                                );
+                              }
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -405,6 +431,38 @@ class _LoginPageState extends State<LoginPage> {
       ],
     );
   }
+
+/*
+TextEditingController _date = new TextEditingController();
+Future _selectDate() async {
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(1903, 1),
+        lastDate: DateTime.now());
+    if (picked != null && picked != selectedDate)
+      setState(() {
+        selectedDate = picked;
+        _date.value =
+            TextEditingValue(text: ('${dateFormat.format(picked)}').toString());
+      });
+  }
+  
+
+                    GestureDetector(
+                      onTap: () => _selectDate(),
+                      child: AbsorbPointer(
+                        child: TextFormField(
+                          controller: _date,
+                          //keyboardType: TextInputType.datetime,
+                          decoration: InputDecoration(
+                            labelText: "Date of Birth",
+                            hasFloatingPlaceholder: true,
+                          ),
+                        ),
+                      ),
+                    )
+  */
 }
 
 class ForgotPage extends StatefulWidget {
@@ -413,17 +471,7 @@ class ForgotPage extends StatefulWidget {
 
 class _ForgotPageState extends State<ForgotPage> {
   double screenHeight;
-  TextEditingController forgot_password_controller;
   String email = "";
-
-  @override
-  void initState() {
-    super.initState();
-    forgot_password_controller = TextEditingController();
-    forgot_password_controller.addListener(() {
-      email = forgot_password_controller.text;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -517,11 +565,13 @@ class _ForgotPageState extends State<ForgotPage> {
                     height: 15,
                   ),
                   TextFormField(
-                    controller: forgot_password_controller,
                     decoration: InputDecoration(
                       labelText: "Your Email",
                       hasFloatingPlaceholder: true,
                     ),
+                    onChanged: (val) {
+                      email = val;
+                    },
                   ),
                   SizedBox(
                     height: 15,

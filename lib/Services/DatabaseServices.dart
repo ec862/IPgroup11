@@ -1,22 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DatabaseServices {
-  final CollectionReference users_collection =
-      Firestore.instance.collection("Users");
+
+  DatabaseServices();
 
   Future setUsername({String uid, String username}) async{
     try {
-      return await users_collection.document(uid).updateData(
+      return await Firestore.instance.collection("Users").document(uid).setData(
         {
-          'username': username
+          'user_name': username
         },
-      );
+      ).whenComplete((){
+        print("Done");
+      });
     } catch (e) {
       print(e);
       try {
-        return await users_collection.document(uid).setData(
+        return await Firestore.instance.collection("Users").document(uid).setData(
           {
-            'username': username
+            'user_name': username
           },
         );
       } catch (ex) {
