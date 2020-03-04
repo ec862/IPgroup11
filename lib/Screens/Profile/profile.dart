@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:template/CustomView/BottomBar.dart';
+import 'package:template/Services/AuthenticationServices.dart';
 import 'editProfile.dart';
 
 class Profile extends StatefulWidget {
@@ -261,6 +262,15 @@ class _ProfileState extends State<Profile> {
                         TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
+          ),
+          InkWell(
+            onTap: () {
+              Authentication().signOut();
+            },
+            child: Text(
+              "LOGOUT",
+              style: TextStyle(color: Colors.blue[900], fontSize: 20),
+            ),
           ),
         ],
       ),

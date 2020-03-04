@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:template/CustomView/BottomBar.dart';
+import 'package:template/Models/User.dart';
 import 'package:template/Screens/SearchTab/searchpage.dart';
 
 import '../main.dart';
@@ -12,6 +13,7 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   @override
   Widget build(BuildContext context) {
+
     final double headPadding = MediaQuery.of(context).size.height / 28;
     final double listSize = MediaQuery.of(context).size.height / 8.1;
 

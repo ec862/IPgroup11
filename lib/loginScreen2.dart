@@ -1,6 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:template/Models/User.dart';
 import 'package:template/Screens/main.dart';
+import 'package:template/Services/AuthenticationServices.dart';
+import 'package:template/Services/DatabaseServices.dart';
 
 enum AuthMode { LOGIN, SIGNUP }
 
@@ -17,10 +23,48 @@ class _LoginPageState extends State<LoginPage> {
 
   // Set initial mode to login
   AuthMode _authMode = AuthMode.LOGIN;
-
   DateTime selectedDate = DateTime.now();
   TextEditingController _date = new TextEditingController();
   var dateFormat = DateFormat('d-MM-yyyy');
+
+  TextEditingController signup_email_controller;
+  TextEditingController signup_password_controller;
+  TextEditingController signup_username_controller;
+  String email = "";
+  String password = "";
+  String username = "";
+
+  TextEditingController signin_email_controller;
+  TextEditingController signin_password_controller;
+  String signin_email = "";
+  String signin_password = "";
+
+  @override
+  void initState() {
+    super.initState();
+    signup_email_controller = TextEditingController();
+    signup_password_controller = TextEditingController();
+    signup_username_controller = TextEditingController();
+    signin_email_controller = TextEditingController();
+    signin_password_controller = TextEditingController();
+
+    signup_email_controller.addListener(() {
+      email = signup_email_controller.text;
+    });
+    signup_password_controller.addListener(() {
+      password = signup_password_controller.text;
+    });
+
+    signin_email_controller.addListener(() {
+      signin_email = signin_email_controller.text;
+    });
+    signin_password_controller.addListener(() {
+      signin_password = signin_password_controller.text;
+    });
+    signup_username_controller.addListener(() {
+      username = signup_username_controller.text;
+    });
+  }
 
   Future _selectDate() async {
     final DateTime picked = await showDatePicker(
@@ -39,7 +83,6 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
       body: SingleChildScrollView(
         child: Stack(
@@ -57,12 +100,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget upperHalf(BuildContext context) {
-    return Container(height: screenHeight / 2
-//      child: Image.asset(
-//        'assets/house.jpg',
-//        fit: BoxFit.cover,
-//      ),
-        );
+    return Container(height: screenHeight / 2);
   }
 
   Widget lowerHalf(BuildContext context) {
@@ -128,13 +166,17 @@ class _LoginPageState extends State<LoginPage> {
                     height: 15,
                   ),
                   TextFormField(
+                    controller: signin_email_controller,
                     decoration: InputDecoration(
-                        labelText: "Your Email", hasFloatingPlaceholder: true),
+                      labelText: "Your Email",
+                      hasFloatingPlaceholder: true,
+                    ),
                   ),
                   SizedBox(
                     height: 20,
                   ),
                   TextFormField(
+                    controller: signin_password_controller,
                     decoration: InputDecoration(
                       labelText: "Password",
                       hasFloatingPlaceholder: true,
@@ -168,11 +210,20 @@ class _LoginPageState extends State<LoginPage> {
                             left: 38, right: 38, top: 15, bottom: 15),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5)),
-                        onPressed: () {
-                          Navigator.of(context)
-                              .pushReplacement(MaterialPageRoute(builder: (ctx) {
-                            return App();
-                          }));
+                        onPressed: () async {
+                          // login
+                          FirebaseUser user = await Authentication().signIn(
+                            email: signin_email,
+                            password: signin_password,
+                          );
+                          if (user == null) {
+                            Fluttertoast.showToast(
+                              msg: "Wrong Email/ Password",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.CENTER,
+                              timeInSecForIos: 1,
+                            );
+                          }
                         },
                       )
                     ],
@@ -239,15 +290,21 @@ class _LoginPageState extends State<LoginPage> {
                     height: 15,
                   ),
                   TextFormField(
+                    controller: signup_username_controller,
                     decoration: InputDecoration(
-                        labelText: "Username", hasFloatingPlaceholder: true),
+                      labelText: "Username",
+                      hasFloatingPlaceholder: true,
+                    ),
                   ),
                   SizedBox(
                     height: 15,
                   ),
                   TextFormField(
+                    controller: signup_email_controller,
                     decoration: InputDecoration(
-                        labelText: "Email", hasFloatingPlaceholder: true),
+                      labelText: "Email",
+                      hasFloatingPlaceholder: true,
+                    ),
                   ),
                   SizedBox(
                     height: 15,
@@ -259,21 +316,18 @@ class _LoginPageState extends State<LoginPage> {
                         controller: _date,
                         //keyboardType: TextInputType.datetime,
                         decoration: InputDecoration(
-                            labelText: "Date of Birth",
-                            hasFloatingPlaceholder: true),
+                          labelText: "Date of Birth",
+                          hasFloatingPlaceholder: true,
+                        ),
                       ),
                     ),
-                  ), //child: Text('Date of Birth'),
-//                        color: Color(0xFF4B9DFE),
-//                        textColor: Colors.white,
-//                        padding: EdgeInsets.only(
-//                            left: 38, right: 38, top: 15, bottom: 15),
-//                        shape: RoundedRectangleBorder(
-//                            borderRadius: BorderRadius.circular(5)),
-//                        onPressed: _selectDate
+                  ),
                   TextFormField(
+                    controller: signup_password_controller,
                     decoration: InputDecoration(
-                        labelText: "Password", hasFloatingPlaceholder: true),
+                      labelText: "Password",
+                      hasFloatingPlaceholder: true,
+                    ),
                     obscureText: true,
                   ),
                   SizedBox(
@@ -298,7 +352,14 @@ class _LoginPageState extends State<LoginPage> {
                             left: 38, right: 38, top: 15, bottom: 15),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5)),
-                        onPressed: () {},
+                        onPressed: () async {
+                          // sign up
+                          FirebaseUser result = await Authentication()
+                              .signUp(email: email, password: password);
+                          if (result != null) {
+                            User.userdata.uid = result.uid;
+                          }
+                        },
                       ),
                     ],
                   ),
@@ -352,6 +413,17 @@ class ForgotPage extends StatefulWidget {
 
 class _ForgotPageState extends State<ForgotPage> {
   double screenHeight;
+  TextEditingController forgot_password_controller;
+  String email = "";
+
+  @override
+  void initState() {
+    super.initState();
+    forgot_password_controller = TextEditingController();
+    forgot_password_controller.addListener(() {
+      email = forgot_password_controller.text;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -445,8 +517,11 @@ class _ForgotPageState extends State<ForgotPage> {
                     height: 15,
                   ),
                   TextFormField(
+                    controller: forgot_password_controller,
                     decoration: InputDecoration(
-                        labelText: "Your Email", hasFloatingPlaceholder: true),
+                      labelText: "Your Email",
+                      hasFloatingPlaceholder: true,
+                    ),
                   ),
                   SizedBox(
                     height: 15,
@@ -459,7 +534,10 @@ class _ForgotPageState extends State<ForgotPage> {
                         left: 38, right: 38, top: 15, bottom: 15),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(5)),
-                    onPressed: () {},
+                    onPressed: () {
+                      // send password forgot
+                      Authentication().ForgotPassword(email: email);
+                    },
                   ),
                 ],
               ),
@@ -470,23 +548,3 @@ class _ForgotPageState extends State<ForgotPage> {
     );
   }
 }
-
-//class TestPage extends StatelessWidget {
-//
-//  @override
-//  Widget build(BuildContext context) {
-//    return Scaffold(
-//      appBar: AppBar(
-//        title: Text("hejiej"),
-//      ),
-//    );
-//  }
-//
-//  Widget test(BuildContext context) {
-//    return Column(
-//      children: <Widget>[
-//        new Text("Hello world"),
-//      ],
-//    );
-//  }
-//}
