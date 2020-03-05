@@ -33,21 +33,12 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   @override
-  Widget build(BuildContext context) {return MaterialApp(
-    home: Scaffold(
+  Widget build(BuildContext context) {
+    return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue[900],
         title: Text('Edit Profile'),
-        actions: <Widget>[
-          IconButton(
-            onPressed: (){
-
-            },
-            icon: Icon(Icons.menu),
-          ),
-        ],
       ),
-
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -56,22 +47,16 @@ class _EditProfileState extends State<EditProfile> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
               Container(
-                width:110,
-                height:140,
+                width: 110,
+                height: 140,
               ),
-              /*Container(
-                  color: Colors.red,
-                  child: CircleAvatar(
-                    radius: 70,
-                    backgroundImage: AssetImage(''),
-                  ),
-                ),*/
               Stack(
                 children: <Widget>[
                   Container(
                     child: CircleAvatar(
                       radius: 70,
-                      backgroundImage: NetworkImage('https://images.unsplash.com/photo-1501549538842-2f24e2dd6520?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80'),
+                      backgroundImage: NetworkImage(
+                          'https://images.unsplash.com/photo-1501549538842-2f24e2dd6520?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80'),
                     ),
                   ),
                   Container(
@@ -92,32 +77,21 @@ class _EditProfileState extends State<EditProfile> {
                   ),
                 ],
               ),
-
-
-
-
               Container(
-                width:110,
-                height:140,
+                width: 110,
+                height: 140,
                 alignment: Alignment.topRight,
                 child: IconButton(
                   icon: Icon(
                     Icons.save,
                   ),
-                  //elevation: 0,
-                  onPressed: (){
+                  onPressed: () {
                     Navigator.pop(context);
                   },
                 ),
-
-                /*Icon(
-                    Icons.edit,
-                    size: 30,
-                  ),*/
               ),
             ],
           ),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
@@ -128,10 +102,7 @@ class _EditProfileState extends State<EditProfile> {
                   child: new TextField(
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                        fontSize: 18.0,
-                        height: 1.0,
-                        color: Colors.black
-                    ),
+                        fontSize: 18.0, height: 1.0, color: Colors.black),
                     decoration: InputDecoration(
                       hintText: 'Frank Davis',
                     ),
@@ -140,59 +111,66 @@ class _EditProfileState extends State<EditProfile> {
               ),
             ],
           ),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Container(
                 padding: EdgeInsets.only(left: 20),
-                child: Text('Favorite Movie', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey[600])),
+                child: Text('Favorite Movie',
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[600])),
               ),
               /*Container(
                   width: 120,
                   child: Text('Joker', textAlign: TextAlign.left, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 ),*/
 
-
               Container(
                 width: 120,
                 child: new TextField(
                   //textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontSize: 18.0,
-                      height: 0,
-                      color: Colors.black
-                  ),
+                  style:
+                      TextStyle(fontSize: 18.0, height: 0, color: Colors.black),
 
                   decoration: InputDecoration(
                     hintText: 'Joker',
                   ),
                 ),
               ),
-
-
-
             ],
           ),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Container(
                 padding: EdgeInsets.only(left: 20),
-                child: Text('Favorite Category', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey[600])),
+                child: Text('Favorite Category',
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[600])),
               ),
               Container(
                 width: 120,
                 child: DropdownButton<String>(
                   value: currentSelectedValueCat,
                   onChanged: (newVal) {
-                    setState(() {
-                      print(newVal);
-                      currentSelectedValueCat = newVal;
-                    },);
+                    setState(
+                      () {
+                        print(newVal);
+                        currentSelectedValueCat = newVal;
+                      },
+                    );
                   },
-                  items: <String>['Action', 'Comedy', 'Thriller', 'Horror', 'Family'].map<DropdownMenuItem<String>>((String value) {
+                  items: <String>[
+                    'Action',
+                    'Comedy',
+                    'Thriller',
+                    'Horror',
+                    'Family'
+                  ].map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),
@@ -202,87 +180,33 @@ class _EditProfileState extends State<EditProfile> {
                 //width: 120,
                 //child: Text('Male', textAlign: TextAlign.left, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
-              /*Container(
-                  width: 120,
-                  child: Text('Thriller', textAlign: TextAlign.left, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                ),*/
             ],
           ),
-
-          /*Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.only(left: 20),
-                  child: Text('Followers', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey[600])),
-                ),
-                Container(
-                  width: 120,
-                  child: Text('22', textAlign: TextAlign.left, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                ),
-              ],
-            ),*/
-
-          /*Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.only(left: 20),
-                  child: Text('Friends', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey[600])),
-                ),
-                Container(
-                  width: 120,
-                  child: Text('10', textAlign: TextAlign.left, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                ),
-              ],
-            ),*/
-
-          /*Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.only(left: 20),
-                  child: Text('Reviewed movies', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey[600])),
-                ),
-                Container(
-                  width: 120,
-                  child: Text('30', textAlign: TextAlign.left, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                ),
-              ],
-            ),*/
-
-          /*Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.only(left: 20),
-                  child: Text('Category most watched', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey[600])),
-                ),
-                Container(
-                  width: 120,
-                  child: Text('Action', textAlign: TextAlign.left, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                ),
-              ],
-            ),*/
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Container(
                 padding: EdgeInsets.only(left: 20),
-                child: Text('Gender', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey[600])),
+                child: Text('Gender',
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[600])),
               ),
               Container(
                 width: 120,
                 child: DropdownButton<String>(
                   value: currentSelectedValue,
                   onChanged: (newVal) {
-                    setState(() {
-                      print(newVal);
-                      currentSelectedValue = newVal;
-                    },);
+                    setState(
+                      () {
+                        print(newVal);
+                        currentSelectedValue = newVal;
+                      },
+                    );
                   },
-                  items: <String>['Male', 'Female', 'Other', 'Not say'].map<DropdownMenuItem<String>>((String value) {
+                  items: <String>['Male', 'Female', 'Other', 'Not say']
+                      .map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),
@@ -294,13 +218,16 @@ class _EditProfileState extends State<EditProfile> {
               ),
             ],
           ),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Container(
                 padding: EdgeInsets.only(left: 20),
-                child: Text('Date of birth', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey[600])),
+                child: Text('Date of birth',
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[600])),
               ),
               /*Container(
                 width: 120,
@@ -308,54 +235,8 @@ class _EditProfileState extends State<EditProfile> {
               ),*/
             ],
           ),
-
-              Transform(
-                transform: Matrix4.translationValues(270, -72, 0.0),                 child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  GestureDetector(
-                    onTap: () => _selectDate(),
-                    child: AbsorbPointer(
-                      child: TextFormField(
-                        controller: _date,
-                        //keyboardType: TextInputType.datetime,
-                        decoration: InputDecoration(
-                          hintText: "08-09-2000",
-                          border: InputBorder.none,
-                          //hasFloatingPlaceholder: true
-                        ),
-                      ),
-                    ),
-                  ), //child: Text('Date of Birth'),
-                ],
-              ),
-              ),
-              /*Container(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    GestureDetector(
-                      onTap: () => _selectDate(),
-                      child: AbsorbPointer(
-                        child: TextFormField(
-                          controller: _date,
-                          //keyboardType: TextInputType.datetime,
-                          decoration: InputDecoration(
-                            hintText: "08-09-2000",
-                            border: InputBorder.none,
-                            //hasFloatingPlaceholder: true
-                          ),
-                        ),
-                      ),
-                    ), //child: Text('Date of Birth'),
-                  ],
-                ),
-              ),*/
-            ],
-
-          ),
-
-          /*Container(
+          Transform(
+            transform: Matrix4.translationValues(270, -72, 0.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
@@ -366,54 +247,18 @@ class _EditProfileState extends State<EditProfile> {
                       controller: _date,
                       //keyboardType: TextInputType.datetime,
                       decoration: InputDecoration(
-                          labelText: "Date of birth",
-                          border: InputBorder.none,
-                          //hasFloatingPlaceholder: true
-                        ),
+                        hintText: "08-09-2000",
+                        border: InputBorder.none,
+                        //hasFloatingPlaceholder: true
+                      ),
                     ),
                   ),
                 ), //child: Text('Date of Birth'),
               ],
             ),
-          ),*/
-
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        iconSize: 30.0,
-        selectedFontSize: 0.0,
-        backgroundColor: BOTTOM_BAR_COLOR,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.white,
-        currentIndex: currentindex,
-        onTap: (index){
-          setState(() {
-            currentindex = index;
-          });
-        },
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              backgroundColor: BOTTOM_BAR_COLOR,
-              title: Text('')),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.search),
-              backgroundColor: BOTTOM_BAR_COLOR,
-              title: Text('')),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.add_box),
-              backgroundColor: BOTTOM_BAR_COLOR,
-              title: Text('')),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.favorite),
-              backgroundColor: BOTTOM_BAR_COLOR,
-              title: Text('')),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              backgroundColor: BOTTOM_BAR_COLOR,
-              title: Text('')),
+          ),
         ],
       ),
-    ),
-  );
+    );
   }
 }

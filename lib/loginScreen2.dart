@@ -375,8 +375,7 @@ class _LoginPageState extends State<LoginPage> {
                                     email: signUpEmail,
                                     password: signUpPassword);
                                 if (result != null) {
-                                  await DatabaseServices().setUsername(
-                                      uid: result.uid,
+                                  await DatabaseServices(result.uid).setUsername(
                                       username: signUpUsername);
                                   User.userdata.uid = result.uid;
                                 }
