@@ -164,7 +164,28 @@ class CustomSearchDelegate extends SearchDelegate<String> {
     movieHistorySet.add(m);
   }
 
-  Widget createRecentSearch(BuildContext context) {
+  Widget createSearchPage(BuildContext context, String query) {
+    return DefaultTabController(
+        length: 2,
+        child: Scaffold(
+            appBar: TabBar(
+              tabs: <Widget>[
+                Tab(
+                  text: "Movies",
+                ),
+                Tab(
+                  text: "People",
+                )
+              ],
+              labelColor: Colors.black,
+            ),
+            body: TabBarView(children: <Widget>[
+              createMovieSearch(context, query),
+              createMovieSearch(context, query)
+            ])));
+  }
+
+  Widget createRecentMovieSearch(BuildContext context) {
     if (movieHistorySet.length == 0) {
       return Center(
         child: Container(
@@ -200,9 +221,9 @@ class CustomSearchDelegate extends SearchDelegate<String> {
     }
   }
 
-  Widget createSearch(BuildContext context, String query) {
+  Widget createMovieSearch(BuildContext context, String query) {
     if (query == "" || query == null) {
-      return createRecentSearch(context);
+      return createRecentMovieSearch(context);
     } else if (query == lastQuery) {
       return lastWidget;
     } else {
@@ -303,76 +324,12 @@ class CustomSearchDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) {
-    return createSearch(context, query);
+    return createSearchPage(context, query);
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    return createSearch(context, query);
-  }
-
-  Widget createSearchScreen(BuildContext context) {
-//    movieSuggestionList = query.isEmpty
-//        ? movieHistorySet.toList()
-//        : movieElementList
-//            .where((m) => m.toLowerCase().startsWith(query.toLowerCase()))
-//            .toList();
-//    int msLength = movieSuggestionList.length;
-//
-//    friendSuggestionList = query.isEmpty
-//        ? friendHistorySet.toList()
-//        : friendElementList
-//            .where((m) => m.toLowerCase().startsWith(query.toLowerCase()))
-//            .toList();
-//
-//    int fsLength = friendSuggestionList.length;
-//
-//    SearchPageObject o;
-//
-//    if (msLength + fsLength >= 1) {
-//      return ListView.builder(
-//        itemBuilder: (context, index) {
-//          if (index == 0 || index == msLength + 1) {
-//            bool x = (index > 0) ? (fsLength > 0) : (msLength > 0);
-//            return (x
-//                ? ListTile(
-//                    title: Text(((index > 0) ? "People" : "Movies"),
-//                        style: TextStyle(fontSize: 21)),
-//                  )
-//                : SizedBox(
-//                    height: 1,
-//                  ));
-//          } else if (index < 1 + msLength) {
-//            o = new SearchPageObject(
-//                true, movieSuggestionList[index - 1], Icon(Icons.movie));
-//          } else {
-//            o = new SearchPageObject(false,
-//                friendSuggestionList[index - msLength - 2], Icon(Icons.people));
-//          }
-//          return ListTile(
-//              leading: o.icon,
-//              title: Text(
-//                o.queryString,
-//                style: TextStyle(fontSize: 18),
-//              ),
-//              onTap: () {
-//                query = o.queryString;
-//                (o.isMovie)
-//                    ? movieHistorySet.add(query)
-//                    : friendHistorySet.add(query);
-//                close(context, o.toJson());
-//              });
-//        },
-//        itemCount: 2 + msLength + fsLength,
-//      );
-//    } else {
-//      return ListTile(
-//        title: Text(
-//          "No results",
-//          textAlign: TextAlign.center,
-//        ),
-//      );
-//    }
+    return createSearchPage(context, query);
   }
 }
 

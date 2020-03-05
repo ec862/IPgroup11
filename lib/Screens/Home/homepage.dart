@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:template/CustomView/BottomBar.dart';
-import 'package:template/Models/User.dart';
+import 'package:template/Screens/CheckRecommendations/CheckRecomendations.dart';
 import 'package:template/Screens/SearchTab/searchpage.dart';
-
+import 'package:template/Services/ImageServices.dart';
 import '../main.dart';
 
 class Homepage extends StatefulWidget {
@@ -11,16 +12,35 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
+  List<RecommendationInfo> movies = [];
+
+  @override
+  void initState() {
+    super.initState();
+    movies.add(RecommendationInfo());
+    movies.add(RecommendationInfo(id: "tt3896198"));
+    movies.add(RecommendationInfo(id: "tt5052448"));
+    movies.add(RecommendationInfo(id: "tt0848228"));
+    movies.add(RecommendationInfo(id: "tt0974015"));
+    movies.add(RecommendationInfo(id: "tt0369610"));
+    movies.add(RecommendationInfo(id: "tt4881806"));
+  }
+
   @override
   Widget build(BuildContext context) {
-
-    final double headPadding = MediaQuery.of(context).size.height / 28;
+    final double headPadding = MediaQuery
+        .of(context)
+        .size
+        .height / 100;
     final double listSize = MediaQuery.of(context).size.height / 8.1;
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue[900],
-        title: Text('Home Page'),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(52.0), // here the desired height
+        child: AppBar(
+          backgroundColor: Colors.blue[900],
+          title: Text('Home Page'),
+        ),
       ),
 
       //*******START OF NON-TEMPLATE***************
@@ -32,105 +52,133 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
-  Column createHomePage(double headPadding, double listSize) {
-    return Column(
-      children: <Widget>[
-        Container(
-          color: Colors.transparent,
-          padding: EdgeInsets.all(headPadding),
-          child: Column(
-            children: <Widget>[
-              RaisedButton(
-                onPressed: () {
-                  showSearch(
-                    context: context, delegate: CustomSearchDelegate(),);
-                },
-                splashColor: Colors.deepOrangeAccent,
-                child: Container(
-                    child: Text(
+  SingleChildScrollView createHomePage(double headPadding, double listSize) {
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          topButtons(context, headPadding),
+          Divider(
+            height: 1,
+          ),
+          Container(
+            child: Text(
+              "Recent Recommendations",
+              style: TextStyle(fontSize: 22),
+            ),
+          ),
+          Divider(
+            height: 1,
+          ),
+          SizedBox(
+            height: MediaQuery
+                .of(context)
+                .size
+                .width * 1.172,
+            //width: MediaQuery.of(context).size.width,
+            child: ListView.builder(
+              physics: BouncingScrollPhysics(),
+              shrinkWrap: false,
+              scrollDirection: Axis.horizontal,
+              itemCount: 5,
+              itemBuilder: (BuildContext context, int index) =>
+                  Container(
+                      width: MediaQuery
+                          .of(context)
+                          .size
+                          .width / 1.02,
+                      child: MovieContent(movies[index], 20)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget topButtons(BuildContext context, double headPadding) {
+    return Container(
+      color: Colors.transparent,
+      padding: EdgeInsets.all(headPadding),
+      child: Column(
+        children: <Widget>[
+          RaisedButton(
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: CustomSearchDelegate(),
+              );
+            },
+            splashColor: Colors.deepOrangeAccent,
+            child: Container(
+                child: Text(
                   "Recommend New Movie",
                   style: TextStyle(fontSize: 25),
                 )),
-                shape: RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(8)),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              RaisedButton(
-                  onPressed: () {
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      Routes.bottomRoutes[2],
-                      ModalRoute.withName('/'),
-                    );
-                  },
-                  splashColor: Colors.deepOrangeAccent,
-                  child: Text(
-                    "See All Friend Recomendations",
-                    style: TextStyle(fontSize: 25),
-                    textAlign: TextAlign.center,
-                  ),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(8))),
-            ],
+            shape: RoundedRectangleBorder(
+                borderRadius: new BorderRadius.circular(5)),
           ),
-        ),
-        Divider(
-          color: Colors.black,
-          height: 15,
-        ),
-        Text(
-          "Recent Recomendations",
-          style: TextStyle(fontSize: listSize / 3.4),
-        ),
-        SizedBox(
-          height: 1,
-        ),
-        Expanded(
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: new ListView.builder(
-              itemBuilder: (BuildContext context, int index) {
-                return new Container(
-                  height: listSize,
-                  child: Card(
-                    child: ListTile(
-                      leading: Icon(
-                        Icons.movie,
-                        size: listSize / 1.75,
-                      ),
-                      title: Text(
-                        "Movie $index",
-                        style: TextStyle(fontSize: listSize / 3),
-                      ),
-                      subtitle: Text("Rec. by AAA BBB",
-                          style: TextStyle(fontSize: listSize / 6.25)),
-                      trailing: Container(
-                        child: Ink(
-                          decoration: const ShapeDecoration(
-                            color: Colors.lightGreenAccent,
-                            shape: CircleBorder(),
-                          ),
-                          child: IconButton(
-                            icon: Icon(Icons.add),
-                            color: Colors.black,
-                            onPressed: () {
-                              print("here$index");
-                            },
-                            iconSize: listSize / 2.5,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+          SizedBox(
+            height: 5,
+          ),
+          RaisedButton(
+              onPressed: () {
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  Routes.bottomRoutes[2],
+                  ModalRoute.withName('/'),
                 );
               },
-              itemCount: 4,
+              splashColor: Colors.deepOrangeAccent,
+              child: Text(
+                "See All Friend Recomendations",
+                style: TextStyle(fontSize: 25),
+                textAlign: TextAlign.center,
+              ),
+              shape: RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(5))),
+        ],
+      ),
+    );
+  }
+
+  Widget createMovieCard(BuildContext context, int index) {
+    return Card(
+      child: Container(
+        width: MediaQuery
+            .of(context)
+            .size
+            .width / 1.02,
+        child: Column(
+          children: <Widget>[
+            Expanded(
+              child: Container(
+                //height: MediaQuery.of(context).size.height / 1.9 / 1.2,
+                width: MediaQuery
+                    .of(context)
+                    .size
+                    .width,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    fit: BoxFit.fill,
+                    image: ImageServices.moviePoster(
+                        "https://m.media-amazon.com/images/M/MV5BNDYxNjQyMjAtNTdiOS00NGYwLWFmNTAtNThmYjU5ZGI2YTI1XkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_SX300.jpg"),
+                  ),
+                ),
+              ),
             ),
-          ),
-        )
-      ],
+            ListTile(
+              title: Text(
+                "movie" + index.toString(),
+                style: TextStyle(fontSize: 20),
+              ),
+              subtitle: Text(
+                index.toString(),
+                style: TextStyle(fontSize: 20),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

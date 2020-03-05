@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:template/Screens/SearchTab/searchpage.dart';
 import 'package:template/Screens/main.dart';
 
-const Color BOTTOM_BAR_COLOR = Colors.redAccent;
+const Color BOTTOM_BAR_COLOR = Colors.black;
 
 class BottomBar {
   int currentindex = 0;
@@ -15,7 +15,7 @@ class BottomBar {
       iconSize: 30.0,
       selectedFontSize: 0.0,
       backgroundColor: BOTTOM_BAR_COLOR,
-      selectedItemColor: Colors.black,
+      selectedItemColor: Colors.blueAccent,
       unselectedItemColor: Colors.white,
       currentIndex: currentindex,
       onTap: (index) {

@@ -41,7 +41,7 @@ class _CheckRecomendationsState extends State<CheckRecomendations> {
         physics: BouncingScrollPhysics(),
         itemCount: movies.length,
         itemBuilder: (ctx, index) {
-          return MovieContent(movies[index]);
+          return MovieContent(movies[index], 0);
         },
       ),
       bottomNavigationBar: BottomBar().createBar(context, 2),
@@ -51,7 +51,9 @@ class _CheckRecomendationsState extends State<CheckRecomendations> {
 
 class MovieContent extends StatefulWidget {
   RecommendationInfo info;
-  MovieContent(this.info);
+  double size;
+
+  MovieContent(this.info, this.size);
   @override
   _MovieContentState createState() => _MovieContentState();
 }
@@ -80,11 +82,14 @@ class _MovieContentState extends State<MovieContent> {
           children: <Widget>[
             Container(
               width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.width / 1.5,
+              height: MediaQuery
+                  .of(context)
+                  .size
+                  .width * 1 - widget.size,
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: ImageServices.moviePoster(widget.info.profilePic),
-                  fit: BoxFit.fitWidth,
+                  fit: BoxFit.contain,
                 ),
               ),
             ),
