@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:template/CustomView/BottomBar.dart';
+import 'package:template/Screens/main.dart';
+import 'package:template/Services/AuthenticationServices.dart';
 import 'editProfile.dart';
 
 class Profile extends StatefulWidget {
@@ -61,7 +63,28 @@ class _ProfileState extends State<Profile> {
           Row(
             children: <Widget>[
               Spacer(),
-              RaisedButton(
+
+              ButtonTheme(
+                minWidth: 120.0,
+                height: 50.0,
+                child: RaisedButton(
+                  shape: new RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(50.0),
+                      side: BorderSide(color: Colors.blue)
+                  ),
+                  color: Colors.white,
+                  child: Center(
+                    child: Text(
+                      "Followers \n22".toUpperCase(),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/followers');
+                  },
+                ),
+              ),
+              /*RaisedButton(
                 onPressed: () {
                   Navigator.pushNamed(context, '/followers');
                 },
@@ -71,9 +94,30 @@ class _ProfileState extends State<Profile> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-              ),
+              ),*/
               Spacer(),
-              RaisedButton(
+              ButtonTheme(
+                minWidth: 120.0,
+                height: 50.0,
+                child: RaisedButton(
+                  shape: new RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(50.0),
+                      side: BorderSide(color: Colors.blue)
+                  ),
+                  color: Colors.white,
+                  child: Center(
+                    child: Text(
+                      "Following \n103".toUpperCase(),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/followings');
+                  },
+                ),
+              ),
+
+              /*RaisedButton(
                 onPressed: () {
                   Navigator.pushNamed(context, '/followings');
                 },
@@ -83,7 +127,7 @@ class _ProfileState extends State<Profile> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-              ),
+              ),*/
               Spacer()
             ],
           ),
@@ -103,7 +147,7 @@ class _ProfileState extends State<Profile> {
                 child: Text('Joker',
                     textAlign: TextAlign.left,
                     style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -123,7 +167,7 @@ class _ProfileState extends State<Profile> {
                 child: Text('Thriller',
                     textAlign: TextAlign.left,
                     style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -143,7 +187,7 @@ class _ProfileState extends State<Profile> {
                 child: Text('22',
                     textAlign: TextAlign.left,
                     style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -198,7 +242,7 @@ class _ProfileState extends State<Profile> {
                 child: Text('30',
                     textAlign: TextAlign.left,
                     style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -218,7 +262,7 @@ class _ProfileState extends State<Profile> {
                 child: Text('Action',
                     textAlign: TextAlign.left,
                     style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -238,7 +282,7 @@ class _ProfileState extends State<Profile> {
                 child: Text('Male',
                     textAlign: TextAlign.left,
                     style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -258,13 +302,26 @@ class _ProfileState extends State<Profile> {
                 child: Text('08/09/2000',
                     textAlign: TextAlign.left,
                     style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
+          InkWell(
+            onTap: () {
+              Authentication().signOut();
+              Navigator.popUntil(context, ModalRoute.withName('/'));
+              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){
+                return AuthScreen();
+              }));
+            },
+            child: Text(
+              "LOGOUT",
+              style: TextStyle(color: Colors.blue[900], fontSize: 20),
+            ),
+          ),
         ],
       ),
-      bottomNavigationBar: BottomBar().createBar(context, 4),
+      //bottomNavigationBar: BottomBar().createBar(context, 4),
     );
   }
 }
