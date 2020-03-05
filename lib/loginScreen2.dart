@@ -58,7 +58,10 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    screenHeight = MediaQuery.of(context).size.height;
+    screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
     getCurrentUser();
 
     return Scaffold(
@@ -214,8 +217,8 @@ class _LoginPageState extends State<LoginPage> {
                               User.userdata.uid = user.uid;
                               return Navigator.of(context).pushReplacement(
                                   MaterialPageRoute(builder: (context) {
-                                return MainApp();
-                              }));
+                                    return MainApp();
+                                  }));
                             }
                           },
                         )
@@ -315,7 +318,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     TextFormField(
                       validator: (val) =>
-                          val.length < 6 ? 'password too short' : null,
+                      val.length < 6 ? 'password too short' : null,
                       decoration: InputDecoration(
                         labelText: "Password",
                         hasFloatingPlaceholder: true,
@@ -331,7 +334,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     TextFormField(
                       validator: (val) =>
-                          val.length < 6 ? 'password too short' : null,
+                      val.length < 6 ? 'password too short' : null,
                       decoration: InputDecoration(
                         labelText: "Confirm Password",
                         hasFloatingPlaceholder: true,
@@ -475,7 +478,10 @@ class _ForgotPageState extends State<ForgotPage> {
 
   @override
   Widget build(BuildContext context) {
-    screenHeight = MediaQuery.of(context).size.height;
+    screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
     return Scaffold(
       body: SingleChildScrollView(
         child: Stack(
@@ -496,7 +502,7 @@ class _ForgotPageState extends State<ForgotPage> {
 //        'assets/house.jpg',
 //        fit: BoxFit.cover,
 //      ),
-        );
+    );
   }
 
   Widget lowerHalf(BuildContext context) {
