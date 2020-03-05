@@ -81,11 +81,13 @@ class _MovieContentState extends State<MovieContent> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Container(
+              //child: //Butt,
               width: MediaQuery.of(context).size.width,
               height: MediaQuery
                   .of(context)
                   .size
-                  .width * 1 - widget.size,
+                  .width * 1 *
+                  ((widget.size / 1.24) > 0 ? (widget.size / 1.24) : 1),
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: ImageServices.moviePoster(widget.info.profilePic),
@@ -94,10 +96,11 @@ class _MovieContentState extends State<MovieContent> {
               ),
             ),
             ListTile(
-              title: Text("${_getShorterText(widget.info.movieName)}"),
+              title: Text("${_getShorterText(widget.info.movieName)}",
+                style: TextStyle(fontSize: 21),),
               subtitle: Text(
                 "Recommended by: ${_getShorterText(widget.info.recBy)}"
-                    .toUpperCase(),
+                    .toUpperCase(), style: TextStyle(fontSize: 16),
               ),
               trailing: Icon(Icons.keyboard_arrow_right),
             ),

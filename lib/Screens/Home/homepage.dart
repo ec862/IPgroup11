@@ -52,10 +52,8 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
-  SingleChildScrollView createHomePage(double headPadding, double listSize) {
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+  ListView createHomePage(double headPadding, double listSize) {
+    return ListView(
         children: <Widget>[
           topButtons(context, headPadding),
           Divider(
@@ -64,13 +62,13 @@ class _HomepageState extends State<Homepage> {
           Container(
             child: Text(
               "Recent Recommendations",
-              style: TextStyle(fontSize: 22),
+              style: TextStyle(fontSize: 22), textAlign: TextAlign.center,
             ),
           ),
           Divider(
             height: 1,
           ),
-          SizedBox(
+          Container(
             height: MediaQuery
                 .of(context)
                 .size
@@ -87,11 +85,10 @@ class _HomepageState extends State<Homepage> {
                           .of(context)
                           .size
                           .width / 1.02,
-                      child: MovieContent(movies[index], 20)),
+                      child: MovieContent(movies[index], 1.172)),
             ),
           ),
         ],
-      ),
     );
   }
 
@@ -137,47 +134,6 @@ class _HomepageState extends State<Homepage> {
               shape: RoundedRectangleBorder(
                   borderRadius: new BorderRadius.circular(5))),
         ],
-      ),
-    );
-  }
-
-  Widget createMovieCard(BuildContext context, int index) {
-    return Card(
-      child: Container(
-        width: MediaQuery
-            .of(context)
-            .size
-            .width / 1.02,
-        child: Column(
-          children: <Widget>[
-            Expanded(
-              child: Container(
-                //height: MediaQuery.of(context).size.height / 1.9 / 1.2,
-                width: MediaQuery
-                    .of(context)
-                    .size
-                    .width,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    fit: BoxFit.fill,
-                    image: ImageServices.moviePoster(
-                        "https://m.media-amazon.com/images/M/MV5BNDYxNjQyMjAtNTdiOS00NGYwLWFmNTAtNThmYjU5ZGI2YTI1XkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_SX300.jpg"),
-                  ),
-                ),
-              ),
-            ),
-            ListTile(
-              title: Text(
-                "movie" + index.toString(),
-                style: TextStyle(fontSize: 20),
-              ),
-              subtitle: Text(
-                index.toString(),
-                style: TextStyle(fontSize: 20),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
