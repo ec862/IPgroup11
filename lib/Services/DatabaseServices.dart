@@ -39,6 +39,8 @@ abstract class BaseDatabase {
 
   Future addToWatchList({@required String movieID, @required String movieName});
 
+  Future removeFromWatchList({movieID});
+
   Future reviewMovie(
       {@required String movieID,
       @required double rating,
@@ -559,6 +561,26 @@ class DatabaseServices implements BaseDatabase {
       print(e);
       onData(null);
       return null;
+    }
+  }
+
+  @override
+  Future removeFromWatchList({movieID}) async {
+    try {
+      return await _usersCollection
+          .document(this.uid)
+          .collection("WatchList")
+          .document(movieID).delete();
+    } catch (e) {
+      try {
+        return await _usersCollection
+            .document(this.uid)
+            .collection("WatchList")
+            .document(movieID).delete();
+      } catch (ex) {
+        print(ex);
+        return null;
+      }
     }
   }
 }
