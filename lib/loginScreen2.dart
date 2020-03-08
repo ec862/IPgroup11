@@ -20,6 +20,7 @@ class _LoginPageState extends State<LoginPage> {
   // so that our layout remains responsive ,we need to
   // calculate the screen height
   double screenHeight;
+  bool checkBoxValue = false;
 
   // Set initial mode to login
   AuthMode _authMode = AuthMode.LOGIN;
@@ -176,12 +177,26 @@ class _LoginPageState extends State<LoginPage> {
                     SizedBox(
                       height: 20,
                     ),
+                    Container(
+                      padding: EdgeInsets.all(10.0),
+                      child: Column(
+                        children: <Widget>[
+                          new CheckboxListTile(value: checkBoxValue,
+                              title: Text('Remember me'),
+                              activeColor: Colors.blue,
+                              onChanged:(bool newValue){
+                                setState(() {
+                                  checkBoxValue = newValue;
+                                });
+                              }),
+                        ],
+                      ),
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
                         MaterialButton(
                           onPressed: () {
-                            //Navigator.pushNamed(context, '/second');
                             Navigator.of(context)
                                 .push(MaterialPageRoute(builder: (context) {
                               return ForgotPage();
@@ -375,7 +390,8 @@ class _LoginPageState extends State<LoginPage> {
                                     email: signUpEmail,
                                     password: signUpPassword);
                                 if (result != null) {
-                                  await DatabaseServices(result.uid).setUsername(
+                                  await DatabaseServices().setUsername(
+                                      uid: result.uid,
                                       username: signUpUsername);
                                   User.userdata.uid = result.uid;
                                 }

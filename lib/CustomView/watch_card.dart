@@ -84,8 +84,8 @@ class WatchCard extends StatelessWidget {
                           filledIconData: Icons.star,
                           halfFilledIconData: Icons.star_half,
                           defaultIconData: Icons.star_border,
-                          color: Colors.green,
-                          borderColor: Colors.green,
+                          color: Colors.yellow[600],
+                          borderColor: Colors.yellow[600],
                           spacing:0.0
                       ): Text("") ,
                     ]

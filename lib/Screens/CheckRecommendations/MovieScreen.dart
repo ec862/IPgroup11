@@ -5,6 +5,7 @@ import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:template/CustomView/comment_view.dart';
 import 'package:template/Models/Arguments.dart';
 import 'package:http/http.dart' as http;
+import 'package:template/Screens/CheckRecommendations/ReviewScreen.dart';
 import 'package:template/Services/ImageServices.dart';
 import 'dart:math';
 import 'RecommendMovie.dart';
@@ -172,8 +173,8 @@ class _MovieScreenState extends State<MovieScreen> {
     return SmoothStarRating(
       starCount: 5,
       rating: rating,
-      color: Colors.green,
-      borderColor: Colors.green,
+      color: Colors.yellow[600],
+      borderColor: Colors.yellow[600],
     );
   }
 
@@ -191,7 +192,7 @@ class _MovieScreenState extends State<MovieScreen> {
     if (limit == null) {
       for (int i = 0; i < list.length; i++) {
         toReturn += list[i];
-        if (i < list.length - 1) toReturn += ", ";
+        if (i < list.length - 1) toReturn += " ";
       }
       return toReturn;
     }
@@ -202,7 +203,7 @@ class _MovieScreenState extends State<MovieScreen> {
         toReturn = toReturn.substring(0, limit) + " ...";
         break;
       }
-      toReturn += ", ";
+      toReturn += " ";
     }
     return toReturn;
   }
@@ -288,9 +289,14 @@ class SelectOption extends StatelessWidget {
           ),
           fullDivider(),
           ListTile(
-            title: Text("Review"),
+            title: Text("Rate and Review"),
             trailing: Icon(Icons.keyboard_arrow_right),
-            onTap: () {},
+            onTap: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) {
+                return ReviewScreen();
+              }));
+            },
           ),
         ],
       ),
@@ -391,7 +397,7 @@ class _MovieInfoContentState extends State<MovieInfoContent>
                 text: "${expanded ? widget.fullTitle : widget.shortTitle}",
                 style: TextStyle(
                   fontSize: 22,
-                  fontStyle: FontStyle.italic,
+                  fontStyle: FontStyle.italic, //Ask group
                 ),
               ),
             ],

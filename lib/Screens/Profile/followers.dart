@@ -72,8 +72,7 @@ class _FollowersState extends State<Followers> {
                 FollowersCard(
                     viewProfile: () {}, name: "Nina Lowery", friend: false),
                 FollowersCard(
-                    viewProfile: () {},
-                    name: "Daniele Frederick", friend: false),
+                    viewProfile: () {}, name: "Daniele Frederick", friend: false),
                 FollowersCard(
                     viewProfile: () {}, name: "Bridget Dotson", friend: false),
               ],
