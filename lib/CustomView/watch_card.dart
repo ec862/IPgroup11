@@ -1,16 +1,41 @@
+import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
+import 'package:http/http.dart' as http;
+import 'package:template/Services/ImageServices.dart';
+import 'package:template/Models/Arguments.dart';
 
-class WatchCard extends StatelessWidget {
+class WatchCard extends StatefulWidget {
 
   final Function options;
-  final String title;
-  final String genre;
-  final String date;
-  final String img;
+  final String movieID;
   final bool isReview;
   final double rating;
-  WatchCard({ this.options, this.title, this.genre, this.date, this.img, @required this.isReview, this.rating});
+  WatchCard({ this.options, @required this.movieID, @required this.isReview, this.rating});
+
+  @override
+  _WatchCardState createState() => _WatchCardState();
+}
+
+class _WatchCardState extends State<WatchCard> {
+
+  String title = "Waiting...";
+  String genre = "Waiting...";
+  String date = "Waiting...";
+  String img;
+  bool dataRetrieved = false;
+
+  void getMovieDetails(String id) async{
+    dynamic response = await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
+    var data = json.decode(response.body);
+    title = data["Title"];
+    img = data["Poster"];
+    genre = data["Genre"].split(",").toString();
+    genre = genre.substring(1,genre.length-1);
+    dataRetrieved = true;
+    setState(() {});
+  }
 
   String _getShorterText(String text) {
     String toReturn = text;
@@ -24,82 +49,89 @@ class WatchCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Container( // --- Movie Poster ---
-                      width: MediaQuery.of(context).size.width /6,
-                      height: MediaQuery.of(context).size.width/4,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                            image: NetworkImage(img),
-                            fit: BoxFit.fitWidth),
-                      ),
-                    ),
-                    IconButton( // --- Options Button ---
-                      onPressed: options,
-                      icon: Icon(Icons.more_horiz, color: Colors.grey,),
-                    ),
-                  ],
-                ),
-                SizedBox(width: 16.0,),
-                Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+    if (dataRetrieved != true)
+      getMovieDetails(widget.movieID);
+    return GestureDetector(
+      onTap: widget.options,
+      child: Card(
+        margin: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
-                      Text( // --- Title Text ---
-                        "${_getShorterText(title)}",
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                            fontSize: 18.0,
-                            color: Colors.grey[600]
+                      Container( // --- Movie Poster ---
+                        width: MediaQuery.of(context).size.width /6,
+                        height: MediaQuery.of(context).size.width/4,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                              image: ImageServices.moviePoster(img),
+                              fit: BoxFit.fitWidth),
                         ),
                       ),
-                      SizedBox(height: 6.0,),
-                      Text( // --- Genre Text ---
-                        genre,
-                        style: TextStyle(
-                          fontSize: 14.0,
-                          color: Colors.grey[800],
-                        ),
+                      /*
+                      IconButton( // --- Options Button ---
+                        onPressed: widget.options,
+                        icon: Icon(Icons.more_horiz, color: Colors.grey,),
                       ),
-                      SizedBox(height: 8.0,),
-                      isReview ? SmoothStarRating( // --- Star Rating ---
-                          allowHalfRating: false,
-                          onRatingChanged: (v) {},
-                          starCount: 5,
-                          rating: rating,
-                          size: 30.0,
-                          filledIconData: Icons.star,
-                          halfFilledIconData: Icons.star_half,
-                          defaultIconData: Icons.star_border,
-                          color: Colors.green,
-                          borderColor: Colors.green,
-                          spacing:0.0
-                      ): Text("") ,
-                    ]
-                ),
-              ],
-            ),
-            SizedBox(width: 4.0,),
-            IconButton( // --- Show Movie Button ---
-              onPressed: (){
-                Navigator.pushNamed(context, '/moviepage');
-              },
-              icon: Icon(Icons.arrow_forward_ios, color: Colors.grey,),
-            ),
-          ],
+                      */
+                    ],
+                  ),
+                  SizedBox(width: 16.0,),
+                  Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text( // --- Title Text ---
+                          "${_getShorterText(title)}",
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              fontSize: 18.0,
+                              color: Colors.grey[600]
+                          ),
+                        ),
+                        SizedBox(height: 6.0,),
+                        Text( // --- Genre Text ---
+                          genre,
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            color: Colors.grey[800],
+                          ),
+                        ),
+                        SizedBox(height: 8.0,),
+                        widget.isReview ? SmoothStarRating( // --- Star Rating ---
+                            allowHalfRating: false,
+                            onRatingChanged: (v) {},
+                            starCount: 5,
+                            rating: widget.rating,
+                            size: 30.0,
+                            filledIconData: Icons.star,
+                            halfFilledIconData: Icons.star_half,
+                            defaultIconData: Icons.star_border,
+                            color: Colors.green,
+                            borderColor: Colors.green,
+                            spacing:0.0
+                        ): Text("") ,
+                      ]
+                  ),
+                ],
+              ),
+              SizedBox(width: 4.0,),
+              IconButton( // --- Show Movie Button ---
+                onPressed: (){
+                  Navigator.pushNamed(context, '/moviepage', arguments: MovieScreenArguments(id: widget.movieID),);
+                },
+                icon: Icon(Icons.arrow_forward_ios, color: Colors.grey,),
+              ),
+            ],
+          ),
         ),
       ),
     );

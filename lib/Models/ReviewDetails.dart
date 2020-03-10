@@ -1,6 +1,6 @@
 class ReviewDetails {
   String movie_id = "";
-  int rating = 0;
+  double rating = 0.0;
   String comment = "";
 
   ReviewDetails({

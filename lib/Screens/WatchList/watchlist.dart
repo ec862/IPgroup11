@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:template/CustomView/BottomBar.dart';
+import 'package:template/Models/ReviewDetails.dart';
+import 'package:template/Screens/CheckRecommendations/RecommendMovie.dart';
 import '../../CustomView/watch_card.dart';
+import 'package:template/Services/DatabaseServices.dart';
+import 'package:template/Models/User.dart';
+
 
 const Color BOTTOM_BAR_COLOR = Colors.redAccent;
 
@@ -11,8 +16,21 @@ class WatchList extends StatefulWidget {
 
 class _WatchListState extends State<WatchList> {
 
+  Future<List<String>> watchlist = DatabaseServices(User.userdata.uid).getWatchList();
+  Future<List<ReviewDetails>> reviewlist = DatabaseServices(User.userdata.uid).getReviewList();
+
   @override
   Widget build(BuildContext context) {
+    Function options = (){
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return SelectOption(isReview: false);
+      }));
+    };
+    Function optionsReview = (){
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return SelectOption(isReview: true);
+      }));
+    };
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -33,73 +51,96 @@ class _WatchListState extends State<WatchList> {
         body: TabBarView(
           children: <Widget>[
             //watchlist tab
-            ListView(
-              children: <Widget>[
-                WatchCard(
-                  isReview: false,
-                  options: () {},
-                  title: "Shrek",
-                  genre: "Romance",
-                  date: "20/04/19",
-                  img:
-                  "https://cdn11.bigcommerce.com/s-yzgoj/images/stencil/1280x1280/products/20913/4123469/MOV214283__23800.1541824966.jpg?c=2&imbypass=on",
-                ),
-                WatchCard(
-                  isReview: false,
-                  options: () {},
-                  title: "Get Out",
-                  genre: "Horror",
-                  date: "13/08/19",
-                  img:
-                  "https://m.media-amazon.com/images/M/MV5BMjUxMDQwNjcyNl5BMl5BanBnXkFtZTgwNzcwMzc0MTI@._V1_.jpg",
-                ),
-                WatchCard(
-                  isReview: false,
-                  options: () {},
-                  title: "Avengers: Endgame",
-                  genre: "Action",
-                  date: "04/01/20",
-                  img:
-                  "https://m.media-amazon.com/images/M/MV5BMTc5MDE2ODcwNV5BMl5BanBnXkFtZTgwMzI2NzQ2NzM@._V1_.jpg",
-                ),
-              ],
+            FutureBuilder(
+              future: watchlist,
+              builder: (BuildContext context, AsyncSnapshot<List> snapshot){
+                if (!snapshot.hasData)
+                  return new Container();
+                List<String> content = snapshot.data;
+                return new ListView.builder(
+                  scrollDirection: Axis.vertical,
+                  padding: new EdgeInsets.all(6.0),
+                  itemCount: content.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return WatchCard(movieID: content[index], isReview: false, options: options);
+                  },
+                );
+              },
             ),
 
             //review history tab
-            ListView(
-              children: <Widget>[
-                WatchCard(
-                    isReview: true,
-                    options: () {},
-                    title: "Shrek",
-                    genre: "Romance",
-                    rating: 4.0,
-                    img:
-                    "https://cdn11.bigcommerce.com/s-yzgoj/images/stencil/1280x1280/products/20913/4123469/MOV214283__23800.1541824966.jpg?c=2&imbypass=on"),
-                WatchCard(
-                  isReview: true,
-                  options: () {},
-                  title: "Get Out",
-                  genre: "Horror",
-                  rating: 2.0,
-                  img:
-                  "https://m.media-amazon.com/images/M/MV5BMjUxMDQwNjcyNl5BMl5BanBnXkFtZTgwNzcwMzc0MTI@._V1_.jpg",
-                ),
-                WatchCard(
-                  isReview: true,
-                  options: () {},
-                  title: "Avengers: End Game",
-                  genre: "Action",
-                  rating: 5.0,
-                  img:
-                  "https://m.media-amazon.com/images/M/MV5BMTc5MDE2ODcwNV5BMl5BanBnXkFtZTgwMzI2NzQ2NzM@._V1_.jpg",
-                ),
-              ],
+            FutureBuilder(
+              future: reviewlist,
+              builder: (BuildContext context, AsyncSnapshot<List> snapshot){
+                if (!snapshot.hasData)
+                  return new Container();
+                List<ReviewDetails> content = snapshot.data;
+                return new ListView.builder(
+                  scrollDirection: Axis.vertical,
+                  padding: new EdgeInsets.all(6.0),
+                  itemCount: content.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return WatchCard(movieID: content[index].movie_id, isReview: true, rating: content[index].rating, options: optionsReview);
+                  },
+                );
+              },
             ),
+            /*
+            ListView(
+              children: <Widget>[WatchCard(movieID: "tt0848228", isReview: true, rating: 4, options: optionsReview)],
+            ),
+            */
           ],
         ),
         bottomNavigationBar: BottomBar().createBar(context, 3),
       ),
+    );
+  }
+}
+
+class SelectOption extends StatelessWidget {
+
+  final isReview;
+  SelectOption({@required this.isReview});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.blue[900],
+        title: Text("Options"),
+      ),
+      body: ListView(
+        children: <Widget>[
+          ListTile(
+            title: !isReview ? Text("Remove from WatchList") : Text("Remove Review"),
+            trailing: Icon(Icons.keyboard_arrow_right),
+            onTap: !isReview ? () {} : () {},
+          ),
+          fullDivider(),
+          ListTile(
+            title: Text("Recommend Movie"),
+            trailing: Icon(Icons.keyboard_arrow_right),
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                  return RecommendMovie();
+                }));
+              },
+          ),
+          fullDivider(),
+          ListTile(
+            title: Text("Review"),
+            trailing: Icon(Icons.keyboard_arrow_right),
+            onTap: () {},
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget fullDivider() {
+    return Divider(
+      color: Colors.black,
     );
   }
 }
