@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:template/CustomView/BottomBar.dart';
 import 'package:template/Models/ReviewDetails.dart';
 import 'package:template/Screens/CheckRecommendations/RecommendMovie.dart';
 import '../../CustomView/watch_card.dart';
 import 'package:template/Services/DatabaseServices.dart';
 import 'package:template/Models/User.dart';
-
 
 const Color BOTTOM_BAR_COLOR = Colors.redAccent;
 
@@ -15,22 +15,23 @@ class WatchList extends StatefulWidget {
 }
 
 class _WatchListState extends State<WatchList> {
-
-  Future<List<String>> watchlist = DatabaseServices(User.userdata.uid).getWatchList();
-  Future<List<ReviewDetails>> reviewlist = DatabaseServices(User.userdata.uid).getReviewList();
+  Future<List<String>> watchlist;
+  Future<List<ReviewDetails>> reviewlist;
 
   @override
   Widget build(BuildContext context) {
-    Function options = (){
+    watchlist = DatabaseServices(User.userdata.uid).getWatchList();
+    reviewlist = DatabaseServices(User.userdata.uid).getReviewList();
+    /*Function options = (String id) {
       Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return SelectOption(isReview: false);
+        return SelectOptions(id, isReview: false);
       }));
     };
-    Function optionsReview = (){
+    Function optionsReview = (String id) {
       Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return SelectOption(isReview: true);
+        return SelectOptions(id, isReview: true);
       }));
-    };
+    };*/
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -53,20 +54,26 @@ class _WatchListState extends State<WatchList> {
             //watchlist tab
             FutureBuilder(
               future: watchlist,
-              builder: (BuildContext context, AsyncSnapshot<List> snapshot){
-                if (!snapshot.hasData)
-                  return new Container(
+              builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+                if (!snapshot.hasData) return new Container();
+                List<String> content = snapshot.data;
+                if (content == null)
+                  return Container(
                     child: Center(
-                      child: Text("No data"),
+                      child: Text("Nothing"),
                     ),
                   );
-                List<String> content = snapshot.data;
+
                 return new ListView.builder(
                   scrollDirection: Axis.vertical,
                   padding: new EdgeInsets.all(6.0),
                   itemCount: content.length,
                   itemBuilder: (BuildContext context, int index) {
-                    return WatchCard(movieID: content[index], isReview: false, options: options);
+                    return WatchCard(
+                      movieID: content[index],
+                      isReview: false,
+                      options: (){},
+                    );
                   },
                 );
               },
@@ -75,25 +82,23 @@ class _WatchListState extends State<WatchList> {
             //review history tab
             FutureBuilder(
               future: reviewlist,
-              builder: (BuildContext context, AsyncSnapshot<List> snapshot){
-                if (!snapshot.hasData)
-                  return new Container();
+              builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+                if (!snapshot.hasData) return new Container();
                 List<ReviewDetails> content = snapshot.data;
                 return new ListView.builder(
                   scrollDirection: Axis.vertical,
                   padding: new EdgeInsets.all(6.0),
                   itemCount: content.length,
                   itemBuilder: (BuildContext context, int index) {
-                    return WatchCard(movieID: content[index].movie_id, isReview: true, rating: content[index].rating, options: optionsReview);
+                    return WatchCard(
+                        movieID: content[index].movie_id,
+                        isReview: true,
+                        rating: content[index].rating,
+                        options: (){});
                   },
                 );
               },
             ),
-            /*
-            ListView(
-              children: <Widget>[WatchCard(movieID: "tt0848228", isReview: true, rating: 4, options: optionsReview)],
-            ),
-            */
           ],
         ),
         bottomNavigationBar: BottomBar().createBar(context, 3),
@@ -102,10 +107,11 @@ class _WatchListState extends State<WatchList> {
   }
 }
 
-class SelectOption extends StatelessWidget {
-
+class SelectOptions extends StatelessWidget {
   final isReview;
-  SelectOption({@required this.isReview});
+  final id;
+
+  SelectOptions(this.id, {@required this.isReview});
 
   @override
   Widget build(BuildContext context) {
@@ -117,19 +123,33 @@ class SelectOption extends StatelessWidget {
       body: ListView(
         children: <Widget>[
           ListTile(
-            title: !isReview ? Text("Remove from WatchList") : Text("Remove Review"),
+            title: !isReview
+                ? Text("Remove from WatchList")
+                : Text("Remove Review"),
             trailing: Icon(Icons.keyboard_arrow_right),
-            onTap: !isReview ? () {} : () {},
+            onTap: !isReview
+                ? () {
+                    DatabaseServices(User.userdata.uid)
+                        .removeFromWatchList(movieID: id);
+                    Fluttertoast.showToast(
+                      msg: "Movie delted",
+                      gravity: ToastGravity.CENTER,
+                    );
+                    Navigator.of(context).pop();
+                  }
+                : () {
+                    Navigator.of(context).pop();
+                  },
           ),
           fullDivider(),
           ListTile(
             title: Text("Recommend Movie"),
             trailing: Icon(Icons.keyboard_arrow_right),
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                  return RecommendMovie();
-                }));
-              },
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                return RecommendMovie();
+              }));
+            },
           ),
           fullDivider(),
           ListTile(

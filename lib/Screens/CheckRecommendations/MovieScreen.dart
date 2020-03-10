@@ -247,7 +247,7 @@ class _MovieScreenState extends State<MovieScreen> {
   void getMovieDetails(String id) async {
     args = ModalRoute.of(context).settings.arguments;
     dynamic response =
-        await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
+    await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
     var data = json.decode(response.body);
     actors = data["Actors"].split(",");
     directors = data["Director"].split(",");
@@ -339,9 +339,9 @@ class ProfileFullScreen extends StatelessWidget {
             height: MediaQuery.of(context).size.height,
             decoration: BoxDecoration(
                 image: DecorationImage(
-              image: ImageServices.moviePoster(posterUrl),
-              fit: BoxFit.fitWidth,
-            )),
+                  image: ImageServices.moviePoster(posterUrl),
+                  fit: BoxFit.fitWidth,
+                )),
           ),
         ),
       ),
@@ -358,8 +358,8 @@ class MovieInfoContent extends StatefulWidget {
 
   MovieInfoContent(
       {@required this.title,
-      @required this.shortTitle,
-      @required this.fullTitle});
+        @required this.shortTitle,
+        @required this.fullTitle});
 
   @override
   _MovieInfoContentState createState() => _MovieInfoContentState();
@@ -397,7 +397,7 @@ class _MovieInfoContentState extends State<MovieInfoContent>
             children: [
               TextSpan(
                 text:
-                    "${expanded ? "${widget.title}:\n" : "${widget.title}:\n"}",
+                "${expanded ? "${widget.title}:\n" : "${widget.title}:\n"}",
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -433,6 +433,5 @@ class _MovieInfoContentState extends State<MovieInfoContent>
         },
       ),
     );
-    ;
   }
 }
