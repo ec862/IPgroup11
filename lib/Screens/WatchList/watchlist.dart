@@ -55,7 +55,11 @@ class _WatchListState extends State<WatchList> {
               future: watchlist,
               builder: (BuildContext context, AsyncSnapshot<List> snapshot){
                 if (!snapshot.hasData)
-                  return new Container();
+                  return new Container(
+                    child: Center(
+                      child: Text("No data"),
+                    ),
+                  );
                 List<String> content = snapshot.data;
                 return new ListView.builder(
                   scrollDirection: Axis.vertical,
