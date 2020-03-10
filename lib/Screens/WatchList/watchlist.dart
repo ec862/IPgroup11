@@ -22,16 +22,7 @@ class _WatchListState extends State<WatchList> {
   Widget build(BuildContext context) {
     watchlist = DatabaseServices(User.userdata.uid).getWatchList();
     reviewlist = DatabaseServices(User.userdata.uid).getReviewList();
-    /*Function options = (String id) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return SelectOptions(id, isReview: false);
-      }));
-    };
-    Function optionsReview = (String id) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return SelectOptions(id, isReview: true);
-      }));
-    };*/
+
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -78,7 +69,6 @@ class _WatchListState extends State<WatchList> {
                 );
               },
             ),
-
             //review history tab
             FutureBuilder(
               future: reviewlist,

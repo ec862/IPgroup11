@@ -41,6 +41,8 @@ abstract class BaseDatabase {
 
   Future removeFromWatchList({@required String movieID});
 
+  Future removeRecommendation({String movieID});
+
   Future reviewMovie(
       {@required String movieID,
       @required double rating,
@@ -569,10 +571,28 @@ class DatabaseServices implements BaseDatabase {
     try {
       return _usersCollection
           .document(this.uid)
-          .collection("WatchList").document(movieID).delete();
-    }catch(e){
+          .collection("WatchList")
+          .document(movieID)
+          .delete();
+    } catch (e) {
       print(e);
       return null;
     }
+  }
+
+  @override
+  Future removeRecommendation({String movieID}) async {
+    QuerySnapshot snapshot = await _usersCollection
+        .document(this.uid)
+        .collection("RecommendedMovies")
+        .where("movie_id", isEqualTo: movieID)
+        .getDocuments();
+    snapshot.documents.forEach((DocumentSnapshot snap) async {
+      await _usersCollection
+          .document(this.uid)
+          .collection("RecommendedMovies")
+          .document(snap.documentID)
+          .delete();
+    });
   }
 }
