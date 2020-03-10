@@ -26,6 +26,7 @@ class _ProfileState extends State<Profile> {
         children: <Widget>[
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            //crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Container(
                 width: 110,
@@ -36,22 +37,40 @@ class _ProfileState extends State<Profile> {
                 backgroundImage: NetworkImage(
                     'https://images.unsplash.com/photo-1501549538842-2f24e2dd6520?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80'),
               ),
+
               Container(
-                width: 110,
+                width: 40,
+                //width: 110,
+              ),
+
+              Container(
                 height: 140,
                 alignment: Alignment.topRight,
-                child: IconButton(
-                  icon: Icon(
-                    Icons.edit,
+                child: SizedBox.fromSize(
+                  size: Size(56, 56), // button width and height
+                  child: ClipOval(
+                    child: Material(
+                      color: Colors.white, // button color
+                      child: InkWell(
+                        splashColor: Colors.blue, // splash color
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => EditProfile()),
+                          );
+                        },
+                        // button pressed
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Icon(Icons.edit), // icon
+                            Text("Edit"), // text
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                  onPressed: () {
-                    //Navigator.of(context).push(MaterialPageRoute(builder: (context) => EditProfile()),
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => EditProfile()),
-                    );
-                  },
-                ),
+                )
               ),
             ],
           ),

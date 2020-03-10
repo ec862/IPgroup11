@@ -40,19 +40,23 @@ class _EditProfileState extends State<EditProfile> {
         title: Text('Edit Profile'),
       ),
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Container(
+                margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
+                //color: Colors.red,
                 width: 110,
                 height: 140,
               ),
               Stack(
                 children: <Widget>[
                   Container(
+                    margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
                     child: CircleAvatar(
                       radius: 70,
                       backgroundImage: NetworkImage(
@@ -60,6 +64,7 @@ class _EditProfileState extends State<EditProfile> {
                     ),
                   ),
                   Container(
+                    margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
                     width: 50,
                     child: FloatingActionButton(
                       backgroundColor: Color.fromRGBO(0, 0, 0, 0.5),
@@ -77,7 +82,7 @@ class _EditProfileState extends State<EditProfile> {
                   ),
                 ],
               ),
-              Container(
+              /*Container(
                 width: 110,
                 height: 140,
                 alignment: Alignment.topRight,
@@ -89,6 +94,40 @@ class _EditProfileState extends State<EditProfile> {
                     Navigator.pop(context);
                   },
                 ),
+              ),*/
+
+              Container(
+                width: 40,
+                //width: 110,
+              ),
+
+              Container(
+                  margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
+                  //color: Colors.red,
+                  height: 100,
+                  alignment: Alignment.topRight,
+                  child: SizedBox.fromSize(
+                    size: Size(56, 56), // button width and height
+                    child: ClipOval(
+                      child: Material(
+                        color: Colors.white, // button color
+                        child: InkWell(
+                          splashColor: Colors.blue, // splash color
+                          onTap: () {
+                              Navigator.pop(context);
+                          },
+                          // button pressed
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Icon(Icons.save), // icon
+                              Text("Save"), // text
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
               ),
             ],
           ),
@@ -236,7 +275,7 @@ class _EditProfileState extends State<EditProfile> {
             ],
           ),
           Transform(
-            transform: Matrix4.translationValues(270, -72, 0.0),
+            transform: Matrix4.translationValues(275, -90, 0.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
