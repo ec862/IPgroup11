@@ -46,9 +46,14 @@ class _WatchListState extends State<WatchList> {
             FutureBuilder(
               future: watchlist,
               builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
-                if (!snapshot.hasData) return new Container();
+                if (!snapshot.hasData)
+                  return Container(
+                    child: Center(
+                      child: Text("Nothing"),
+                    ),
+                  );
                 List<String> content = snapshot.data;
-                if (content == null)
+                if (snapshot.data == null)
                   return Container(
                     child: Center(
                       child: Text("Nothing"),
@@ -63,7 +68,7 @@ class _WatchListState extends State<WatchList> {
                     return WatchCard(
                       movieID: content[index],
                       isReview: false,
-                      options: (){},
+                      options: () {},
                     );
                   },
                 );
@@ -84,7 +89,7 @@ class _WatchListState extends State<WatchList> {
                         movieID: content[index].movie_id,
                         isReview: true,
                         rating: content[index].rating,
-                        options: (){});
+                        options: () {});
                   },
                 );
               },

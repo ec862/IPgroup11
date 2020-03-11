@@ -8,4 +8,8 @@ class ImageServices{
       return AssetImage("asserts/no_picture_avatar.jpg");
     }
   }
+
+  static ImageProvider profileImage(String url){
+    return moviePoster(url);
+  }
 }

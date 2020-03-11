@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:template/CustomView/BottomBar.dart';
+import 'package:template/Models/User.dart';
 import 'package:template/Screens/CheckRecommendations/CheckRecomendations.dart';
 import 'package:template/Screens/SearchTab/searchpage.dart';
+import 'package:template/Services/DatabaseServices.dart';
 import 'package:template/Services/ImageServices.dart';
 import '../main.dart';
 

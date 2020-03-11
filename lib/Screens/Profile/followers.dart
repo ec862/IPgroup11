@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:template/Models/User.dart';
+import 'package:template/Models/UserDetails.dart';
+import 'package:template/Services/DatabaseServices.dart';
 import '../../CustomView/followers_card.dart';
 
 class Followers extends StatefulWidget {
   final int index;
+
   Followers({@required this.index});
 
-   @override
+  @override
   _FollowersState createState() => _FollowersState();
 }
 
 class _FollowersState extends State<Followers> {
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -33,54 +36,86 @@ class _FollowersState extends State<Followers> {
         body: TabBarView(
           children: <Widget>[
             //followers tab
-            ListView(
-              children: <Widget>[
-                FollowersCard(
-                    viewProfile: () {}, name: "Winnie Horner", friend: true),
-                FollowersCard(
-                    viewProfile: () {}, name: "Jeff Smith", friend: true),
-                FollowersCard(
-                    viewProfile: () {}, name: "Olli Holder", friend: true),
-                FollowersCard(
-                    viewProfile: () {}, name: "Keyaan Major", friend: true),
-                FollowersCard(
-                    viewProfile: () {}, name: "Eoin Andrews", friend: false),
-                FollowersCard(
-                    viewProfile: () {}, name: "Sabiha Cannon", friend: false),
-                FollowersCard(
-                    viewProfile: () {}, name: "Rahma Landry", friend: false),
-                FollowersCard(
-                    viewProfile: () {}, name: "Aida Brett", friend: false),
-                FollowersCard(
-                    viewProfile: () {}, name: "Nate O'Ryan", friend: false),
-                FollowersCard(
-                    viewProfile: () {}, name: "Christian Rocha", friend: false),
-              ],
-            ),
-
+            getFollowers(),
             //following tab
-            ListView(
-              children: <Widget>[
-                FollowersCard(
-                    viewProfile: () {}, name: "Winnie Horner", friend: true),
-                FollowersCard(
-                    viewProfile: () {}, name: "Jeff Smith", friend: true),
-                FollowersCard(
-                    viewProfile: () {}, name: "Olli Holder", friend: true),
-                FollowersCard(
-                    viewProfile: () {}, name: "Keyaan Major", friend: true),
-                FollowersCard(
-                    viewProfile: () {}, name: "Nina Lowery", friend: false),
-                FollowersCard(
-                    viewProfile: () {},
-                    name: "Daniele Frederick", friend: false),
-                FollowersCard(
-                    viewProfile: () {}, name: "Bridget Dotson", friend: false),
-              ],
-            ),
+            getFollowing(),
           ],
         ),
       ),
+    );
+  }
+
+  Widget getFollowing() {
+    Future<List<FollowerDetails>> followers =
+        DatabaseServices(User.userdata.uid).getFollowing();
+    return FutureBuilder(
+      future: followers,
+      builder: (BuildContext context,
+          AsyncSnapshot<List<FollowerDetails>> snapshot) {
+        if (!snapshot.hasData)
+          return Container(
+            child: Center(
+              child: Text("Waiting..."),
+            ),
+          );
+        if (snapshot.data == null || snapshot.data.isEmpty)
+          return Container(
+            child: Center(
+              child: Text("You're not following anyone at the moment"),
+            ),
+          );
+
+        List<FollowerDetails> content = snapshot.data;
+        return ListView.builder(
+          itemCount: content.length,
+          itemBuilder: (context, index) {
+            return FollowersCard(
+              uid: content[index].user_id,
+              isAccepted: content[index].accepted,
+              isFollowers: false,
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget getFollowers() {
+    Future<List<FollowerDetails>> followers =
+        DatabaseServices(User.userdata.uid).getFollowers();
+    return FutureBuilder(
+      future: followers,
+      builder: (BuildContext context,
+          AsyncSnapshot<List<FollowerDetails>> snapshot) {
+        if (!snapshot.hasData)
+          return Container(
+            child: Center(
+              child: Text("Waiting..."),
+            ),
+          );
+
+        if (snapshot.data == null || snapshot.data.isEmpty)
+          return Container(
+            child: Center(
+              child: Text("No one is following you at the moment"),
+            ),
+          );
+
+        List<FollowerDetails> content = snapshot.data;
+        return ListView.builder(
+          itemCount: content.length,
+          itemBuilder: (context, index) {
+            return FollowersCard(
+              uid: content[index].user_id,
+              isAccepted: content[index].accepted,
+              isFollowers: true,
+              reset: (){
+                setState(() {});
+              },
+            );
+          },
+        );
+      },
     );
   }
 }

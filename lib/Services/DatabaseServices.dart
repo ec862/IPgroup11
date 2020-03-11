@@ -53,6 +53,10 @@ abstract class BaseDatabase {
       @required String movieID,
       @required String movieName});
 
+  Future<bool> isFollowing({@required String uid});
+
+  Future <bool> isFollower({@required String uid});
+
   ///getters
   Future<List<String>> getWatchList();
 
@@ -69,6 +73,8 @@ abstract class BaseDatabase {
   Future<List<FollowerDetails>> getFollowing();
 
   Future<MovieDetails> getMovieDetails({@required String id});
+
+  Future<List<Map<String , String>>> getPersonSuggestion(String suggestion);
 }
 
 class DatabaseServices implements BaseDatabase {
@@ -83,18 +89,28 @@ class DatabaseServices implements BaseDatabase {
     _storageReference = FirebaseStorage.instance.ref().child("Images");
   }
 
+  List<String> _setSearchParam(String caseNumber) {
+    List<String> caseSearchList = List();
+    String temp = "";
+    for (int i = 0; i < caseNumber.length; i++) {
+      temp = temp + caseNumber[i];
+      caseSearchList.add(temp);
+    }
+    return caseSearchList;
+  }
+
   @override
   Future setUsername({@required String username}) async {
     try {
       return await _usersCollection.document(this.uid).updateData(
-        {'user_name': username},
+        {'user_name': username, 'search_param': _setSearchParam(username)},
       ).whenComplete(() {
         print("Done");
       });
     } catch (e) {
       try {
         return await _usersCollection.document(this.uid).setData(
-          {'user_name': username},
+          {'user_name': username, 'search_param': _setSearchParam(username)},
         );
       } catch (ex) {
         print(ex);
@@ -263,10 +279,10 @@ class DatabaseServices implements BaseDatabase {
       return await _usersCollection
           .document(uid)
           .collection("Followers")
-          .document(uid)
+          .document(this.uid)
           .updateData(
         {
-          'user_id': uid,
+          'user_id': this.uid,
           'accepted': false,
         },
       ).whenComplete(() {
@@ -278,10 +294,10 @@ class DatabaseServices implements BaseDatabase {
         return await _usersCollection
             .document(uid)
             .collection("Followers")
-            .document(uid)
+            .document(this.uid)
             .setData(
           {
-            'user_id': uid,
+            'user_id': this.uid,
             'accepted': false,
           },
         ).whenComplete(() {
@@ -594,5 +610,55 @@ class DatabaseServices implements BaseDatabase {
           .document(snap.documentID)
           .delete();
     });
+  }
+
+  @override
+  Future<List<Map<String , String>>> getPersonSuggestion(String suggestion) async {
+    List<Map<String , String>> toReturn = [];
+    QuerySnapshot querySnapshot = await _usersCollection
+        .where("search_param", arrayContains: suggestion)
+        .getDocuments();
+    querySnapshot.documents.forEach((DocumentSnapshot documentSnapshot){
+      toReturn.add({
+        'uid' : documentSnapshot.documentID,
+        'user_name' : documentSnapshot.data['user_name'],
+      });
+    });
+    return toReturn;
+  }
+
+  Future setUserSearch() async {
+    QuerySnapshot snap = await _usersCollection.getDocuments();
+    snap.documents.forEach((DocumentSnapshot snapShot) {
+      try {
+        _usersCollection.document(snapShot.documentID).updateData(
+            {'search_param': _setSearchParam(snapShot.data['user_name'])});
+      } catch (e) {}
+    });
+  }
+
+  @override
+  Future<bool> isFollowing({String uid}) async {
+    DocumentSnapshot snap = await _usersCollection.document(this.uid).collection("Following").document(uid).get();
+    if (snap == null)
+      return false;
+
+    if (snap.exists)
+      return true;
+
+    return false;
+  }
+
+  @override
+  Future<bool> isFollower({String uid}) async {
+    DocumentSnapshot snap = await _usersCollection.document(this.uid).collection("Followers").document(uid).get();
+    if (snap == null)
+      return false;
+
+    if (snap.exists)
+      if (snap.data['accepted'])
+        return true;
+
+    return false;
   }
 }

@@ -4,6 +4,7 @@ import 'package:template/Screens/CheckRecommendations/CheckRecomendations.dart';
 import 'package:template/Screens/CheckRecommendations/MovieScreen.dart';
 import 'package:template/Screens/Home/homepage.dart';
 import 'package:template/Screens/Profile/followers.dart';
+import 'package:template/Screens/Profile/otherProfile.dart';
 import 'package:template/Screens/Profile/profile.dart';
 import 'package:template/Screens/WatchList/watchlist.dart';
 import 'package:template/loginScreen2.dart';
@@ -43,6 +44,8 @@ class MainApp extends StatelessWidget {
                   return new Followers(index: 0);
                 case '/followings':
                   return new Followers(index: 1);
+                case '/otherProfile':
+                  return new OtherProfile();
                 default:
                   return null;
               }

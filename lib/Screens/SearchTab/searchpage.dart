@@ -4,6 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:template/Models/Arguments.dart';
+import 'package:template/Models/User.dart';
+import 'package:template/Services/DatabaseServices.dart';
 
 final friendList = [
   "Elon Musk",
@@ -96,7 +98,9 @@ LinkedHashSet<MovieObject> movieHistorySet =
     new LinkedHashSet(); // history of clicks, keeping their MovieObjects
 List data = new List();
 String lastQuery = "zzzz";
+String lastFriendQuery = "zzzz";
 Widget lastWidget;
+Widget lastFriendWidget;
 
 class MovieSearch {
   Future getMovieData(String movieSearch) async {
@@ -156,6 +160,29 @@ class MovieSearch {
   }
 }
 
+class FriendSearch {
+  Future getSearchData(String friendSearch) async {
+    lastFriendQuery = friendSearch;
+    List<Map<String, String>> data = await DatabaseServices(User.userdata.uid)
+        .getPersonSuggestion(friendSearch);
+
+    if (data == null) return -1;
+    if (data.length < 0) return -1;
+
+    List userdata = [];
+    for (int i = 0; i < data.length; i++) {
+      userdata.add(
+        FriendObject(
+          uid: data[i]['uid'],
+          userName: data[i]['user_name'],
+        ),
+      );
+    }
+
+    return userdata;
+  }
+}
+
 class CustomSearchDelegate extends SearchDelegate<String> {
   void addToMovieSet(MovieObject m) {
     if (movieHistorySet.length >= 20) {
@@ -166,23 +193,27 @@ class CustomSearchDelegate extends SearchDelegate<String> {
 
   Widget createSearchPage(BuildContext context, String query) {
     return DefaultTabController(
-        length: 2,
-        child: Scaffold(
-            appBar: TabBar(
-              tabs: <Widget>[
-                Tab(
-                  text: "Movies",
-                ),
-                Tab(
-                  text: "People",
-                )
-              ],
-              labelColor: Colors.black,
+      length: 2,
+      child: Scaffold(
+        appBar: TabBar(
+          tabs: <Widget>[
+            Tab(
+              text: "Movies",
             ),
-            body: TabBarView(children: <Widget>[
-              createMovieSearch(context, query),
-              createMovieSearch(context, query)
-            ])));
+            Tab(
+              text: "People",
+            )
+          ],
+          labelColor: Colors.black,
+        ),
+        body: TabBarView(
+          children: <Widget>[
+            createMovieSearch(context, query),
+            createPeopleSearch(context, query),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget createRecentMovieSearch(BuildContext context) {
@@ -300,6 +331,64 @@ class CustomSearchDelegate extends SearchDelegate<String> {
     }
   }
 
+  Widget createPeopleSearch(BuildContext context, String query) {
+    if (query == "" || query == null) {
+      return Center(
+        child: Container(
+          child: Text("Waiting for user input..."),
+        ),
+      );
+    } else if (query == lastFriendQuery) {
+      return lastFriendWidget;
+    } else {
+      return FutureBuilder(
+        future: FriendSearch().getSearchData(query),
+        builder: (context, projectSnap) {
+          if (projectSnap.connectionState != ConnectionState.done) {
+            return Center(child: CircularProgressIndicator());
+          } else if (projectSnap.data == -1) {
+            String s = 'No data';
+            lastFriendWidget = Center(
+              child: Container(
+                child: Text(s),
+              ),
+            );
+            return lastFriendWidget;
+          } else if (projectSnap.hasError) {
+            lastFriendWidget = Center(
+              child: Container(
+                child: Text("Error with query"),
+              ),
+            );
+            return lastFriendWidget;
+          } else {
+            lastFriendWidget = ListView.builder(
+              itemCount: projectSnap.data.length,
+              itemBuilder: (context, index) {
+                FriendObject f = projectSnap.data[index];
+                return ListTile(
+                  title: Text(f.userName, style: TextStyle(fontSize: 21)),
+                  onTap: () {
+                    if (f.uid == User.userdata.uid) {
+                      Navigator.of(context).pushNamed('/profile');
+                      return;
+                    }
+                    Navigator.of(context).pushNamed('/otherProfile',
+                        arguments: OtherProfileArgument(
+                            id: f.uid, userName: f.userName));
+                  },
+                  leading: Icon(Icons.account_circle),
+                );
+              },
+            );
+            print(projectSnap.data.length);
+            return lastFriendWidget;
+          }
+        },
+      );
+    }
+  }
+
   @override
   List<Widget> buildActions(BuildContext context) {
     return [
@@ -360,4 +449,11 @@ class MovieObject {
     return MovieObject(result["movieTitle"], result["movieID"],
         result["movieYear"], result["movieImageURL"]);
   }
+}
+
+class FriendObject {
+  String uid;
+  String userName;
+
+  FriendObject({this.uid, this.userName});
 }

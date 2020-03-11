@@ -4,3 +4,9 @@ class MovieScreenArguments{
     this.id = id;
   }
 }
+
+class OtherProfileArgument{
+  String id = "";
+  String userName = "";
+  OtherProfileArgument({this.id, this.userName});
+}
