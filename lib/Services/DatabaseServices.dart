@@ -351,7 +351,7 @@ class DatabaseServices implements BaseDatabase {
         .collection("Following")
         .document(this.uid)
         .setData(
-      {'user_id': uid, 'accepted': accepted},
+      {'user_id': this.uid, 'accepted': accepted},
     );
   }
 
