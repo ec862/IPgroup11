@@ -1,9 +1,7 @@
-import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:template/Models/Arguments.dart';
-import 'package:http/http.dart' as http;
 import 'package:template/Models/MovieDetails.dart';
 import 'package:template/Models/User.dart';
 import 'package:template/Services/DatabaseServices.dart';
@@ -19,18 +17,19 @@ class CheckRecomendations extends StatefulWidget {
 }
 
 class _CheckRecomendationsState extends State<CheckRecomendations> {
-  List<RecommendationInfo> movies = [];
+  List<RecommendedMoviesDetails> movies;
+  String userID;
+  List movieCards;
 
   @override
   void initState() {
     super.initState();
-    movies.add(RecommendationInfo());
-    movies.add(RecommendationInfo(id: "tt3896198"));
-    movies.add(RecommendationInfo(id: "tt5052448"));
-    movies.add(RecommendationInfo(id: "tt0848228"));
-    movies.add(RecommendationInfo(id: "tt0974015"));
-    movies.add(RecommendationInfo(id: "tt0369610"));
-    movies.add(RecommendationInfo(id: "tt4881806"));
+    userID = User.userdata.uid;
+  }
+
+  Future getRecomendedMovies() async {
+    movies = await DatabaseServices(userID).getRecommendations();
+    return movies;
   }
 
   @override
@@ -40,34 +39,65 @@ class _CheckRecomendationsState extends State<CheckRecomendations> {
         backgroundColor: Colors.blue[900],
         title: Text('Check Recommendations'),
       ),
-      body: ListView.builder(
-        physics: BouncingScrollPhysics(),
-        itemCount: movies.length,
-        itemBuilder: (ctx, index) {
-          return MovieContent(movies[index], 0);
+      body: FutureBuilder(
+        builder: (context, projectSnap) {
+          if (projectSnap.connectionState != ConnectionState.done) {
+            return Center(
+              child: Text("Loading"),
+            );
+          }
+          else {
+            return ListView.builder(
+              shrinkWrap: false,
+              physics: BouncingScrollPhysics(),
+              itemCount: ((movies != null) ? movies.length : 0),
+              itemBuilder: (BuildContext context, int index) {
+                return FutureBuilder(
+                  builder: (context, projectSnap) {
+                    if (projectSnap.connectionState != ConnectionState.done) {
+                      return Container(
+                        height: MediaQuery
+                            .of(context)
+                            .size
+                            .height * 0.72,
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+                    else {
+                      return projectSnap.data;
+                    }
+                  },
+                  future: MovieContent(movies[index]).cardBuilder(context),
+                );
+              },
+            );
+          }
         },
+        future: getRecomendedMovies(),
       ),
       bottomNavigationBar: BottomBar().createBar(context, 2),
     );
   }
 }
 
-class MovieContent extends StatefulWidget {
-  RecommendationInfo info;
-  double size;
+class MovieContent {
+  RecommendedMoviesDetails info;
 
-  MovieContent(this.info, this.size);
+  MovieContent(this.info);
 
-  @override
-  _MovieContentState createState() => _MovieContentState();
-}
-
-class _MovieContentState extends State<MovieContent> {
-  bool dataRetrieved = false;
+  Future<String> getURL(String movieID) async {
+    MovieDetails posterURl =
+    await DatabaseServices(User.userdata.uid).getMovieDetails(id: movieID);
+    return posterURl.profileUrl;
+  }
 
   @override
-  Widget build(BuildContext context) {
-    if (dataRetrieved != true) getMovieDetails(widget.info.id);
+  Future cardBuilder(BuildContext context) async {
+    var posterURL = await getURL(info.movie_id);
+    var poster = ImageServices.moviePoster(posterURL);
+
     return Card(
       margin: EdgeInsets.all(8),
       elevation: 10,
@@ -76,39 +106,69 @@ class _MovieContentState extends State<MovieContent> {
           Navigator.pushNamed(
             context,
             '/moviepage',
-            arguments: MovieScreenArguments(id: widget.info.id),
+            arguments: MovieScreenArguments(id: info.movie_id),
           );
         },
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              //child: //Butt,
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.width *
-                  1 *
-                  ((widget.size / 1.24) > 0 ? (widget.size / 1.24) : 1),
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: ImageServices.moviePoster(widget.info.profilePic),
-                  fit: BoxFit.contain,
+        child: Container(
+          height: MediaQuery
+              .of(context)
+              .size
+              .height * 0.72,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                width: MediaQuery
+                    .of(context)
+                    .size
+                    .width,
+                height: MediaQuery
+                    .of(context)
+                    .size
+                    .height * 0.61,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: poster,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
-            ),
-            ListTile(
-              title: Text(
-                "${_getShorterText(widget.info.movieName)}",
-                style: TextStyle(fontSize: 21),
+              Expanded(
+                child: ListTile(
+                  title: Text(
+                    "${_getShorterText(info.movie_name)}",
+                    style: TextStyle(
+                        fontSize: (MediaQuery
+                            .of(context)
+                            .size
+                            .height / 30)),
+                  ),
+                  subtitle: FutureBuilder(
+                    builder: (context, projectSnap) {
+                      if (projectSnap.connectionState != ConnectionState.done) {
+                        return Text(
+                          "Rec. by:",
+                          style: TextStyle(fontSize: 30),
+                        );
+                      }
+                      else {
+                        StringBuffer a = new StringBuffer("Rec. by");
+                        a.write(projectSnap.data.name);
+                        return Text(
+                          a.toString(),
+                          style: TextStyle(fontSize: 16),
+                        );
+                      }
+                    },
+                    future: DatabaseServices(User.userdata.uid)
+                        .getFriendInfo(uid: info.rec_by),
+                  ),
+                  trailing: Icon(Icons.keyboard_arrow_right),
+                ),
               ),
-              subtitle: Text(
-                "Recommended by: ${_getShorterText(widget.info.recBy)}"
-                    .toUpperCase(),
-                style: TextStyle(fontSize: 16),
-              ),
-              trailing: Icon(Icons.keyboard_arrow_right),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -125,28 +185,4 @@ class _MovieContentState extends State<MovieContent> {
     }
     return toReturn;
   }
-
-  void getMovieDetails(String id) async {
-    dynamic response =
-        await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
-    var data = json.decode(response.body);
-    widget.info.movieName = data["Title"];
-    widget.info.profilePic = data["Poster"];
-    print(widget.info.profilePic);
-    dataRetrieved = true;
-    setState(() {});
-  }
-}
-
-class RecommendationInfo {
-  String profilePic;
-  String movieName;
-  String recBy;
-  String id;
-
-  RecommendationInfo(
-      {this.profilePic = "Waiting...",
-      this.movieName = "Waiting...",
-      this.recBy = "Waiting...",
-      this.id = "tt4154796"});
 }

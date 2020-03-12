@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:template/CustomView/BottomBar.dart';
+import 'package:template/Models/MovieDetails.dart';
 import 'package:template/Models/User.dart';
 import 'package:template/Screens/CheckRecommendations/CheckRecomendations.dart';
 import 'package:template/Screens/SearchTab/searchpage.dart';
 import 'package:template/Services/DatabaseServices.dart';
-import 'package:template/Services/ImageServices.dart';
 import '../main.dart';
 
 class Homepage extends StatefulWidget {
@@ -14,18 +14,18 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-  List<RecommendationInfo> movies = [];
+  List<RecommendedMoviesDetails> movies;
+  String userID;
 
   @override
   void initState() {
     super.initState();
-    movies.add(RecommendationInfo());
-    movies.add(RecommendationInfo(id: "tt3896198"));
-    movies.add(RecommendationInfo(id: "tt5052448"));
-    movies.add(RecommendationInfo(id: "tt0848228"));
-    movies.add(RecommendationInfo(id: "tt0974015"));
-    movies.add(RecommendationInfo(id: "tt0369610"));
-    movies.add(RecommendationInfo(id: "tt4881806"));
+    userID = User.userdata.uid;
+    getRecomendedMovies();
+  }
+
+  void getRecomendedMovies() async {
+    movies = await DatabaseServices(userID).getRecommendations();
   }
 
   @override
@@ -34,7 +34,6 @@ class _HomepageState extends State<Homepage> {
         .of(context)
         .size
         .height / 100;
-    final double listSize = MediaQuery.of(context).size.height / 8.1;
 
     return Scaffold(
       appBar: PreferredSize(
@@ -46,7 +45,7 @@ class _HomepageState extends State<Homepage> {
       ),
 
       //*******START OF NON-TEMPLATE***************
-      body: createHomePage(headPadding, listSize),
+      body: createHomePage(headPadding),
 
       // **********END OF NON-TEMPLATE************
 
@@ -54,43 +53,81 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
-  ListView createHomePage(double headPadding, double listSize) {
+  ListView createHomePage(double headPadding) {
     return ListView(
-        children: <Widget>[
-          topButtons(context, headPadding),
-          Divider(
-            height: 1,
+      children: <Widget>[
+        topButtons(context, headPadding),
+        Divider(
+          height: 1,
+        ),
+        Container(
+          child: Text(
+            "Recent Recommendations",
+            style: TextStyle(fontSize: 22),
+            textAlign: TextAlign.center,
           ),
-          Container(
-            child: Text(
-              "Recent Recommendations",
-              style: TextStyle(fontSize: 22), textAlign: TextAlign.center,
-            ),
-          ),
-          Divider(
-            height: 1,
-          ),
-          Container(
-            height: MediaQuery
-                .of(context)
-                .size
-                .width * 1.172,
-            //width: MediaQuery.of(context).size.width,
-            child: ListView.builder(
-              physics: BouncingScrollPhysics(),
-              shrinkWrap: false,
-              scrollDirection: Axis.horizontal,
-              itemCount: 5,
-              itemBuilder: (BuildContext context, int index) =>
-                  Container(
+        ),
+        Divider(
+          height: 1,
+        ),
+        Container(
+          height: MediaQuery
+              .of(context)
+              .size
+              .height * 0.73,
+          //width: MediaQuery.of(context).size.width,
+          child: ListView.builder(
+            physics: BouncingScrollPhysics(),
+            shrinkWrap: false,
+            scrollDirection: Axis.horizontal,
+            itemCount: ((movies != null) ? (movies.length > 5 ? 5 : movies
+                .length) : 0),
+            itemBuilder: (BuildContext context, int index) =>
+                Stack(
+                  children: <Widget>[
+                    Container(
                       width: MediaQuery
                           .of(context)
                           .size
-                          .width / 1.02,
-                      child: MovieContent(movies[index], 1.172)),
-            ),
+                          .width,
+                      child: FutureBuilder(
+                        builder: (context, projectSnap) {
+                          if (projectSnap.connectionState !=
+                              ConnectionState.done) {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          else {
+                            return projectSnap.data;
+                          }
+                        },
+                        future: MovieContent(movies[index]).cardBuilder(
+                            context),
+                      ),
+                    ),
+                    Positioned(
+                      right: 10,
+                      top: 11,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: IconButton(
+                          color: Colors.blueGrey,
+                          splashColor: Colors.red,
+                          icon: Icon(Icons.close),
+                          onPressed: () {
+                            setState(() {
+                              movies.removeAt(index);
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
           ),
-        ],
+        ),
+      ],
     );
   }
 
