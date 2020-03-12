@@ -9,6 +9,8 @@ import 'package:http/http.dart' as http;
 import 'package:template/Models/User.dart';
 import 'package:template/Services/DatabaseServices.dart';
 import 'package:template/Screens/CheckRecommendations/ReviewScreen.dart';
+import 'package:template/Models/User.dart';
+import 'package:template/Services/DatabaseServices.dart';
 import 'package:template/Services/ImageServices.dart';
 import 'dart:math';
 import 'RecommendMovie.dart';
@@ -103,7 +105,7 @@ class _MovieScreenState extends State<MovieScreen> {
               movieID: args.id,
               name: name,
             );
-          }));
+            }));
         },
         child: Icon(Icons.arrow_forward),
         backgroundColor: Colors.blue[900],
@@ -348,9 +350,9 @@ class ProfileFullScreen extends StatelessWidget {
             height: MediaQuery.of(context).size.height,
             decoration: BoxDecoration(
                 image: DecorationImage(
-              image: ImageServices.moviePoster(posterUrl),
-              fit: BoxFit.fitWidth,
-            )),
+                  image: ImageServices.moviePoster(posterUrl),
+                  fit: BoxFit.fitWidth,
+                )),
           ),
         ),
       ),
@@ -367,8 +369,8 @@ class MovieInfoContent extends StatefulWidget {
 
   MovieInfoContent(
       {@required this.title,
-      @required this.shortTitle,
-      @required this.fullTitle});
+        @required this.shortTitle,
+        @required this.fullTitle});
 
   @override
   _MovieInfoContentState createState() => _MovieInfoContentState();
@@ -406,7 +408,7 @@ class _MovieInfoContentState extends State<MovieInfoContent>
             children: [
               TextSpan(
                 text:
-                    "${expanded ? "${widget.title}:\n" : "${widget.title}:\n"}",
+                "${expanded ? "${widget.title}:\n" : "${widget.title}:\n"}",
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,

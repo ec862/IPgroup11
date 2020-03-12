@@ -30,21 +30,8 @@ class _WatchCardState extends State<WatchCard> {
   String img;
   bool dataRetrieved = false;
 
-  void getMovieDetails(String id) async {
-    dynamic response =
-        await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
-    var data = json.decode(response.body);
-    title = data["Title"];
-    img = data["Poster"];
-    genre = data["Genre"].split(",").toString();
-    genre = genre.substring(1, genre.length - 1);
-    dataRetrieved = true;
-    setState(() {});
-  }
-
-  String _getShorterText(String text) {
+  String _getShorterText(String text, int maxLen) {
     String toReturn = text;
-    int maxLen = 18;
     if (text.length >= maxLen) {
       toReturn = toReturn.substring(0, maxLen);
       toReturn += " ...";
@@ -52,11 +39,27 @@ class _WatchCardState extends State<WatchCard> {
     return toReturn;
   }
 
+  void getMovieDetails(String id) async {
+    dynamic response =
+        await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
+    var data = json.decode(response.body);
+    title = _getShorterText(data["Title"],18);
+    img = data["Poster"];
+    genre = data["Genre"].split(",").toString();
+    genre = _getShorterText(genre.substring(1, genre.length - 1),26);
+    dataRetrieved = true;
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     if (dataRetrieved != true) getMovieDetails(widget.movieID);
     return GestureDetector(
-      onTap: widget.isReview ? (){} : (){
+      onTap: widget.isReview ? (){
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return SelectOptions(widget.movieID, isReview: false, movieName: title,);
+        }));
+      } : (){
         Navigator.push(context, MaterialPageRoute(builder: (context) {
           return SelectOptions(widget.movieID, isReview: false, movieName: title,);
         }));
@@ -86,12 +89,6 @@ class _WatchCardState extends State<WatchCard> {
                               fit: BoxFit.fitWidth),
                         ),
                       ),
-                      /*
-                      IconButton( // --- Options Button ---
-                        onPressed: widget.options,
-                        icon: Icon(Icons.more_horiz, color: Colors.grey,),
-                      ),
-                      */
                     ],
                   ),
                   SizedBox(
@@ -100,6 +97,9 @@ class _WatchCardState extends State<WatchCard> {
                   Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
+                        Text(
+                          // --- Title Text ---
+                          "${_getShorterText(title,18)}"),
                         Text(
                           // --- Title Text ---
                           "${_getShorterText(title)}",
@@ -118,73 +118,33 @@ class _WatchCardState extends State<WatchCard> {
                             color: Colors.grey[800],
                           ),
                         ),
-                        SizedBox(
-                          height: 8.0,
-                        ),
-                        widget.isReview
-                            ? SmoothStarRating(
-                                // --- Star Rating ---
-                                allowHalfRating: false,
-                                onRatingChanged: (v) {},
-                                starCount: 5,
-                                rating: widget.rating,
-                                size: 30.0,
-                                filledIconData: Icons.star,
-                                halfFilledIconData: Icons.star_half,
-                                defaultIconData: Icons.star_border,
-                                color: Colors.green,
-                                borderColor: Colors.green,
-                                spacing: 0.0)
-                            : Text(""),
-                      ]),
+                        SizedBox(height: 8.0,),
+                        widget.isReview ? SmoothStarRating( // --- Star Rating ---
+                            allowHalfRating: false,
+                            onRatingChanged: (v) {},
+                            starCount: 5,
+                            rating: widget.rating,
+                            size: 30.0,
+                            filledIconData: Icons.star,
+                            halfFilledIconData: Icons.star_half,
+                            defaultIconData: Icons.star_border,
+                            color: Colors.yellow,
+                            borderColor: Colors.yellow,
+                            spacing:0.0
+                        ): Text("") ,
+                      ]
+                  ),
                 ],
               ),
-              SizedBox(
-                width: 4.0,
-              ),
-              IconButton(
-                // --- Show Movie Button ---
-                onPressed: () {
-                  Navigator.pushNamed(
-                    context,
-                    '/moviepage',
-                    arguments: MovieScreenArguments(id: widget.movieID),
-                  );
+              SizedBox(width: 4.0,),
+              IconButton( // --- Show Movie Button ---
+                onPressed: (){
+                  Navigator.pushNamed(context, '/moviepage', arguments: MovieScreenArguments(id: widget.movieID),);
                 },
-                icon: Icon(
-                  Icons.arrow_forward_ios,
-                  color: Colors.grey,
-                ),
+                icon: Icon(Icons.arrow_forward_ios, color: Colors.grey,),
               ),
             ],
           ),
-                      ),
-                      SizedBox(height: 8.0,),
-                      isReview ? SmoothStarRating( // --- Star Rating ---
-                          allowHalfRating: false,
-                          onRatingChanged: (v) {},
-                          starCount: 5,
-                          rating: rating,
-                          size: 30.0,
-                          filledIconData: Icons.star,
-                          halfFilledIconData: Icons.star_half,
-                          defaultIconData: Icons.star_border,
-                          color: Colors.yellow[600],
-                          borderColor: Colors.yellow[600],
-                          spacing:0.0
-                      ): Text("") ,
-                    ]
-                ),
-              ],
-            ),
-            SizedBox(width: 4.0,),
-            IconButton( // --- Show Movie Button ---
-              onPressed: (){
-                Navigator.pushNamed(context, '/moviepage');
-              },
-              icon: Icon(Icons.arrow_forward_ios, color: Colors.grey,),
-            ),
-          ],
         ),
       ),
     );

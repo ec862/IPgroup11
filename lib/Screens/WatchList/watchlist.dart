@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:template/CustomView/BottomBar.dart';
 import 'package:template/Models/ReviewDetails.dart';
 import 'package:template/Screens/CheckRecommendations/RecommendMovie.dart';
@@ -74,6 +73,7 @@ class _WatchListState extends State<WatchList> {
                 );
               },
             ),
+
             //review history tab
             FutureBuilder(
               future: reviewlist,
@@ -108,6 +108,9 @@ class SelectOptions extends StatelessWidget {
   final movieName;
 
   SelectOptions(this.id, {@required this.isReview, @required this.movieName});
+  final id;
+
+  SelectOptions(this.id, {@required this.isReview});
 
   @override
   Widget build(BuildContext context) {
@@ -129,6 +132,19 @@ class SelectOptions extends StatelessWidget {
                         .removeFromWatchList(movieID: id);
                     Fluttertoast.showToast(
                       msg: "Movie delted",
+                      gravity: ToastGravity.CENTER,
+                    );
+                    Navigator.of(context).pop();
+                  }
+                : () {
+                    Navigator.of(context).pop();
+                  },
+            onTap: !isReview
+                ? () {
+                    DatabaseServices(User.userdata.uid)
+                        .removeFromWatchList(movieID: id);
+                    Fluttertoast.showToast(
+                      msg: "Movie Remove From WatchList",
                       gravity: ToastGravity.CENTER,
                     );
                     Navigator.of(context).pop();
