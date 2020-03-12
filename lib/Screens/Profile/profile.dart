@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:template/CustomView/BottomBar.dart';
+import 'package:template/Models/User.dart';
 import 'package:template/Screens/main.dart';
 import 'package:template/Services/AuthenticationServices.dart';
+import 'package:template/Services/DatabaseServices.dart';
 import 'editProfile.dart';
 
 class Profile extends StatefulWidget {
@@ -38,7 +40,10 @@ class _ProfileState extends State<Profile> {
                 width: 110,
                 height: 140,
                 alignment: Alignment.topRight,
-                child: MaterialButton(
+                child: IconButton(
+                  icon: Icon(
+                    Icons.edit,
+                  ),
                   onPressed: () {
                     //Navigator.of(context).push(MaterialPageRoute(builder: (context) => EditProfile()),
                     Navigator.push(
@@ -46,7 +51,6 @@ class _ProfileState extends State<Profile> {
                       MaterialPageRoute(builder: (context) => EditProfile()),
                     );
                   },
-                  child: Text("Edit"),
                 ),
               ),
             ],
@@ -61,27 +65,43 @@ class _ProfileState extends State<Profile> {
           Row(
             children: <Widget>[
               Spacer(),
-              RaisedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/followers');
-                },
-                child: Center(
-                  child: Text(
-                    "Followers \n22".toUpperCase(),
-                    textAlign: TextAlign.center,
+              ButtonTheme(
+                minWidth: 120.0,
+                height: 50.0,
+                child: RaisedButton(
+                  shape: new RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(50.0),
+                      side: BorderSide(color: Colors.blue)),
+                  color: Colors.white,
+                  child: Center(
+                    child: Text(
+                      "Followers \n22".toUpperCase(),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/followers');
+                  },
                 ),
               ),
               Spacer(),
-              RaisedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/followings');
-                },
-                child: Center(
-                  child: Text(
-                    "Following \n103".toUpperCase(),
-                    textAlign: TextAlign.center,
+              ButtonTheme(
+                minWidth: 120.0,
+                height: 50.0,
+                child: RaisedButton(
+                  shape: new RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(50.0),
+                      side: BorderSide(color: Colors.blue)),
+                  color: Colors.white,
+                  child: Center(
+                    child: Text(
+                      "Following \n103".toUpperCase(),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/followings');
+                  },
                 ),
               ),
               Spacer()
@@ -266,7 +286,8 @@ class _ProfileState extends State<Profile> {
             onTap: () {
               Authentication().signOut();
               Navigator.popUntil(context, ModalRoute.withName('/'));
-              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){
+              Navigator.of(context)
+                  .pushReplacement(MaterialPageRoute(builder: (context) {
                 return AuthScreen();
               }));
             },
@@ -278,6 +299,7 @@ class _ProfileState extends State<Profile> {
         ],
       ),
       bottomNavigationBar: BottomBar().createBar(context, 4),
+      //bottomNavigationBar: BottomBar().createBar(context, 4),
     );
   }
 }
