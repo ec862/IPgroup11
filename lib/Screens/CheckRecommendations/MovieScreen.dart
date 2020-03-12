@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:template/CustomView/comment_view.dart';
 import 'package:template/Models/Arguments.dart';
 import 'package:http/http.dart' as http;
+import 'package:template/Models/User.dart';
+import 'package:template/Services/DatabaseServices.dart';
 import 'package:template/Services/ImageServices.dart';
 import 'dart:math';
 import 'RecommendMovie.dart';
@@ -95,7 +98,7 @@ class _MovieScreenState extends State<MovieScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return SelectOption();
+            return SelectOption(movieID: args.id, name: name,);
           }));
         },
         child: Icon(Icons.arrow_forward),
@@ -244,7 +247,7 @@ class _MovieScreenState extends State<MovieScreen> {
   void getMovieDetails(String id) async {
     args = ModalRoute.of(context).settings.arguments;
     dynamic response =
-        await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
+    await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
     var data = json.decode(response.body);
     actors = data["Actors"].split(",");
     directors = data["Director"].split(",");
@@ -262,6 +265,11 @@ class _MovieScreenState extends State<MovieScreen> {
 }
 
 class SelectOption extends StatelessWidget {
+  String name = "";
+  String movieID = "";
+
+  SelectOption({@required this.movieID, @required this.name});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -284,7 +292,15 @@ class SelectOption extends StatelessWidget {
           ListTile(
             title: Text("Add to Watch List"),
             trailing: Icon(Icons.keyboard_arrow_right),
-            onTap: () {},
+            onTap: () async {
+              await DatabaseServices(User.userdata.uid)
+                  .addToWatchList(movieID: movieID, movieName: name);
+              Fluttertoast.showToast(
+                msg: "Movie added",
+                gravity: ToastGravity.CENTER,
+              );
+              Navigator.of(context).pop();
+            },
           ),
           fullDivider(),
           ListTile(
@@ -323,9 +339,9 @@ class ProfileFullScreen extends StatelessWidget {
             height: MediaQuery.of(context).size.height,
             decoration: BoxDecoration(
                 image: DecorationImage(
-              image: ImageServices.moviePoster(posterUrl),
-              fit: BoxFit.fitWidth,
-            )),
+                  image: ImageServices.moviePoster(posterUrl),
+                  fit: BoxFit.fitWidth,
+                )),
           ),
         ),
       ),
@@ -342,8 +358,8 @@ class MovieInfoContent extends StatefulWidget {
 
   MovieInfoContent(
       {@required this.title,
-      @required this.shortTitle,
-      @required this.fullTitle});
+        @required this.shortTitle,
+        @required this.fullTitle});
 
   @override
   _MovieInfoContentState createState() => _MovieInfoContentState();
@@ -381,7 +397,7 @@ class _MovieInfoContentState extends State<MovieInfoContent>
             children: [
               TextSpan(
                 text:
-                    "${expanded ? "${widget.title}:\n" : "${widget.title}:\n"}",
+                "${expanded ? "${widget.title}:\n" : "${widget.title}:\n"}",
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -417,6 +433,5 @@ class _MovieInfoContentState extends State<MovieInfoContent>
         },
       ),
     );
-    ;
   }
 }

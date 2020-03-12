@@ -19,7 +19,6 @@ class BottomBar {
       unselectedItemColor: Colors.white,
       currentIndex: currentindex,
       onTap: (index) {
-
         // change when login stuff done
         if (index == 0){
           Navigator.popUntil(context, ModalRoute.withName('/'));

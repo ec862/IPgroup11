@@ -78,6 +78,7 @@ class Person {
   bool selected = false;
   String profile = "asserts/no_picture_avatar.jpg";
   String name;
+  String uid;
 
   Person({this.selected, this.profile, this.name});
 }
