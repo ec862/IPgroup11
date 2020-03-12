@@ -1,9 +1,7 @@
-import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:template/Models/Arguments.dart';
-import 'package:http/http.dart' as http;
 import 'package:template/Models/MovieDetails.dart';
 import 'package:template/Models/User.dart';
 import 'package:template/Services/DatabaseServices.dart';
@@ -150,13 +148,17 @@ class MovieContent {
                     builder: (context, projectSnap) {
                       if (projectSnap.connectionState != ConnectionState.done) {
                         return Text(
-                          "Rec. by:", style: TextStyle(fontSize: 30),);
+                          "Rec. by:",
+                          style: TextStyle(fontSize: 30),
+                        );
                       }
                       else {
                         StringBuffer a = new StringBuffer("Rec. by");
                         a.write(projectSnap.data.name);
                         return Text(
-                          a.toString(), style: TextStyle(fontSize: 16),);
+                          a.toString(),
+                          style: TextStyle(fontSize: 16),
+                        );
                       }
                     },
                     future: DatabaseServices(User.userdata.uid)
@@ -171,7 +173,6 @@ class MovieContent {
       ),
     );
   }
-
 
   String _getShorterText(String text) {
     String toReturn = text;
