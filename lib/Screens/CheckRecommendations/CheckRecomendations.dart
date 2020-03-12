@@ -148,12 +148,12 @@ class MovieContent {
                     builder: (context, projectSnap) {
                       if (projectSnap.connectionState != ConnectionState.done) {
                         return Text(
-                          "Rec. by:",
+                          "Rec. by: ",
                           style: TextStyle(fontSize: 30),
                         );
                       }
                       else {
-                        StringBuffer a = new StringBuffer("Rec. by");
+                        StringBuffer a = new StringBuffer("Rec. by: ");
                         a.write(projectSnap.data.name);
                         return Text(
                           a.toString(),
