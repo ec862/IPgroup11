@@ -102,7 +102,7 @@ class _WatchCardState extends State<WatchCard> {
                           "${_getShorterText(title,18)}"),
                         Text(
                           // --- Title Text ---
-                          "${_getShorterText(title)}",
+                          "${_getShorterText(title, 18)}",
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                               fontSize: 18.0, color: Colors.grey[600]),

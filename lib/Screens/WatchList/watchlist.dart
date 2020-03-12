@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:template/CustomView/BottomBar.dart';
 import 'package:template/Models/ReviewDetails.dart';
 import 'package:template/Screens/CheckRecommendations/RecommendMovie.dart';
@@ -108,9 +109,6 @@ class SelectOptions extends StatelessWidget {
   final movieName;
 
   SelectOptions(this.id, {@required this.isReview, @required this.movieName});
-  final id;
-
-  SelectOptions(this.id, {@required this.isReview});
 
   @override
   Widget build(BuildContext context) {
@@ -139,19 +137,6 @@ class SelectOptions extends StatelessWidget {
                 : () {
                     Navigator.of(context).pop();
                   },
-            onTap: !isReview
-                ? () {
-                    DatabaseServices(User.userdata.uid)
-                        .removeFromWatchList(movieID: id);
-                    Fluttertoast.showToast(
-                      msg: "Movie Remove From WatchList",
-                      gravity: ToastGravity.CENTER,
-                    );
-                    Navigator.of(context).pop();
-                  }
-                : () {
-                    Navigator.of(context).pop();
-                  },
           ),
           fullDivider(),
           ListTile(
@@ -159,7 +144,10 @@ class SelectOptions extends StatelessWidget {
             trailing: Icon(Icons.keyboard_arrow_right),
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                return RecommendMovie(movieID: id, movieName: movieName,);
+                return RecommendMovie(
+                  movieID: id,
+                  movieName: movieName,
+                );
               }));
             },
           ),
