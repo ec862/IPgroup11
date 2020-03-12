@@ -158,6 +158,33 @@ class _WatchCardState extends State<WatchCard> {
               ),
             ],
           ),
+                      ),
+                      SizedBox(height: 8.0,),
+                      isReview ? SmoothStarRating( // --- Star Rating ---
+                          allowHalfRating: false,
+                          onRatingChanged: (v) {},
+                          starCount: 5,
+                          rating: rating,
+                          size: 30.0,
+                          filledIconData: Icons.star,
+                          halfFilledIconData: Icons.star_half,
+                          defaultIconData: Icons.star_border,
+                          color: Colors.yellow[600],
+                          borderColor: Colors.yellow[600],
+                          spacing:0.0
+                      ): Text("") ,
+                    ]
+                ),
+              ],
+            ),
+            SizedBox(width: 4.0,),
+            IconButton( // --- Show Movie Button ---
+              onPressed: (){
+                Navigator.pushNamed(context, '/moviepage');
+              },
+              icon: Icon(Icons.arrow_forward_ios, color: Colors.grey,),
+            ),
+          ],
         ),
       ),
     );

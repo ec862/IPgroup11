@@ -51,8 +51,8 @@ class _CommentView extends State<CommentView> {
                   ),
                   SmoothStarRating(
                     rating: widget.rating.toDouble(),
-                    color: Colors.green,
-                    borderColor: Colors.green,
+                    color: Colors.yellow[600],
+                    borderColor: Colors.yellow[600],
                   ),
                 ],
               ),
