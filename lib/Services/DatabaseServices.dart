@@ -649,7 +649,8 @@ class DatabaseServices implements BaseDatabase {
       return false;
 
     if (snap.exists)
-      return true;
+      if (snap.data['accepted'])
+        return true;
 
     return false;
   }
