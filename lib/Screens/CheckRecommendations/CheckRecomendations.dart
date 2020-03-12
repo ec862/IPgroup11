@@ -172,6 +172,7 @@ class MovieContent {
     );
   }
 
+
   String _getShorterText(String text) {
     String toReturn = text;
     int maxLen = 45;
