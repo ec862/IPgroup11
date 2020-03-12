@@ -105,8 +105,9 @@ class _WatchListState extends State<WatchList> {
 class SelectOptions extends StatelessWidget {
   final isReview;
   final id;
+  final movieName;
 
-  SelectOptions(this.id, {@required this.isReview});
+  SelectOptions(this.id, {@required this.isReview, @required this.movieName});
 
   @override
   Widget build(BuildContext context) {
@@ -142,7 +143,7 @@ class SelectOptions extends StatelessWidget {
             trailing: Icon(Icons.keyboard_arrow_right),
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                return RecommendMovie();
+                return RecommendMovie(movieID: id, movieName: movieName,);
               }));
             },
           ),

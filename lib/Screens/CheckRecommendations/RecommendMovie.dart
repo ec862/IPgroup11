@@ -1,28 +1,23 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:template/Models/User.dart';
+import 'package:template/Models/UserDetails.dart';
+import 'package:template/Services/DatabaseServices.dart';
+import 'package:template/Services/ImageServices.dart';
 
 class RecommendMovie extends StatefulWidget {
+  final movieID;
+  final movieName;
+
+  RecommendMovie({this.movieID, this.movieName});
+
   @override
   _RecommendMovieState createState() => _RecommendMovieState();
 }
 
 class _RecommendMovieState extends State<RecommendMovie> {
-  List<Person> friends = [];
-
-  @override
-  void initState() {
-    super.initState();
-    var names = ["Ed","Cheng", "Arron", "Andrez", "Luke", "Umar", "Zee"];
-    for (int i = 0; i < names.length; i++) {
-      friends.add(
-        Person(
-          selected: false,
-          profile: "asserts/no_picture_avatar.jpg",
-          name: names[i],
-        ),
-      );
-    }
-  }
+  Map<String, Person> friends = Map();
 
   @override
   Widget build(BuildContext context) {
@@ -31,46 +26,126 @@ class _RecommendMovieState extends State<RecommendMovie> {
         backgroundColor: Colors.blue[900],
         title: Text("Recommend"),
       ),
-      body: ListView.builder(
-        itemCount: friends.length,
-        itemBuilder: (ctx, index) {
-          return ListTile(
-            leading: SizedBox(
-              width: 100,
-              child: Row(
-                children: <Widget>[
-                  Checkbox(
-                    value: friends[index].selected,
-                    onChanged: (state) {
-                      setState(() {
-                        friends[index].selected = state;
-                      });
-                    },
-                  ),
-                  CircleAvatar(
-                    radius: 20,
-                    backgroundImage: AssetImage(friends[index].profile),
-                  ),
-                ],
+      body: FutureBuilder(
+        future: DatabaseServices(User.userdata.uid).getFollowers(),
+        builder: (BuildContext context,
+            AsyncSnapshot<List<FollowerDetails>> snapshot) {
+          if (!snapshot.hasData)
+            return Container(
+              child: Center(
+                child: CircularProgressIndicator(),
               ),
-            ),
-            title: Text("${friends[index].name}"),
-            onTap: () {
-              setState(() {
-                friends[index].selected = !friends[index].selected;
-              });
+            );
+          if (snapshot.data == null || snapshot.data.isEmpty)
+            return Container(
+              child: Center(
+                child: Text("No friends"),
+              ),
+            );
+          List<FollowerDetails> temp = snapshot.data;
+          List<FollowerDetails> content = [];
+          for (int i = 0; i < temp.length; i++) {
+            if (temp[i].accepted) {
+              content.add(temp[i]);
+            }
+          }
+          return ListView.builder(
+            itemCount: content.length,
+            itemBuilder: (context, index) {
+              return personCard(content[index].user_id);
             },
           );
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          Navigator.of(context).pop();
+          recommend();
         },
         label: Text("Send"),
         backgroundColor: Colors.blue[900],
       ),
     );
+  }
+
+  Widget personCard(String uid) {
+    return FutureBuilder(
+      future: DatabaseServices(User.userdata.uid).getFriendInfo(uid: uid),
+      builder: (BuildContext context, AsyncSnapshot<UserDetails> snapshot) {
+        if (!snapshot.hasData) return ListTile();
+
+        if (snapshot.data == null) return ListTile();
+
+        if (!friends.containsKey(snapshot.data.user_id))
+          friends[snapshot.data.user_id] = Person(
+            name: snapshot.data.user_name,
+            uid: uid,
+          );
+
+        return ListTile(
+          leading: SizedBox(
+            width: 100,
+            child: Row(
+              children: <Widget>[
+                Checkbox(
+                  value: friends[snapshot.data.user_id].selected,
+                  onChanged: (state) {
+                    friends[snapshot.data.user_id].selected = state;
+                    print(friends[snapshot.data.user_id].selected);
+                    setState(() {});
+                  },
+                ),
+                CircleAvatar(
+                  radius: 20,
+                  backgroundImage: ImageServices.profileImage(""),
+                ),
+              ],
+            ),
+          ),
+          title: Text("${snapshot.data.user_name}"),
+          onTap: () {
+            setState(() {
+              friends[snapshot.data.user_id].selected =
+                  !friends[snapshot.data.user_id].selected;
+            });
+          },
+        );
+      },
+    );
+  }
+
+  void recommend() {
+    List<Person> toRecommend = [];
+    friends.forEach(
+      (String key, Person person) {
+        if (person.selected) {
+          toRecommend.add(person);
+        }
+      },
+    );
+    BaseDatabase db = DatabaseServices(User.userdata.uid);
+
+    if (toRecommend == null || toRecommend.isEmpty) {
+      Fluttertoast.showToast(
+        msg: "Please chose person to recommend movie",
+        gravity: ToastGravity.CENTER,
+      );
+      return;
+    }
+
+    for (int i = 0; i < toRecommend.length; i++) {
+      db.recommendMovie(
+        uid: toRecommend[i].uid,
+        movieID: widget.movieID,
+        movieName: widget.movieName,
+      );
+    }
+
+    Fluttertoast.showToast(
+      msg: "Movie Recommended",
+      gravity: ToastGravity.CENTER,
+    );
+
+    Navigator.of(context).pop();
   }
 }
 
@@ -80,5 +155,5 @@ class Person {
   String name;
   String uid;
 
-  Person({this.selected, this.profile, this.name});
+  Person({this.selected = false, this.profile, this.name, this.uid});
 }

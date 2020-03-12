@@ -58,7 +58,7 @@ class _WatchCardState extends State<WatchCard> {
     return GestureDetector(
       onTap: widget.isReview ? (){} : (){
         Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return SelectOptions(widget.movieID, isReview: false);
+          return SelectOptions(widget.movieID, isReview: false, movieName: title,);
         }));
       },
       child: Card(

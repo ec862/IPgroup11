@@ -405,6 +405,7 @@ class DatabaseServices implements BaseDatabase {
         },
       ).whenComplete(() {
         print("Done");
+        removeFromWatchList(movieID: movieID);
       });
     } catch (e) {
       try {
@@ -418,7 +419,10 @@ class DatabaseServices implements BaseDatabase {
             'rating': rating,
             'comment': comment,
           },
-        );
+        ).whenComplete((){
+          print('Done');
+          removeFromWatchList(movieID: movieID);
+        });
       } catch (ex) {
         print(ex);
         return null;

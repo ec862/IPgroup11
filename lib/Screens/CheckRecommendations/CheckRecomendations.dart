@@ -4,6 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:template/Models/Arguments.dart';
 import 'package:http/http.dart' as http;
+import 'package:template/Models/MovieDetails.dart';
+import 'package:template/Models/User.dart';
+import 'package:template/Services/DatabaseServices.dart';
 import 'package:template/Services/ImageServices.dart';
 
 import '../../CustomView/BottomBar.dart';
@@ -54,6 +57,7 @@ class MovieContent extends StatefulWidget {
   double size;
 
   MovieContent(this.info, this.size);
+
   @override
   _MovieContentState createState() => _MovieContentState();
 }
@@ -63,13 +67,12 @@ class _MovieContentState extends State<MovieContent> {
 
   @override
   Widget build(BuildContext context) {
-    if (dataRetrieved != true)
-      getMovieDetails(widget.info.id);
+    if (dataRetrieved != true) getMovieDetails(widget.info.id);
     return Card(
       margin: EdgeInsets.all(8),
       elevation: 10,
       child: InkWell(
-        onTap: (){
+        onTap: () {
           Navigator.pushNamed(
             context,
             '/moviepage',
@@ -83,10 +86,8 @@ class _MovieContentState extends State<MovieContent> {
             Container(
               //child: //Butt,
               width: MediaQuery.of(context).size.width,
-              height: MediaQuery
-                  .of(context)
-                  .size
-                  .width * 1 *
+              height: MediaQuery.of(context).size.width *
+                  1 *
                   ((widget.size / 1.24) > 0 ? (widget.size / 1.24) : 1),
               decoration: BoxDecoration(
                 image: DecorationImage(
@@ -96,11 +97,14 @@ class _MovieContentState extends State<MovieContent> {
               ),
             ),
             ListTile(
-              title: Text("${_getShorterText(widget.info.movieName)}",
-                style: TextStyle(fontSize: 21),),
+              title: Text(
+                "${_getShorterText(widget.info.movieName)}",
+                style: TextStyle(fontSize: 21),
+              ),
               subtitle: Text(
                 "Recommended by: ${_getShorterText(widget.info.recBy)}"
-                    .toUpperCase(), style: TextStyle(fontSize: 16),
+                    .toUpperCase(),
+                style: TextStyle(fontSize: 16),
               ),
               trailing: Icon(Icons.keyboard_arrow_right),
             ),
@@ -122,8 +126,9 @@ class _MovieContentState extends State<MovieContent> {
     return toReturn;
   }
 
-  void getMovieDetails(String id) async{
-    dynamic response = await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
+  void getMovieDetails(String id) async {
+    dynamic response =
+        await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
     var data = json.decode(response.body);
     widget.info.movieName = data["Title"];
     widget.info.profilePic = data["Poster"];
