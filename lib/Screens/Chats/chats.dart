@@ -24,6 +24,7 @@ class _ChatsState extends State<Chats> {
         builder: (BuildContext context, AsyncSnapshot<UserDetails> snapshot) {
           if (!snapshot.hasData) return CircularProgressIndicator();
           if (snapshot.data == null) return Center(child: Text("No friends"));
+          if (snapshot.data.isChatting == null) return Center(child: Text("No friends"));
 
           return ListView.separated(
             itemBuilder: (context, index) {
@@ -39,7 +40,7 @@ class _ChatsState extends State<Chats> {
                     leading: CircleAvatar(
                       backgroundImage: ImageServices.profileImage(""),
                     ),
-                    title: Text(snapshot.data.user_name),
+                    title: Text(snapshot.data.user_name??"No username"),
                     onTap: () {
                       Navigator.pushNamed(
                         context,

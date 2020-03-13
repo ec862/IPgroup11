@@ -718,11 +718,27 @@ class DatabaseServices implements BaseDatabase {
     try {
       return await _usersCollection.document(this.uid).updateData(
         {'isChattingwith': FieldValue.arrayUnion(p)},
-      );
+      ).whenComplete(() async {
+        try {
+          await _usersCollection.document(uid).updateData(
+              {'isChattingwith': FieldValue.arrayUnion([this.uid])});
+        }catch (e) {
+          await _usersCollection.document(uid).setData(
+              {'isChattingwith': FieldValue.arrayUnion([this.uid])});
+        }
+      });
     } catch (e) {
       return await _usersCollection.document(this.uid).setData(
         {'isChattingwith': FieldValue.arrayUnion(p)},
-      );
+      ).whenComplete(() async {
+        try {
+          await _usersCollection.document(uid).updateData(
+              {'isChattingwith': FieldValue.arrayUnion([this.uid])});
+        }catch (e) {
+          await _usersCollection.document(uid).setData(
+              {'isChattingwith': FieldValue.arrayUnion([this.uid])});
+        }
+      });
     }
   }
 }
