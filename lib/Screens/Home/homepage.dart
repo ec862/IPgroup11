@@ -203,7 +203,6 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
-
   Widget topButtons(BuildContext context, double headPadding) {
     return Container(
       color: Colors.transparent,

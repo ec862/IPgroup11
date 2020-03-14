@@ -34,23 +34,34 @@ class _OtherProfileState extends State<OtherProfile> {
         backgroundColor: Colors.blue[900],
         title: Text(args.userName),
         actions: <Widget>[
-          !pressed ? FutureBuilder(
-            future: DatabaseServices(User.userdata.uid).isFollower(uid: args.id),
-            builder: (BuildContext context, AsyncSnapshot<bool> snapshot){
-              if (!snapshot.hasData)
-                return Text("");
+          FutureBuilder(
+            future:
+                DatabaseServices(User.userdata.uid).isFollower(uid: args.id),
+            builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+              if (!snapshot.hasData) return Text("");
 
-              return snapshot.data ? IconButton(
-                onPressed: () {
-                  Navigator.of(context).pushNamed(
-                    '/chatMessages',
-                    arguments: ChatMessagesArgument(id: args.id),
-                  );
-                },
-                icon: Icon(Icons.message),
-              ) : Text("");
+              return snapshot.data
+                  ? FutureBuilder(
+                      future: DatabaseServices(User.userdata.uid)
+                          .isFollowing(uid: args.id),
+                      builder: (context, snap) {
+                        if (!snapshot.hasData) return Text("");
+                        return snapshot.data
+                            ? IconButton(
+                                onPressed: () {
+                                  Navigator.of(context).pushNamed(
+                                    '/chatMessages',
+                                    arguments:
+                                        ChatMessagesArgument(id: args.id),
+                                  );
+                                },
+                                icon: Icon(Icons.message),
+                              )
+                            : Text("");
+                      })
+                  : Text("");
             },
-          ) : Text("")
+          )
         ],
       ),
       body: Column(
