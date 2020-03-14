@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:template/Models/Message.dart';
 import 'package:template/Models/MovieDetails.dart';
 import 'package:template/Models/ReviewDetails.dart';
 import 'package:template/Models/UserDetails.dart';
@@ -55,7 +56,7 @@ abstract class BaseDatabase {
 
   Future<bool> isFollowing({@required String uid});
 
-  Future <bool> isFollower({@required String uid});
+  Future<bool> isFollower({@required String uid});
 
   ///getters
   Future<List<String>> getWatchList();
@@ -74,19 +75,27 @@ abstract class BaseDatabase {
 
   Future<MovieDetails> getMovieDetails({@required String id});
 
-  Future<List<Map<String , String>>> getPersonSuggestion(String suggestion);
+  Future<List<Map<String, String>>> getPersonSuggestion(String suggestion);
+
+  Stream<QuerySnapshot> getMessages({String uid});
+
+  Future sendMessage({String uid, String message});
+
+  Future addNewChatPerson({String uid});
 }
 
 class DatabaseServices implements BaseDatabase {
   String uid;
   CollectionReference _usersCollection;
   StorageReference _storageReference;
+  CollectionReference _chatsCollection;
 
   /// uid is the id of person currently logged in
   /// btw to get this type 'User.userdata.uid'
   DatabaseServices(this.uid) {
     _usersCollection = Firestore.instance.collection("Users");
     _storageReference = FirebaseStorage.instance.ref().child("Images");
+    _chatsCollection = Firestore.instance.collection("Chats");
   }
 
   List<String> _setSearchParam(String caseNumber) {
@@ -380,7 +389,7 @@ class DatabaseServices implements BaseDatabase {
           'movie_name': movieName,
           'rec_by': this.uid,
         },
-          //${this.uid}$movieID
+        //${this.uid}$movieID
       );
     } catch (ex) {
       print(ex);
@@ -420,7 +429,7 @@ class DatabaseServices implements BaseDatabase {
             'rating': rating,
             'comment': comment,
           },
-        ).whenComplete((){
+        ).whenComplete(() {
           print('Done');
           removeFromWatchList(movieID: movieID);
         });
@@ -458,7 +467,7 @@ class DatabaseServices implements BaseDatabase {
   UserDetails _toUserDetails(DocumentSnapshot documentSnapshot) {
     try {
       return UserDetails(
-        user_id: documentSnapshot.data["user_id"],
+        user_id: documentSnapshot.documentID,
         name: documentSnapshot.data["name"],
         user_name: documentSnapshot.data["user_name"],
         email: documentSnapshot.data["email"],
@@ -468,6 +477,7 @@ class DatabaseServices implements BaseDatabase {
         num_followers: documentSnapshot.data["num_followers"] ?? 0,
         num_following: documentSnapshot.data["num_following"] ?? 0,
         photo_profile: documentSnapshot.data["photo_profile"],
+        isChatting: documentSnapshot.data['isChattingwith'],
       );
     } catch (e) {
       return null;
@@ -618,15 +628,16 @@ class DatabaseServices implements BaseDatabase {
   }
 
   @override
-  Future<List<Map<String , String>>> getPersonSuggestion(String suggestion) async {
-    List<Map<String , String>> toReturn = [];
+  Future<List<Map<String, String>>> getPersonSuggestion(
+      String suggestion) async {
+    List<Map<String, String>> toReturn = [];
     QuerySnapshot querySnapshot = await _usersCollection
         .where("search_param", arrayContains: suggestion)
         .getDocuments();
-    querySnapshot.documents.forEach((DocumentSnapshot documentSnapshot){
+    querySnapshot.documents.forEach((DocumentSnapshot documentSnapshot) {
       toReturn.add({
-        'uid' : documentSnapshot.documentID,
-        'user_name' : documentSnapshot.data['user_name'],
+        'uid': documentSnapshot.documentID,
+        'user_name': documentSnapshot.data['user_name'],
       });
     });
     return toReturn;
@@ -644,27 +655,90 @@ class DatabaseServices implements BaseDatabase {
 
   @override
   Future<bool> isFollowing({String uid}) async {
-    DocumentSnapshot snap = await _usersCollection.document(this.uid).collection("Following").document(uid).get();
-    if (snap == null)
-      return false;
+    DocumentSnapshot snap = await _usersCollection
+        .document(this.uid)
+        .collection("Following")
+        .document(uid)
+        .get();
+    if (snap == null) return false;
 
-    if (snap.exists)
-      if (snap.data['accepted'])
-        return true;
+    if (snap.exists) if (snap.data['accepted']) return true;
 
     return false;
   }
 
   @override
   Future<bool> isFollower({String uid}) async {
-    DocumentSnapshot snap = await _usersCollection.document(this.uid).collection("Followers").document(uid).get();
-    if (snap == null)
-      return false;
+    DocumentSnapshot snap = await _usersCollection
+        .document(this.uid)
+        .collection("Followers")
+        .document(uid)
+        .get();
+    if (snap == null) return false;
 
-    if (snap.exists)
-      if (snap.data['accepted'])
-        return true;
+    if (snap.exists) if (snap.data['accepted']) return true;
 
     return false;
+  }
+
+  @override
+  Future sendMessage({String uid, String message}) async {
+    String chatId = _getChatID(uid, this.uid);
+    return await _chatsCollection.document(chatId).collection("Messages").add(
+      {
+        'sender_id': this.uid,
+        'reciever_id': uid,
+        'message': message,
+        'timestamp': DateTime.now().millisecondsSinceEpoch.toString()
+      },
+    );
+  }
+
+  static String _getChatID(String id, String id2) {
+    if (id.compareTo(id2) <= 0)
+      return "$id-$id2";
+    else
+      return "$id2-$id";
+  }
+
+  @override
+  Stream<QuerySnapshot> getMessages({String uid}) {
+    String chatId = _getChatID(uid, this.uid);
+    return _chatsCollection
+        .document(chatId)
+        .collection("Messages")
+        .orderBy('timestamp', descending: false)
+        .limit(20)
+        .snapshots();
+  }
+
+  @override
+  Future addNewChatPerson({String uid}) async {
+    List p = [uid];
+    try {
+      return await _usersCollection.document(this.uid).updateData(
+        {'isChattingwith': FieldValue.arrayUnion(p)},
+      ).whenComplete(() async {
+        try {
+          await _usersCollection.document(uid).updateData(
+              {'isChattingwith': FieldValue.arrayUnion([this.uid])});
+        }catch (e) {
+          await _usersCollection.document(uid).setData(
+              {'isChattingwith': FieldValue.arrayUnion([this.uid])});
+        }
+      });
+    } catch (e) {
+      return await _usersCollection.document(this.uid).setData(
+        {'isChattingwith': FieldValue.arrayUnion(p)},
+      ).whenComplete(() async {
+        try {
+          await _usersCollection.document(uid).updateData(
+              {'isChattingwith': FieldValue.arrayUnion([this.uid])});
+        }catch (e) {
+          await _usersCollection.document(uid).setData(
+              {'isChattingwith': FieldValue.arrayUnion([this.uid])});
+        }
+      });
+    }
   }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_page_transition/flutter_page_transition.dart';
+import 'package:template/Screens/Chats/chat_messages.dart';
+import 'package:template/Screens/Chats/chats.dart';
 import 'package:template/Screens/CheckRecommendations/CheckRecomendations.dart';
 import 'package:template/Screens/CheckRecommendations/MovieScreen.dart';
 import 'package:template/Screens/Home/homepage.dart';
@@ -14,7 +16,10 @@ void main() => runApp(AuthScreen());
 class AuthScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: LoginPage());
+    return MaterialApp(
+      home: LoginPage(),
+      debugShowCheckedModeBanner: false,
+    );
   }
 }
 
@@ -46,6 +51,10 @@ class MainApp extends StatelessWidget {
                   return new Followers(index: 1);
                 case '/otherProfile':
                   return new OtherProfile();
+                case '/chats':
+                  return new Chats();
+                case '/chatMessages':
+                  return new ChatMessages();
                 default:
                   return null;
               }
@@ -60,6 +69,12 @@ class MainApp extends StatelessWidget {
                   return effectMap[PageTransitionType.slideUp](
                       Curves.linear, animation, secondaryAnimation, child);
                 case '/followings':
+                  return effectMap[PageTransitionType.slideUp](
+                      Curves.linear, animation, secondaryAnimation, child);
+                case '/chats':
+                  return effectMap[PageTransitionType.slideUp](
+                      Curves.linear, animation, secondaryAnimation, child);
+                case '/chatMessages':
                   return effectMap[PageTransitionType.slideUp](
                       Curves.linear, animation, secondaryAnimation, child);
                 default:

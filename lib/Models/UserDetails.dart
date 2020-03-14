@@ -9,6 +9,7 @@ class UserDetails {
   String photo_profile = null;
   int num_followers = 0;
   int num_following = 0;
+  List<dynamic> isChatting;
 
   UserDetails({
     this.user_id,
@@ -21,6 +22,7 @@ class UserDetails {
     this.num_followers,
     this.num_following,
     this.photo_profile,
+    this.isChatting,
   });
 }
 
@@ -29,3 +31,4 @@ class FollowerDetails{
   bool accepted = false;
   FollowerDetails({this.user_id, this.accepted});
 }
+

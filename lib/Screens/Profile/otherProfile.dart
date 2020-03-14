@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:template/Models/Arguments.dart';
 import 'package:template/Models/User.dart';
 import 'package:template/Services/DatabaseServices.dart';
-import 'profile.dart';
 
 const Color BOTTOM_BAR_COLOR = Colors.redAccent;
 
@@ -29,12 +28,30 @@ class _OtherProfileState extends State<OtherProfile> {
   @override
   Widget build(BuildContext context) {
     args = ModalRoute.of(context).settings.arguments;
-    if (!dataRetrieved)
-      getData();
+    if (!dataRetrieved) getData();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue[900],
         title: Text(args.userName),
+        actions: <Widget>[
+          !pressed ? FutureBuilder(
+            future: DatabaseServices(User.userdata.uid).isFollower(uid: args.id),
+            builder: (BuildContext context, AsyncSnapshot<bool> snapshot){
+              if (!snapshot.hasData)
+                return Text("");
+
+              return snapshot.data ? IconButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed(
+                    '/chatMessages',
+                    arguments: ChatMessagesArgument(id: args.id),
+                  );
+                },
+                icon: Icon(Icons.message),
+              ) : Text("");
+            },
+          ) : Text("")
+        ],
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -271,6 +288,4 @@ class _OtherProfileState extends State<OtherProfile> {
       ),
     );
   }
-
-
 }

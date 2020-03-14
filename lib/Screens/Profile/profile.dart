@@ -19,6 +19,14 @@ class _ProfileState extends State<Profile> {
       appBar: AppBar(
         backgroundColor: Colors.blue[900],
         title: Text('Profile'),
+        actions: <Widget>[
+          IconButton(
+            onPressed: (){
+              Navigator.of(context).pushNamed('/chats');
+            },
+            icon: Icon(Icons.message),
+          ),
+        ],
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,

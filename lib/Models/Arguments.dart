@@ -10,3 +10,8 @@ class OtherProfileArgument{
   String userName = "";
   OtherProfileArgument({this.id, this.userName});
 }
+
+class ChatMessagesArgument{
+  String id;
+  ChatMessagesArgument({this.id});
+}
