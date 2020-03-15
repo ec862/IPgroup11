@@ -1,22 +1,71 @@
 import 'package:flutter/material.dart';
 import 'profile.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:template/Services/AuthenticationServices.dart';
+import 'package:template/Services/DatabaseServices.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:developer';
+import 'package:template/Models/UserDetails.dart';
+import 'package:template/Models/User.dart';
 
 const Color BOTTOM_BAR_COLOR = Colors.redAccent;
 
 class EditProfile extends StatefulWidget {
   @override
+  final String text;
+  EditProfile({Key key, @required this.text}) : super (key: key);
   _EditProfileState createState() => _EditProfileState();
 }
 
 class _EditProfileState extends State<EditProfile> {
+  String gender = "Male";
+  String dob = "08/09/2000";
+
+  UserDetails userDetails;
+
+  TextEditingController nameController = new TextEditingController();
+  TextEditingController userNameController = new TextEditingController();
+  TextEditingController favMovieController = new TextEditingController();
+
+  void getCurrentUser() async {
+    FirebaseUser user = await Authentication().user;
+    if (user == null) return;
+
+    DatabaseServices dbs = new DatabaseServices(user.uid);
+    userDetails = await DatabaseServices(User.userdata.uid).getUserInfo();
+
+    nameController.text = userDetails.name;
+    userNameController.text = userDetails.user_name;
+    favMovieController.text = userDetails.favorite_movie;
+    currentSelectedValueCat = userDetails.favorite_category;
+    //currentSelectedValue = userDetails.gender;
+    //dob = userDetails.dob;
+
+    setState(() => currentSelectedValueCat = userDetails.favorite_category);
+  }
+
+  void setCurrentUser() async{
+    FirebaseUser user = await Authentication().user;
+    if (user == null) return;
+    DatabaseServices dbs = new DatabaseServices(user.uid);
+
+    dbs.setName(name: this.nameController.text);
+    dbs.setUsername(username: this.userNameController.text);
+    dbs.setFavMovie(movieName: this.favMovieController.text);
+    dbs.setFavCategory(category: currentSelectedValueCat);
+    //dbs.setDOB(date: this.dob);
+    //dbs.setGender(gender: this.gender);
+  }
+
+
   int currentindex = 0; // home = 0
   var currentSelectedValue = 'Male';
-  var currentSelectedValueCat = 'Action';
+  var currentSelectedValueCat = "Action";
 
   DateTime selectedDate = DateTime.now();
   TextEditingController _date = new TextEditingController();
-  var dateFormat = DateFormat('d-MM-yyyy');
+  var dateFormat = DateFormat('d/MM/yyyy');
 
   _selectDate() async {
     final DateTime picked = await showDatePicker(
@@ -32,8 +81,17 @@ class _EditProfileState extends State<EditProfile> {
       });
   }
 
+  void initState() {
+    super.initState();
+    setState(() {
+      getCurrentUser();
+      print("sup$dob");
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    //getCurrentUser();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue[900],
@@ -69,7 +127,8 @@ class _EditProfileState extends State<EditProfile> {
                     child: FloatingActionButton(
                       backgroundColor: Color.fromRGBO(0, 0, 0, 0.5),
                       elevation: 0,
-                      onPressed: () => {},
+                      onPressed: () => {
+                      },
                       tooltip: 'Edit',
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -82,19 +141,6 @@ class _EditProfileState extends State<EditProfile> {
                   ),
                 ],
               ),
-              /*Container(
-                width: 110,
-                height: 140,
-                alignment: Alignment.topRight,
-                child: IconButton(
-                  icon: Icon(
-                    Icons.save,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-              ),*/
 
               Container(
                 width: 40,
@@ -114,6 +160,8 @@ class _EditProfileState extends State<EditProfile> {
                         child: InkWell(
                           splashColor: Colors.blue, // splash color
                           onTap: () {
+                              setCurrentUser();
+                              print("new Info saved");
                               Navigator.pop(context);
                           },
                           // button pressed
@@ -137,19 +185,39 @@ class _EditProfileState extends State<EditProfile> {
               //Text('Frank Davis', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               Flexible(
                 child: Container(
-                  width: 120,
+                  width: 200,
                   child: new TextField(
+                    controller: nameController,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         fontSize: 18.0, height: 1.0, color: Colors.black),
                     decoration: InputDecoration(
-                      hintText: 'Frank Davis',
                     ),
                   ),
                 ),
               ),
             ],
           ),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Flexible(
+                child: Container(
+                  padding: EdgeInsets.only(left: 20),
+                  width: 150,
+                  child: new TextField(
+                    controller: userNameController,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 12.0, height: 1.0, color: Colors.black),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
@@ -169,13 +237,10 @@ class _EditProfileState extends State<EditProfile> {
               Container(
                 width: 120,
                 child: new TextField(
+                  controller: favMovieController,
                   //textAlign: TextAlign.center,
                   style:
                       TextStyle(fontSize: 18.0, height: 0, color: Colors.black),
-
-                  decoration: InputDecoration(
-                    hintText: 'Joker',
-                  ),
                 ),
               ),
             ],
@@ -196,10 +261,8 @@ class _EditProfileState extends State<EditProfile> {
                 child: DropdownButton<String>(
                   value: currentSelectedValueCat,
                   onChanged: (newVal) {
-                    setState(
-                      () {
-                        print(newVal);
-                        currentSelectedValueCat = newVal;
+                    setState(() {
+                        this.currentSelectedValueCat = newVal;
                       },
                     );
                   },
@@ -275,7 +338,7 @@ class _EditProfileState extends State<EditProfile> {
             ],
           ),
           Transform(
-            transform: Matrix4.translationValues(275, -90, 0.0),
+            transform: Matrix4.translationValues(275, -80, 0.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
@@ -286,7 +349,7 @@ class _EditProfileState extends State<EditProfile> {
                       controller: _date,
                       //keyboardType: TextInputType.datetime,
                       decoration: InputDecoration(
-                        hintText: "08-09-2000",
+                        hintText: dob,
                         border: InputBorder.none,
                         //hasFloatingPlaceholder: true
                       ),

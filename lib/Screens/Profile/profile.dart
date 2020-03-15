@@ -6,6 +6,15 @@ import 'package:template/Screens/main.dart';
 import 'package:template/Services/AuthenticationServices.dart';
 import 'package:template/Services/DatabaseServices.dart';
 import 'editProfile.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:developer';
+import 'package:template/Models/UserDetails.dart';
+import 'package:flutter/scheduler.dart';
 
 class Profile extends StatefulWidget {
   @override
@@ -13,20 +22,69 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+
+  String name = '';
+  String userName = '';
+  String favoriteMovie = '';
+  String favoriteCategory = '';
+  String followers = "22";
+  String friends = "10";
+  String following = "103";
+//int followers = 22;
+//int friends = 10;
+//int following = 103;
+  String reviewedMovies = "30";
+  String catMostWatched = "";
+  String gender = "Male";
+  String dob = "08/09/2000";
+
+  UserDetails userDetails;
+
+  Future getCurrentUser() async {
+    FirebaseUser user = await Authentication().user;
+    if (user == null) return;
+    DatabaseServices dbs = await DatabaseServices(user.uid);
+    userDetails = await DatabaseServices(User.userdata.uid).getUserInfo();
+    name = await userDetails.name;
+    userName = await userDetails.user_name;
+    favoriteMovie = await userDetails.favorite_movie;
+    favoriteCategory = await userDetails.favorite_category;
+    //dob = await userDetails.dob;
+    //
+    setState(() => name = userDetails.name);
+    //print("right here $name");
+    //this.followers = userDetails.num_followers;
+    //this.friends = userDetails.
+    //this.following = userDetails.num_following;
+    //this.reviewedMovies = userDetails.
+    //this.catMostWatched = userDetails.
+
+    //this.gender = userDetails.gender
+
+  }
+
+  void initState() {
+    super.initState();
+    setState(() {
+      getCurrentUser();
+    });
+  }
+
+  /*void initState() {
+    super.initState();
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => getCurrentUser());
+    print("here");
+    getCurrentUser().then;
+  }*/
+
   @override
   Widget build(BuildContext context) {
+    getCurrentUser();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue[900],
         title: Text('Profile'),
-        actions: <Widget>[
-          IconButton(
-            onPressed: (){
-              Navigator.of(context).pushNamed('/chats');
-            },
-            icon: Icon(Icons.message),
-          ),
-        ],
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -34,6 +92,7 @@ class _ProfileState extends State<Profile> {
         children: <Widget>[
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            //crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Container(
                 width: 110,
@@ -44,32 +103,64 @@ class _ProfileState extends State<Profile> {
                 backgroundImage: NetworkImage(
                     'https://images.unsplash.com/photo-1501549538842-2f24e2dd6520?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80'),
               ),
+
               Container(
-                width: 110,
+                width: 40,
+                //width: 110,
+              ),
+
+              Container(
                 height: 140,
                 alignment: Alignment.topRight,
-                child: IconButton(
-                  icon: Icon(
-                    Icons.edit,
+                child: SizedBox.fromSize(
+                  size: Size(56, 56), // button width and height
+                  child: ClipOval(
+                    child: Material(
+                      color: Colors.white, // button color
+                      child: InkWell(
+                        splashColor: Colors.blue, // splash color
+                        onTap: () {
+                          //print(name);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => EditProfile(text: 'Thriller',)),
+                          );
+                        },
+                        // button pressed
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Icon(Icons.edit), // icon
+                            Text("Edit"), // text
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                  onPressed: () {
-                    //Navigator.of(context).push(MaterialPageRoute(builder: (context) => EditProfile()),
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => EditProfile()),
-                    );
-                  },
+                )
+              ),
+            ],
+          ),
+          Column(
+            //mainAxisAlignment: MainAxisAlignment.start,
+            //crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+                Align(
+                alignment: Alignment.center, // Align however you like (i.e .centerRight, centerLeft)
+                child: Text(name, textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              ),
+              Container(
+                padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                child: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Text('#$userName',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black54)),
                 ),
               ),
             ],
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Text('Frank Davis',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            ],
-          ),
+
           Row(
             children: <Widget>[
               Spacer(),
@@ -83,7 +174,7 @@ class _ProfileState extends State<Profile> {
                   color: Colors.white,
                   child: Center(
                     child: Text(
-                      "Followers \n22".toUpperCase(),
+                      "Followers \n$followers",
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -103,7 +194,7 @@ class _ProfileState extends State<Profile> {
                   color: Colors.white,
                   child: Center(
                     child: Text(
-                      "Following \n103".toUpperCase(),
+                      "Following \n$following",
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -128,7 +219,7 @@ class _ProfileState extends State<Profile> {
               ),
               Container(
                 width: 120,
-                child: Text('Joker',
+                child: Text(favoriteMovie,
                     textAlign: TextAlign.left,
                     style:
                         TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
@@ -148,7 +239,7 @@ class _ProfileState extends State<Profile> {
               ),
               Container(
                 width: 120,
-                child: Text('Thriller',
+                child: Text(favoriteCategory,
                     textAlign: TextAlign.left,
                     style:
                         TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
@@ -168,7 +259,7 @@ class _ProfileState extends State<Profile> {
               ),
               Container(
                 width: 120,
-                child: Text('22',
+                child: Text(followers,
                     textAlign: TextAlign.left,
                     style:
                         TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
@@ -190,13 +281,13 @@ class _ProfileState extends State<Profile> {
                 width: 120,
                 child: Row(
                   children: <Widget>[
-                    Text('10',
+                    Text(friends,
                         textAlign: TextAlign.left,
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),
                     //Align
 
-                    SizedBox(
+                    /*SizedBox(
                       height: 22.0,
                       width: 22.0,
                       child: new IconButton(
@@ -204,7 +295,7 @@ class _ProfileState extends State<Profile> {
                         icon: new Icon(Icons.arrow_forward_ios, size: 16.0),
                         onPressed: () {},
                       ),
-                    ),
+                    ),*/
                   ],
                 ),
               ),
@@ -223,7 +314,7 @@ class _ProfileState extends State<Profile> {
               ),
               Container(
                 width: 120,
-                child: Text('30',
+                child: Text(reviewedMovies,
                     textAlign: TextAlign.left,
                     style:
                         TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
@@ -243,7 +334,7 @@ class _ProfileState extends State<Profile> {
               ),
               Container(
                 width: 120,
-                child: Text('Action',
+                child: Text(catMostWatched,
                     textAlign: TextAlign.left,
                     style:
                         TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
@@ -263,7 +354,7 @@ class _ProfileState extends State<Profile> {
               ),
               Container(
                 width: 120,
-                child: Text('Male',
+                child: Text(gender,
                     textAlign: TextAlign.left,
                     style:
                         TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
@@ -283,7 +374,7 @@ class _ProfileState extends State<Profile> {
               ),
               Container(
                 width: 120,
-                child: Text('08/09/2000',
+                child: Text(dob,
                     textAlign: TextAlign.left,
                     style:
                         TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
@@ -300,7 +391,7 @@ class _ProfileState extends State<Profile> {
               }));
             },
             child: Text(
-              "LOGOUT",
+              "Logout",
               style: TextStyle(color: Colors.blue[900], fontSize: 20),
             ),
           ),
