@@ -43,10 +43,7 @@ class _HomepageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
-    final double headPadding = MediaQuery
-        .of(context)
-        .size
-        .height / 100;
+    final double headPadding = MediaQuery.of(context).size.height / 100;
 
     return Scaffold(
       appBar: PreferredSize(
@@ -96,12 +93,10 @@ class _HomepageState extends State<Homepage> {
   }
 
   Widget createRecentRecs(int numberOfMovies) {
-
     return Container(
-      height: (movies != null && movies.length>0) ? MediaQuery
-          .of(context)
-          .size
-          .height * 0.73 : 1,
+      height: (movies != null && movies.length > 0)
+          ? MediaQuery.of(context).size.height * 0.73
+          : 1,
       //width: MediaQuery.of(context).size.width,
       child: FutureBuilder(
         builder: (context, projectSnap) {
@@ -114,11 +109,7 @@ class _HomepageState extends State<Homepage> {
 
   Widget createRecsOnFav(int numberOfMovies) {
     return Container(
-      height: MediaQuery
-          .of(context)
-          .size
-          .height * 0.73,
-      //width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height * 0.73,
       child: FutureBuilder(
         builder: (context, projectSnap) {
           return createScrollRecs(numberOfMovies, false, projectSnap);
@@ -128,77 +119,69 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
-  Widget createScrollRecs(int numberOfMovies, bool recentRecs,
-      var projectSnap) {
+  Widget createScrollRecs(
+      int numberOfMovies, bool recentRecs, var projectSnap) {
     if (projectSnap.connectionState != ConnectionState.done) {
       return Center(
         child: Text("Loading..."),
       );
-    }
-    else {
+    } else {
       return ListView.builder(
         physics: BouncingScrollPhysics(),
         shrinkWrap: false,
         scrollDirection: Axis.horizontal,
         itemCount: ((projectSnap.data != null)
             ? (projectSnap.data.length > numberOfMovies
-            ? numberOfMovies
-            : projectSnap.data.length)
+                ? numberOfMovies
+                : projectSnap.data.length)
             : 0),
-        itemBuilder: (BuildContext context, int index) =>
-            Stack(
-              children: <Widget>[
-                Container(
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width,
-                  child: FutureBuilder(
-                    builder: (context, projectSnapInner) {
-                      if (projectSnapInner.connectionState !=
-                          ConnectionState.done) {
-                        return Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-                      else {
-                        return projectSnapInner.data;
-                      }
-                    },
-                    future:
+        itemBuilder: (BuildContext context, int index) => Stack(
+          children: <Widget>[
+            Container(
+              width: MediaQuery.of(context).size.width,
+              child: FutureBuilder(
+                builder: (context, projectSnapInner) {
+                  if (projectSnapInner.connectionState !=
+                      ConnectionState.done) {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else {
+                    return projectSnapInner.data;
+                  }
+                },
+                future:
                     MovieContent(projectSnap.data[index]).cardBuilder(context),
-                  ),
-                ),
-                Positioned(
-                  right: 10,
-                  top: 11,
-                  child: Material(
-                    color: Colors.transparent,
-                    child: IconButton(
-                      color: Colors.blueAccent,
-                      splashColor: Colors.red,
-                      icon: Icon(Icons.close),
-                      onPressed: () {
-                        if (recentRecs) {
-                          setState(() {
-                            DatabaseServices(User.userdata.uid)
-                                .removeRecommendation(
-                                movieID: movies[index].movie_id);
-                            movies.removeAt(index);
-                          });
-                        }
-                        else {
-                          setState(() {
-                            RecommendByGenre.action.remove(
-                                movies[index].movie_id);
-                          });
-                        }
-                      },
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
+            Positioned(
+              right: 10,
+              top: 11,
+              child: Material(
+                color: Colors.transparent,
+                child: IconButton(
+                  color: Colors.blueAccent,
+                  splashColor: Colors.red,
+                  icon: Icon(Icons.close),
+                  onPressed: () {
+                    if (recentRecs) {
+                      setState(() {
+                        DatabaseServices(User.userdata.uid)
+                            .removeRecommendation(
+                                movieID: movies[index].movie_id);
+                        movies.removeAt(index);
+                      });
+                    } else {
+                      setState(() {
+                        RecommendByGenre.action.remove(movies[index].movie_id);
+                      });
+                    }
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
       );
     }
   }
@@ -219,9 +202,9 @@ class _HomepageState extends State<Homepage> {
             splashColor: Colors.deepOrangeAccent,
             child: Container(
                 child: Text(
-                  "Recommend New Movie",
-                  style: TextStyle(fontSize: 25),
-                )),
+              "Recommend New Movie",
+              style: TextStyle(fontSize: 25),
+            )),
             shape: RoundedRectangleBorder(
                 borderRadius: new BorderRadius.circular(5)),
           ),

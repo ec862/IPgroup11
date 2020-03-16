@@ -338,7 +338,7 @@ class SelectOption extends StatelessWidget {
 class ProfileFullScreen extends StatelessWidget {
   final posterUrl;
 
-  ProfileFullScreen(this.posterUrl);
+  ProfileFullScreen(this.posterUrl,{Key key}):super(key: key);
 
   @override
   Widget build(BuildContext context) {
