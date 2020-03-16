@@ -26,6 +26,8 @@ abstract class BaseDatabase {
 
   Future setProfilePhoto({@required File image});
 
+  Future setGender({String gender});
+
   /// actions to perform
   Future follow(uid);
 
@@ -82,6 +84,8 @@ abstract class BaseDatabase {
   Future sendMessage({String uid, String message});
 
   Future addNewChatPerson({String uid});
+
+  Stream<UserDetails> get userStream;
 }
 
 class DatabaseServices implements BaseDatabase {
@@ -468,16 +472,17 @@ class DatabaseServices implements BaseDatabase {
     try {
       return UserDetails(
         user_id: documentSnapshot.documentID,
-        name: documentSnapshot.data["name"],
-        user_name: documentSnapshot.data["user_name"],
-        email: documentSnapshot.data["email"],
-        favorite_category: documentSnapshot.data["favourite_category"],
-        favorite_movie: documentSnapshot.data["favourite_movie"],
-        dob: documentSnapshot.data["dob"],
+        name: documentSnapshot.data["name"]??'',
+        user_name: documentSnapshot.data["user_name"]??'',
+        email: documentSnapshot.data["email"]??'',
+        favorite_category: documentSnapshot.data["favourite_category"]??'',
+        favorite_movie: documentSnapshot.data["favourite_movie"]??'',
+        dob: documentSnapshot.data["dob"]??'',
         num_followers: documentSnapshot.data["num_followers"] ?? 0,
         num_following: documentSnapshot.data["num_following"] ?? 0,
-        photo_profile: documentSnapshot.data["photo_profile"],
+        photo_profile: documentSnapshot.data["photo_profile"]??'',
         isChatting: documentSnapshot.data['isChattingwith'],
+        gender: documentSnapshot.data['gender']??'',
       );
     } catch (e) {
       return null;
@@ -739,6 +744,31 @@ class DatabaseServices implements BaseDatabase {
               {'isChattingwith': FieldValue.arrayUnion([this.uid])});
         }
       });
+    }
+  }
+
+  @override
+  Stream<UserDetails> get userStream {
+    return _usersCollection.document(this.uid).snapshots().map(_toUserDetails);
+  }
+
+  @override
+  Future setGender({String gender}) async {
+    try {
+      return await _usersCollection.document(this.uid).updateData(
+        {'gender': gender},
+      ).whenComplete(() {
+        print("Done");
+      });
+    } catch (e) {
+      try {
+        return await _usersCollection.document(this.uid).setData(
+          {'gender': gender},
+        );
+      } catch (ex) {
+        print(ex);
+        return null;
+      }
     }
   }
 }

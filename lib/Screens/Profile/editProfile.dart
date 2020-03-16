@@ -14,7 +14,9 @@ const Color BOTTOM_BAR_COLOR = Colors.redAccent;
 class EditProfile extends StatefulWidget {
   @override
   final String text;
-  EditProfile({Key key, @required this.text}) : super (key: key);
+
+  EditProfile({Key key, @required this.text}) : super(key: key);
+
   _EditProfileState createState() => _EditProfileState();
 }
 
@@ -45,7 +47,7 @@ class _EditProfileState extends State<EditProfile> {
     setState(() => currentSelectedValueCat = userDetails.favorite_category);
   }
 
-  void setCurrentUser() async{
+  void setCurrentUser() async {
     FirebaseUser user = await Authentication().user;
     if (user == null) return;
     DatabaseServices dbs = new DatabaseServices(user.uid);
@@ -54,12 +56,10 @@ class _EditProfileState extends State<EditProfile> {
     dbs.setUsername(username: this.userNameController.text);
     dbs.setFavMovie(movieName: this.favMovieController.text);
     dbs.setFavCategory(category: currentSelectedValueCat);
-    //dbs.setDOB(date: this.dob);
-    //dbs.setGender(gender: this.gender);
+    dbs.setDOB(date: selectedDate);
+    dbs.setGender(gender: this.gender);
   }
 
-
-  int currentindex = 0; // home = 0
   var currentSelectedValue = 'Male';
   var currentSelectedValueCat = "Action";
 
@@ -107,7 +107,6 @@ class _EditProfileState extends State<EditProfile> {
             children: <Widget>[
               Container(
                 margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
-                //color: Colors.red,
                 width: 110,
                 height: 140,
               ),
@@ -127,8 +126,7 @@ class _EditProfileState extends State<EditProfile> {
                     child: FloatingActionButton(
                       backgroundColor: Color.fromRGBO(0, 0, 0, 0.5),
                       elevation: 0,
-                      onPressed: () => {
-                      },
+                      onPressed: () => {},
                       tooltip: 'Edit',
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -141,12 +139,9 @@ class _EditProfileState extends State<EditProfile> {
                   ),
                 ],
               ),
-
               Container(
                 width: 40,
-                //width: 110,
               ),
-
               Container(
                   margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
                   //color: Colors.red,
@@ -160,9 +155,9 @@ class _EditProfileState extends State<EditProfile> {
                         child: InkWell(
                           splashColor: Colors.blue, // splash color
                           onTap: () {
-                              setCurrentUser();
-                              print("new Info saved");
-                              Navigator.pop(context);
+                            setCurrentUser();
+                            print("new Info saved");
+                            Navigator.pop(context);
                           },
                           // button pressed
                           child: Column(
@@ -175,8 +170,7 @@ class _EditProfileState extends State<EditProfile> {
                         ),
                       ),
                     ),
-                  )
-              ),
+                  )),
             ],
           ),
           Row(
@@ -191,14 +185,12 @@ class _EditProfileState extends State<EditProfile> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         fontSize: 18.0, height: 1.0, color: Colors.black),
-                    decoration: InputDecoration(
-                    ),
+                    decoration: InputDecoration(),
                   ),
                 ),
               ),
             ],
           ),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
@@ -216,8 +208,6 @@ class _EditProfileState extends State<EditProfile> {
               ),
             ],
           ),
-
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
@@ -229,11 +219,6 @@ class _EditProfileState extends State<EditProfile> {
                         fontWeight: FontWeight.bold,
                         color: Colors.grey[600])),
               ),
-              /*Container(
-                  width: 120,
-                  child: Text('Joker', textAlign: TextAlign.left, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                ),*/
-
               Container(
                 width: 120,
                 child: new TextField(
@@ -261,7 +246,8 @@ class _EditProfileState extends State<EditProfile> {
                 child: DropdownButton<String>(
                   value: currentSelectedValueCat,
                   onChanged: (newVal) {
-                    setState(() {
+                    setState(
+                      () {
                         this.currentSelectedValueCat = newVal;
                       },
                     );
@@ -300,12 +286,11 @@ class _EditProfileState extends State<EditProfile> {
                 child: DropdownButton<String>(
                   value: currentSelectedValue,
                   onChanged: (newVal) {
-                    setState(
-                      () {
-                        print(newVal);
-                        currentSelectedValue = newVal;
-                      },
-                    );
+                    setState(() {
+                      print(newVal);
+                      currentSelectedValue = newVal;
+                      gender = newVal;
+                    });
                   },
                   items: <String>['Male', 'Female', 'Other', 'Not say']
                       .map<DropdownMenuItem<String>>((String value) {

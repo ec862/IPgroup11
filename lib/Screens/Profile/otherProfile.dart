@@ -58,7 +58,8 @@ class _OtherProfileState extends State<OtherProfile> {
                                 icon: Icon(Icons.message),
                               )
                             : Text("");
-                      })
+                      },
+                    )
                   : Text("");
             },
           )
@@ -71,7 +72,8 @@ class _OtherProfileState extends State<OtherProfile> {
           CircleAvatar(
             radius: 70,
             backgroundImage: NetworkImage(
-                'https://images.unsplash.com/photo-1501549538842-2f24e2dd6520?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80'),
+              'https://images.unsplash.com/photo-1501549538842-2f24e2dd6520?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80',
+            ),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,

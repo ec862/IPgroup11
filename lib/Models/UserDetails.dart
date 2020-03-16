@@ -10,6 +10,7 @@ class UserDetails {
   int num_followers = 0;
   int num_following = 0;
   List<dynamic> isChatting;
+  String gender = null;
 
   UserDetails({
     this.user_id,
@@ -23,6 +24,7 @@ class UserDetails {
     this.num_following,
     this.photo_profile,
     this.isChatting,
+    this.gender,
   });
 }
 

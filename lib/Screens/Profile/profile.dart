@@ -1,18 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:template/CustomView/BottomBar.dart';
+import 'package:template/Models/MovieDetails.dart';
 import 'package:template/Models/User.dart';
 import 'package:template/Screens/main.dart';
 import 'package:template/Services/AuthenticationServices.dart';
 import 'package:template/Services/DatabaseServices.dart';
 import 'editProfile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'dart:convert';
-import 'dart:io';
-import 'package:flutter/cupertino.dart';
-import 'package:http/http.dart' as http;
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'dart:developer';
 import 'package:template/Models/UserDetails.dart';
 import 'package:flutter/scheduler.dart';
 
@@ -22,7 +18,6 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-
   String name = '';
   String userName = '';
   String favoriteMovie = '';
@@ -30,6 +25,7 @@ class _ProfileState extends State<Profile> {
   String followers = "22";
   String friends = "10";
   String following = "103";
+
 //int followers = 22;
 //int friends = 10;
 //int following = 103;
@@ -45,13 +41,12 @@ class _ProfileState extends State<Profile> {
     if (user == null) return;
     DatabaseServices dbs = await DatabaseServices(user.uid);
     userDetails = await DatabaseServices(User.userdata.uid).getUserInfo();
-    name = await userDetails.name;
-    userName = await userDetails.user_name;
-    favoriteMovie = await userDetails.favorite_movie;
-    favoriteCategory = await userDetails.favorite_category;
+    name = userDetails.name ?? '';
+    userName = userDetails.user_name ?? '';
+    favoriteMovie = userDetails.favorite_movie ?? '';
+    favoriteCategory = userDetails.favorite_category ?? '';
     //dob = await userDetails.dob;
-    //
-    setState(() => name = userDetails.name);
+    setState(() => name = userDetails.name ?? '');
     //print("right here $name");
     //this.followers = userDetails.num_followers;
     //this.friends = userDetails.
@@ -60,7 +55,6 @@ class _ProfileState extends State<Profile> {
     //this.catMostWatched = userDetails.
 
     //this.gender = userDetails.gender
-
   }
 
   void initState() {
@@ -70,332 +64,346 @@ class _ProfileState extends State<Profile> {
     });
   }
 
-  /*void initState() {
-    super.initState();
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => getCurrentUser());
-    print("here");
-    getCurrentUser().then;
-  }*/
-
   @override
   Widget build(BuildContext context) {
-    getCurrentUser();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue[900],
         title: Text('Profile'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.message),
+            onPressed: () {
+              Navigator.of(context).pushNamed('/chats');
+            },
+          )
+        ],
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Row(
+      body: StreamBuilder(
+        stream: DatabaseServices(User.userdata.uid).userStream,
+        builder: (context, snap) {
+          if (!snap.hasData)
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+
+          UserDetails details = snap.data;
+          return Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            //crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Container(
-                width: 110,
-                height: 140,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    width: 110,
+                    height: 140,
+                  ),
+                  CircleAvatar(
+                    radius: 70,
+                    backgroundImage: NetworkImage(
+                        'https://images.unsplash.com/photo-1501549538842-2f24e2dd6520?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80'),
+                  ),
+                  Container(
+                    width: 40,
+                    //width: 110,
+                  ),
+                  Container(
+                      height: 140,
+                      alignment: Alignment.topRight,
+                      child: SizedBox.fromSize(
+                        size: Size(56, 56), // button width and height
+                        child: ClipOval(
+                          child: Material(
+                            color: Colors.white, // button color
+                            child: InkWell(
+                              splashColor: Colors.blue, // splash color
+                              onTap: () {
+                                //print(name);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        EditProfile(
+                                          text: 'Thriller',
+                                        ),
+                                  ),
+                                );
+                              },
+                              // button pressed
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Icon(Icons.edit), // icon
+                                  Text("Edit"), // text
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      )),
+                ],
               ),
-              CircleAvatar(
-                radius: 70,
-                backgroundImage: NetworkImage(
-                    'https://images.unsplash.com/photo-1501549538842-2f24e2dd6520?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80'),
+              Column(
+                //mainAxisAlignment: MainAxisAlignment.start,
+                //crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Align(
+                    alignment: Alignment.center,
+                    // Align however you like (i.e .centerRight, centerLeft)
+                    child: Text(details.name,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                  ),
+                  Container(
+                    padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                    child: Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Text('#${details.user_name}',
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black54)),
+                    ),
+                  ),
+                ],
               ),
-
-              Container(
-                width: 40,
-                //width: 110,
-              ),
-
-              Container(
-                height: 140,
-                alignment: Alignment.topRight,
-                child: SizedBox.fromSize(
-                  size: Size(56, 56), // button width and height
-                  child: ClipOval(
-                    child: Material(
-                      color: Colors.white, // button color
-                      child: InkWell(
-                        splashColor: Colors.blue, // splash color
-                        onTap: () {
-                          //print(name);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => EditProfile(text: 'Thriller',)),
-                          );
-                        },
-                        // button pressed
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Icon(Icons.edit), // icon
-                            Text("Edit"), // text
-                          ],
+              Row(
+                children: <Widget>[
+                  Spacer(),
+                  ButtonTheme(
+                    minWidth: 120.0,
+                    height: 50.0,
+                    child: RaisedButton(
+                      shape: new RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(50.0),
+                          side: BorderSide(color: Colors.blue)),
+                      color: Colors.white,
+                      child: Center(
+                        child: Text(
+                          "Followers \n$followers",
+                          textAlign: TextAlign.center,
                         ),
                       ),
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/followers');
+                      },
                     ),
                   ),
-                )
-              ),
-            ],
-          ),
-          Column(
-            //mainAxisAlignment: MainAxisAlignment.start,
-            //crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-                Align(
-                alignment: Alignment.center, // Align however you like (i.e .centerRight, centerLeft)
-                child: Text(name, textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              ),
-              Container(
-                padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
-                child: Align(
-                  alignment: Alignment.bottomLeft,
-                  child: Text('#$userName',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black54)),
-                ),
-              ),
-            ],
-          ),
-
-          Row(
-            children: <Widget>[
-              Spacer(),
-              ButtonTheme(
-                minWidth: 120.0,
-                height: 50.0,
-                child: RaisedButton(
-                  shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(50.0),
-                      side: BorderSide(color: Colors.blue)),
-                  color: Colors.white,
-                  child: Center(
-                    child: Text(
-                      "Followers \n$followers",
-                      textAlign: TextAlign.center,
+                  Spacer(),
+                  ButtonTheme(
+                    minWidth: 120.0,
+                    height: 50.0,
+                    child: RaisedButton(
+                      shape: new RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(50.0),
+                          side: BorderSide(color: Colors.blue)),
+                      color: Colors.white,
+                      child: Center(
+                        child: Text(
+                          "Following \n$following",
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/followings');
+                      },
                     ),
                   ),
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/followers');
-                  },
-                ),
+                  Spacer()
+                ],
               ),
-              Spacer(),
-              ButtonTheme(
-                minWidth: 120.0,
-                height: 50.0,
-                child: RaisedButton(
-                  shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(50.0),
-                      side: BorderSide(color: Colors.blue)),
-                  color: Colors.white,
-                  child: Center(
-                    child: Text(
-                      "Following \n$following",
-                      textAlign: TextAlign.center,
-                    ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.only(left: 20),
+                    child: Text('Favorite Movie',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[600])),
                   ),
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/followings');
-                  },
-                ),
-              ),
-              Spacer()
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.only(left: 20),
-                child: Text('Favorite Movie',
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[600])),
-              ),
-              Container(
-                width: 120,
-                child: Text(favoriteMovie,
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.only(left: 20),
-                child: Text('Favorite Category',
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[600])),
-              ),
-              Container(
-                width: 120,
-                child: Text(favoriteCategory,
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.only(left: 20),
-                child: Text('Followers',
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[600])),
-              ),
-              Container(
-                width: 120,
-                child: Text(followers,
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.only(left: 20),
-                child: Text('Friends',
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[600])),
-              ),
-              Container(
-                width: 120,
-                child: Row(
-                  children: <Widget>[
-                    Text(friends,
+                  Container(
+                    width: 120,
+                    child: Text(details.favorite_movie,
                         textAlign: TextAlign.left,
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),
-                    //Align
-
-                    /*SizedBox(
-                      height: 22.0,
-                      width: 22.0,
-                      child: new IconButton(
-                        padding: new EdgeInsets.all(0.0),
-                        icon: new Icon(Icons.arrow_forward_ios, size: 16.0),
-                        onPressed: () {},
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.only(left: 20),
+                    child: Text('Favorite Category',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[600])),
+                  ),
+                  Container(
+                    width: 120,
+                    child: Text(details.favorite_category,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.only(left: 20),
+                    child: Text('Followers',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[600])),
+                  ),
+                  Container(
+                    width: 120,
+                    child: Text(followers,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.only(left: 20),
+                    child: Text('Friends',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[600])),
+                  ),
+                  Container(
+                    width: 120,
+                    child: Row(
+                      children: <Widget>[
+                        Text(friends,
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.only(left: 20),
+                    child: Text('Reviewed movies',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[600])),
+                  ),
+                  Container(
+                    width: 120,
+                    child: Text(
+                      reviewedMovies,
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
-                    ),*/
-                  ],
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.only(left: 20),
+                    child: Text(
+                      'Category most watched',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: 120,
+                    child: Text(catMostWatched,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.only(left: 20),
+                    child: Text('Gender',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[600])),
+                  ),
+                  Container(
+                    width: 120,
+                    child: Text(details.gender,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.only(left: 20),
+                    child: Text('Date of birth',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[600])),
+                  ),
+                  Container(
+                    width: 120,
+                    child: Text('${DateTime.fromMillisecondsSinceEpoch(
+                        details.dob.millisecondsSinceEpoch).toString()}',
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+              InkWell(
+                onTap: () {
+                  Authentication().signOut();
+                  Navigator.popUntil(context, ModalRoute.withName('/'));
+                  Navigator.of(context)
+                      .pushReplacement(MaterialPageRoute(builder: (context) {
+                    return AuthScreen();
+                  }));
+                },
+                child: Text(
+                  "Logout",
+                  style: TextStyle(color: Colors.blue[900], fontSize: 20),
                 ),
               ),
             ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.only(left: 20),
-                child: Text('Reviewed movies',
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[600])),
-              ),
-              Container(
-                width: 120,
-                child: Text(reviewedMovies,
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.only(left: 20),
-                child: Text('Category most watched',
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[600])),
-              ),
-              Container(
-                width: 120,
-                child: Text(catMostWatched,
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.only(left: 20),
-                child: Text('Gender',
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[600])),
-              ),
-              Container(
-                width: 120,
-                child: Text(gender,
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.only(left: 20),
-                child: Text('Date of birth',
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[600])),
-              ),
-              Container(
-                width: 120,
-                child: Text(dob,
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              ),
-            ],
-          ),
-          InkWell(
-            onTap: () {
-              Authentication().signOut();
-              Navigator.popUntil(context, ModalRoute.withName('/'));
-              Navigator.of(context)
-                  .pushReplacement(MaterialPageRoute(builder: (context) {
-                return AuthScreen();
-              }));
-            },
-            child: Text(
-              "Logout",
-              style: TextStyle(color: Colors.blue[900], fontSize: 20),
-            ),
-          ),
-        ],
+          );
+        },
       ),
       bottomNavigationBar: BottomBar().createBar(context, 4),
       //bottomNavigationBar: BottomBar().createBar(context, 4),

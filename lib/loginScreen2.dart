@@ -21,7 +21,6 @@ class _LoginPageState extends State<LoginPage> {
   // calculate the screen height
   double screenHeight;
   bool checkBoxValue = false;
-
   // Set initial mode to login
   AuthMode _authMode = AuthMode.LOGIN;
   DateTime selectedDate = DateTime.now();
@@ -40,7 +39,6 @@ class _LoginPageState extends State<LoginPage> {
   void getCurrentUser() async {
     FirebaseUser user = await Authentication().user;
     if (user == null) return;
-
     if (user.isEmailVerified) {
       User.userdata.uid = user.uid;
       Navigator.of(context)

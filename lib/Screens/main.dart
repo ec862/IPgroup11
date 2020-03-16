@@ -1,5 +1,7 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_page_transition/flutter_page_transition.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:template/Screens/Chats/chat_messages.dart';
 import 'package:template/Screens/Chats/chats.dart';
 import 'package:template/Screens/CheckRecommendations/CheckRecomendations.dart';
@@ -23,7 +25,34 @@ class AuthScreen extends StatelessWidget {
   }
 }
 
-class MainApp extends StatelessWidget {
+class MainApp extends StatefulWidget {
+
+  @override
+  _MainAppState createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+  final FirebaseMessaging _fbm = FirebaseMessaging();
+
+  @override
+  void initState() {
+    super.initState();
+    _fbm.configure(
+      onMessage: (Map<String,dynamic> message) async {
+        Fluttertoast.showToast(msg: "$message");
+        print(message);
+      },
+      onLaunch: (Map<String,dynamic> message) async {
+        Fluttertoast.showToast(msg: "$message");
+        print(message);
+      },
+      onResume: (Map<String,dynamic> message) async {
+        Fluttertoast.showToast(msg: "$message");
+        print(message);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -97,17 +126,3 @@ class Routes {
     '/profile'
   ];
 }
-
-/*
-routes: <String, WidgetBuilder>{
-        Routes.bottomRoutes[0]: (BuildContext context) => new Homepage(),
-        Routes.bottomRoutes[1]: (BuildContext context) => new SearchPage(),
-        Routes.bottomRoutes[2]: (BuildContext context) => new CheckRecomendations(),
-        Routes.bottomRoutes[3]: (BuildContext context) => new WatchList(),
-        Routes.bottomRoutes[4]: (BuildContext context) => new Profile(),
-        '/friendsearchpage': (BuildContext context) => new FriendSearchPage(),
-        '/moviepage': (BuildContext context) => new MovieScreen(),
-        '/followers': (BuildContext context) => new Followers(index: 0),
-        '/followings': (BuildContext context) => new Followers(index: 1),
-      }
- */
