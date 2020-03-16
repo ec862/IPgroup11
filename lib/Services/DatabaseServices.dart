@@ -477,7 +477,7 @@ class DatabaseServices implements BaseDatabase {
         email: documentSnapshot.data["email"]??'',
         favorite_category: documentSnapshot.data["favourite_category"]??'',
         favorite_movie: documentSnapshot.data["favourite_movie"]??'',
-        dob: documentSnapshot.data["dob"]??'',
+        dob: documentSnapshot.data["dob"],
         num_followers: documentSnapshot.data["num_followers"] ?? 0,
         num_following: documentSnapshot.data["num_following"] ?? 0,
         photo_profile: documentSnapshot.data["photo_profile"]??'',

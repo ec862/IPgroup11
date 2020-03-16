@@ -29,29 +29,26 @@ class _EditProfileState extends State<EditProfile> {
   TextEditingController nameController = new TextEditingController();
   TextEditingController userNameController = new TextEditingController();
   TextEditingController favMovieController = new TextEditingController();
+  String currentSelectedValue = 'Male';
+  String currentSelectedValueCat = "Action";
+  DateTime selectedDate = DateTime.now();
+  TextEditingController _date = new TextEditingController();
+  var dateFormat = DateFormat('d/MM/yyyy');
 
   void getCurrentUser() async {
-    FirebaseUser user = await Authentication().user;
-    if (user == null) return;
-
-    DatabaseServices dbs = new DatabaseServices(user.uid);
     userDetails = await DatabaseServices(User.userdata.uid).getUserInfo();
-
     nameController.text = userDetails.name;
     userNameController.text = userDetails.user_name;
     favMovieController.text = userDetails.favorite_movie;
     currentSelectedValueCat = userDetails.favorite_category;
-    //currentSelectedValue = userDetails.gender;
-    //dob = userDetails.dob;
+    currentSelectedValue = userDetails.gender;
+    dob = userDetails.dob;
 
-    setState(() => currentSelectedValueCat = userDetails.favorite_category);
+    setState(() {});
   }
 
   void setCurrentUser() async {
-    FirebaseUser user = await Authentication().user;
-    if (user == null) return;
-    DatabaseServices dbs = new DatabaseServices(user.uid);
-
+    DatabaseServices dbs = new DatabaseServices(User.userdata.uid);
     dbs.setName(name: this.nameController.text);
     dbs.setUsername(username: this.userNameController.text);
     dbs.setFavMovie(movieName: this.favMovieController.text);
@@ -59,13 +56,6 @@ class _EditProfileState extends State<EditProfile> {
     dbs.setDOB(date: selectedDate);
     dbs.setGender(gender: this.gender);
   }
-
-  var currentSelectedValue = 'Male';
-  var currentSelectedValueCat = "Action";
-
-  DateTime selectedDate = DateTime.now();
-  TextEditingController _date = new TextEditingController();
-  var dateFormat = DateFormat('d/MM/yyyy');
 
   _selectDate() async {
     final DateTime picked = await showDatePicker(
@@ -83,15 +73,11 @@ class _EditProfileState extends State<EditProfile> {
 
   void initState() {
     super.initState();
-    setState(() {
-      getCurrentUser();
-      print("sup$dob");
-    });
+    getCurrentUser();
   }
 
   @override
   Widget build(BuildContext context) {
-    //getCurrentUser();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue[900],
@@ -176,7 +162,6 @@ class _EditProfileState extends State<EditProfile> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              //Text('Frank Davis', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               Flexible(
                 child: Container(
                   width: 200,
@@ -244,13 +229,11 @@ class _EditProfileState extends State<EditProfile> {
               Container(
                 width: 120,
                 child: DropdownButton<String>(
-                  value: currentSelectedValueCat,
+                  value: currentSelectedValueCat.isNotEmpty ? currentSelectedValueCat : null,
                   onChanged: (newVal) {
-                    setState(
-                      () {
-                        this.currentSelectedValueCat = newVal;
-                      },
-                    );
+                    setState(() {
+                      this.currentSelectedValueCat = newVal;
+                    });
                   },
                   items: <String>[
                     'Action',
@@ -265,8 +248,6 @@ class _EditProfileState extends State<EditProfile> {
                     );
                   }).toList(),
                 ),
-                //width: 120,
-                //child: Text('Male', textAlign: TextAlign.left, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -275,19 +256,21 @@ class _EditProfileState extends State<EditProfile> {
             children: <Widget>[
               Container(
                 padding: EdgeInsets.only(left: 20),
-                child: Text('Gender',
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[600])),
+                child: Text(
+                  'Gender',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[600],
+                  ),
+                ),
               ),
               Container(
                 width: 120,
                 child: DropdownButton<String>(
-                  value: currentSelectedValue,
+                  value: currentSelectedValue.isNotEmpty ? currentSelectedValue : null,
                   onChanged: (newVal) {
                     setState(() {
-                      print(newVal);
                       currentSelectedValue = newVal;
                       gender = newVal;
                     });
@@ -300,8 +283,6 @@ class _EditProfileState extends State<EditProfile> {
                     );
                   }).toList(),
                 ),
-                //width: 120,
-                //child: Text('Male', textAlign: TextAlign.left, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -310,16 +291,15 @@ class _EditProfileState extends State<EditProfile> {
             children: <Widget>[
               Container(
                 padding: EdgeInsets.only(left: 20),
-                child: Text('Date of birth',
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[600])),
+                child: Text(
+                  'Date of birth',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[600],
+                  ),
+                ),
               ),
-              /*Container(
-                width: 120,
-                child: Text('08/09/2000', textAlign: TextAlign.left, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              ),*/
             ],
           ),
           Transform(
