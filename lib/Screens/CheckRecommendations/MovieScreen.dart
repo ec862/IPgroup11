@@ -18,8 +18,10 @@ import 'RecommendMovie.dart';
 const Color BOTTOM_BAR_COLOR = Colors.redAccent;
 
 class MovieScreen extends StatefulWidget {
+  MovieScreen({Key key}):super(key: key);
+
   @override
-  _MovieScreenState createState() => _MovieScreenState();
+  createState() => new _MovieScreenState();
 }
 
 class _MovieScreenState extends State<MovieScreen> {
@@ -105,7 +107,7 @@ class _MovieScreenState extends State<MovieScreen> {
               movieID: args.id,
               name: name,
             );
-            }));
+          }));
         },
         child: Icon(Icons.arrow_forward),
         backgroundColor: Colors.blue[900],
@@ -253,7 +255,7 @@ class _MovieScreenState extends State<MovieScreen> {
   void getMovieDetails(String id) async {
     args = ModalRoute.of(context).settings.arguments;
     dynamic response =
-        await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
+    await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
     var data = json.decode(response.body);
     actors = data["Actors"].split(",");
     directors = data["Director"].split(",");
@@ -268,6 +270,8 @@ class _MovieScreenState extends State<MovieScreen> {
     dataRetrieved = true;
     setState(() {});
   }
+
+
 }
 
 class SelectOption extends StatelessWidget {

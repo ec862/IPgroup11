@@ -124,10 +124,9 @@ class _ProfileState extends State<Profile> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) =>
-                                        EditProfile(
-                                          text: 'Thriller',
-                                        ),
+                                    builder: (context) => EditProfile(
+                                      text: 'Thriller',
+                                    ),
                                   ),
                                 );
                               },
@@ -371,19 +370,25 @@ class _ProfileState extends State<Profile> {
                 children: <Widget>[
                   Container(
                     padding: EdgeInsets.only(left: 20),
-                    child: Text('Date of birth',
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey[600])),
+                    child: Text(
+                      'Date of birth',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[600],
+                      ),
+                    ),
                   ),
                   Container(
                     width: 120,
-                    child: Text('${DateTime.fromMillisecondsSinceEpoch(
-                        details.dob.millisecondsSinceEpoch).toString()}',
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    child: Text(
+                      '${DateTime.fromMillisecondsSinceEpoch(details.dob.millisecondsSinceEpoch).toString()}',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ],
               ),

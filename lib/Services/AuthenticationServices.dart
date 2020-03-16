@@ -12,7 +12,6 @@ class Authentication {
           .createUserWithEmailAndPassword(email: email, password: password)
           .then((AuthResult res) {
         res.user.sendEmailVerification();
-        _auth.signOut();
         _showToast(
           "Verification email sent to your email please check your emails",
         );

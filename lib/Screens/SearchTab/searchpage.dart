@@ -7,103 +7,102 @@ import 'package:template/Models/Arguments.dart';
 import 'package:template/Models/User.dart';
 import 'package:template/Services/DatabaseServices.dart';
 
-final friendList = [
-  "Elon Musk",
-  "Jack Black",
-  "Taylor Swift",
-  "Christian Bale",
-  "Matt Damon",
-  "George Michael",
-  "Django",
-  'Maragaret Rotella',
-  'Eboni Gehlert',
-  "Michel Proctor",
-  "Stacy Dawn",
-  'Golda Mccawley',
-  "Hattie Farina",
-  "Dori Gallant",
-  "Albertha Lawlor",
-  "Suzette Meunier",
-  "Malia Bartlow",
-  "Anissa Rutland",
-  "Margie Close",
-  "Melonie Montez",
-  "Lauri Boyers",
-  "Ira Wheeler",
-  "Kristine Hennessee",
-  "Una Ressler",
-  "Elidia Rahim",
-  "Ayana Nussbaum",
-  "Bibi Brunson",
-  "Dayle Mccardle",
-  "Dong Goetz",
-  "Lael Waddle",
-  "Lavone Sowa",
-  "Brigid Schneiderman",
-  "Roxie Mondor",
-  "May Berardi",
-  "Chong Hanke",
-  "Rosalee Spain",
-  "Latashia Escamilla",
-  "Nickie Spindler",
-  "Shaquana Schapiro",
-  "Ellis Koons",
-  'Emory Owens',
-  'Amal Filice',
-  "Adina Ali",
-  "Julieann Heil",
-  "Chelsea Hankey",
-  "Penni Gains",
-  "Arla Brazee",
-  "Valda Lotz",
-  "Rossana Hodgin",
-  "Jacob Larrimore",
-  "Caleb Dillahunt",
-  "Kathryn Deaner",
-  "Jaqueline Yip",
-  "Lucy Lucian ",
-  "Edra Blow  ",
-  "Ouida Center ",
-  "Emogene Marlin ",
-];
-
-final movieList = [
-  "Shrek 2",
-  "Dark Knight",
-  "Despicable Me",
-  "Shrek",
-  "Avengers",
-  "Alien",
-  "Dark Knight Rises",
-  "Django",
-  "Batman v Superman: Dawn of Justice",
-  "Dunkirk",
-  "Inception",
-  "Insomnia",
-  "Interstellar",
-  "Justice League",
-  "Larceny",
-  "Man of Steel",
-  "Memento",
-  "The Prestige",
-  "Quay",
-  "Get Out",
-  "1917",
-  "Mamma Mia",
-  "Finding Nemo",
-];
+//final friendList = [
+//  "Elon Musk",
+//  "Jack Black",
+//  "Taylor Swift",
+//  "Christian Bale",
+//  "Matt Damon",
+//  "George Michael",
+//  "Django",
+//  'Maragaret Rotella',
+//  'Eboni Gehlert',
+//  "Michel Proctor",
+//  "Stacy Dawn",
+//  'Golda Mccawley',
+//  "Hattie Farina",
+//  "Dori Gallant",
+//  "Albertha Lawlor",
+//  "Suzette Meunier",
+//  "Malia Bartlow",
+//  "Anissa Rutland",
+//  "Margie Close",
+//  "Melonie Montez",
+//  "Lauri Boyers",
+//  "Ira Wheeler",
+//  "Kristine Hennessee",
+//  "Una Ressler",
+//  "Elidia Rahim",
+//  "Ayana Nussbaum",
+//  "Bibi Brunson",
+//  "Dayle Mccardle",
+//  "Dong Goetz",
+//  "Lael Waddle",
+//  "Lavone Sowa",
+//  "Brigid Schneiderman",
+//  "Roxie Mondor",
+//  "May Berardi",
+//  "Chong Hanke",
+//  "Rosalee Spain",
+//  "Latashia Escamilla",
+//  "Nickie Spindler",
+//  "Shaquana Schapiro",
+//  "Ellis Koons",
+//  'Emory Owens',
+//  'Amal Filice',
+//  "Adina Ali",
+//  "Julieann Heil",
+//  "Chelsea Hankey",
+//  "Penni Gains",
+//  "Arla Brazee",
+//  "Valda Lotz",
+//  "Rossana Hodgin",
+//  "Jacob Larrimore",
+//  "Caleb Dillahunt",
+//  "Kathryn Deaner",
+//  "Jaqueline Yip",
+//  "Lucy Lucian ",
+//  "Edra Blow  ",
+//  "Ouida Center ",
+//  "Emogene Marlin ",
+//];
+//
+//final movieList = [
+//  "Shrek 2",
+//  "Dark Knight",
+//  "Despicable Me",
+//  "Shrek",
+//  "Avengers",
+//  "Alien",
+//  "Dark Knight Rises",
+//  "Django",
+//  "Batman v Superman: Dawn of Justice",
+//  "Dunkirk",
+//  "Inception",
+//  "Insomnia",
+//  "Interstellar",
+//  "Justice League",
+//  "Larceny",
+//  "Man of Steel",
+//  "Memento",
+//  "The Prestige",
+//  "Quay",
+//  "Get Out",
+//  "1917",
+//  "Mamma Mia",
+//  "Finding Nemo",
+//];
 
 HashSet<String> friendHistorySet = new HashSet();
-LinkedHashSet<MovieObject> movieHistorySet =
-    new LinkedHashSet(); // history of clicks, keeping their MovieObjects
+LinkedHashSet<MovieObject> movieHistorySet = new LinkedHashSet();
 List data = new List();
-String lastQuery = "zzzz";
-String lastFriendQuery = "zzzz";
-Widget lastWidget;
-Widget lastFriendWidget;
+String lastQuery = '';
+String lastFriendQuery = '';
+Widget lastWidget = Text('no data');
+Widget lastFriendWidget = Text('no data');
 
 class MovieSearch {
-  Future getMovieData(String movieSearch) async {
+  static Future getMovieData(String movieSearch) async {
     StringBuffer url = new StringBuffer(
         "http://www.omdbapi.com/?apikey=80246e40&type=movie&s=" +
             movieSearch.replaceAll(" ", "*") +
@@ -309,8 +308,7 @@ class CustomSearchDelegate extends SearchDelegate<String> {
                   ),
                   onTap: () {
                     addToMovieSet(m);
-                    Navigator.pushNamed(
-                      context,
+                    Navigator.of(context).pushNamed(
                       '/moviepage',
                       arguments: MovieScreenArguments(id: m.movieID),
                     );
@@ -319,14 +317,14 @@ class CustomSearchDelegate extends SearchDelegate<String> {
                     m.movieImageURL,
                     height: 400,
                     width: 40,
-                  ), //CircleAvatar(backgroundImage: NetworkImage(m.movieImageURL),),
+                  ),
                 );
               },
             );
             return lastWidget;
           }
         },
-        future: MovieSearch().getMovieData(query),
+        future: MovieSearch.getMovieData(query),
       );
     }
   }

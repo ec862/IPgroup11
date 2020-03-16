@@ -6,6 +6,7 @@ import 'package:template/Services/DatabaseServices.dart';
 const Color BOTTOM_BAR_COLOR = Colors.redAccent;
 
 class OtherProfile extends StatefulWidget {
+  OtherProfile({Key key}) : super(key: key);
   @override
   _OtherProfileState createState() => _OtherProfileState();
 }

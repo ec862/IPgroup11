@@ -20,14 +20,15 @@ class BottomBar {
       currentIndex: currentindex,
       onTap: (index) {
         // change when login stuff done
-        if (index == 0){
+        if (index == 0) {
           Navigator.popUntil(context, ModalRoute.withName('/'));
-          return;
-        }
-        else if (index == 1) {
-          showSearch(context: context, delegate: CustomSearchDelegate(),);
-        }
-        else if (index != currentIndex && index < Routes.bottomRoutes.length) {
+        } else if (index == 1) {
+          showSearch(
+            context: context,
+            delegate: CustomSearchDelegate(),
+          );
+        } else if (index != currentIndex &&
+            index < Routes.bottomRoutes.length) {
           Navigator.pushNamedAndRemoveUntil(
             context,
             Routes.bottomRoutes[index],

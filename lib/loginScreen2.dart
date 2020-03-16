@@ -226,12 +226,21 @@ class _LoginPageState extends State<LoginPage> {
                                 gravity: ToastGravity.CENTER,
                                 timeInSecForIos: 1,
                               );
-                            } else {
-                              User.userdata.uid = user.uid;
-                              return Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(builder: (context) {
-                                    return MainApp();
-                                  }));
+                            } else{
+                              if (user.isEmailVerified) {
+                                User.userdata.uid = user.uid;
+                                return Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(builder: (context) {
+                                      return MainApp();
+                                    }));
+                              }else{
+                                Fluttertoast.showToast(
+                                  msg: "Please verify email address",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.CENTER,
+                                  timeInSecForIos: 1,
+                                );
+                              }
                             }
                           },
                         )
