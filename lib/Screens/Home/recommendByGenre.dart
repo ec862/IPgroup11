@@ -130,7 +130,7 @@ class RecommendByGenre {
         RecommendedMoviesDetails b = RecommendedMoviesDetails(
             movie_id: temp[index],
             movie_name: a.name,
-            rec_by: "IPGroup11");
+            rec_by: "NpHAJVFNnZteNSfIy8Mc");
         moviesRecs.add(b);
       }
     }
