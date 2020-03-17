@@ -99,9 +99,6 @@ class _WatchCardState extends State<WatchCard> {
                       children: <Widget>[
                         Text(
                           // --- Title Text ---
-                          "${_getShorterText(title,18)}"),
-                        Text(
-                          // --- Title Text ---
                           "${_getShorterText(title, 18)}",
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(

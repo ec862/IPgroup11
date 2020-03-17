@@ -21,6 +21,7 @@ class _LoginPageState extends State<LoginPage> {
   // calculate the screen height
   double screenHeight;
   bool checkBoxValue = false;
+
   // Set initial mode to login
   AuthMode _authMode = AuthMode.LOGIN;
   DateTime selectedDate = DateTime.now();
@@ -57,10 +58,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    screenHeight = MediaQuery.of(context).size.height;
     getCurrentUser();
 
     return Scaffold(
@@ -175,21 +173,22 @@ class _LoginPageState extends State<LoginPage> {
                     SizedBox(
                       height: 20,
                     ),
-                    Container(
-                      padding: EdgeInsets.all(10.0),
-                      child: Column(
-                        children: <Widget>[
-                          new CheckboxListTile(value: checkBoxValue,
-                              title: Text('Remember me'),
-                              activeColor: Colors.blue,
-                              onChanged:(bool newValue){
-                                setState(() {
-                                  checkBoxValue = newValue;
-                                });
-                              }),
-                        ],
-                      ),
-                    ),
+//                    Container(
+//                      padding: EdgeInsets.all(10.0),
+//                      child: Column(
+//                        children: <Widget>[
+//                          new CheckboxListTile(
+//                              value: checkBoxValue,
+//                              title: Text('Remember me'),
+//                              activeColor: Colors.blue,
+//                              onChanged: (bool newValue) {
+//                                setState(() {
+//                                  checkBoxValue = newValue;
+//                                });
+//                              }),
+//                        ],
+//                      ),
+//                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
@@ -226,14 +225,14 @@ class _LoginPageState extends State<LoginPage> {
                                 gravity: ToastGravity.CENTER,
                                 timeInSecForIos: 1,
                               );
-                            } else{
+                            } else {
                               if (user.isEmailVerified) {
                                 User.userdata.uid = user.uid;
                                 return Navigator.of(context).pushReplacement(
                                     MaterialPageRoute(builder: (context) {
-                                      return MainApp();
-                                    }));
-                              }else{
+                                  return MainApp();
+                                }));
+                              } else {
                                 Fluttertoast.showToast(
                                   msg: "Please verify email address",
                                   toastLength: Toast.LENGTH_SHORT,
@@ -340,7 +339,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     TextFormField(
                       validator: (val) =>
-                      val.length < 6 ? 'password too short' : null,
+                          val.length < 6 ? 'password too short' : null,
                       decoration: InputDecoration(
                         labelText: "Password",
                         hasFloatingPlaceholder: true,
@@ -356,7 +355,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     TextFormField(
                       validator: (val) =>
-                      val.length < 6 ? 'password too short' : null,
+                          val.length < 6 ? 'password too short' : null,
                       decoration: InputDecoration(
                         labelText: "Confirm Password",
                         hasFloatingPlaceholder: true,
@@ -399,6 +398,8 @@ class _LoginPageState extends State<LoginPage> {
                                 if (result != null) {
                                   await DatabaseServices(User.userdata.uid)
                                       .setUsername(username: signUpUsername);
+                                  await DatabaseServices(User.userdata.uid)
+                                      .setFirstTimeLogIn(state: true);
                                   User.userdata.uid = result.uid;
                                 }
                               } else {
@@ -499,10 +500,7 @@ class _ForgotPageState extends State<ForgotPage> {
 
   @override
   Widget build(BuildContext context) {
-    screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       body: SingleChildScrollView(
         child: Stack(
@@ -523,7 +521,7 @@ class _ForgotPageState extends State<ForgotPage> {
 //        'assets/house.jpg',
 //        fit: BoxFit.cover,
 //      ),
-    );
+        );
   }
 
   Widget lowerHalf(BuildContext context) {

@@ -10,7 +10,11 @@ import 'package:template/Models/ReviewDetails.dart';
 import 'package:template/Models/UserDetails.dart';
 
 abstract class BaseDatabase {
-  /// set details
+  // set details
+
+  Future setFirstTimeLogIn({bool state});
+  Future<bool> isFirstTimeLogin();
+
   Future setUsername({@required String username});
 
   Future setName({@required String name});
@@ -108,6 +112,18 @@ class DatabaseServices implements BaseDatabase {
     for (int i = 0; i < caseNumber.length; i++) {
       temp = temp + caseNumber[i];
       caseSearchList.add(temp);
+    }
+    List<String> t = caseNumber.split('_');
+    for (int i; i < t.length; i++){
+      caseSearchList.add(t[i]);
+    }
+    t = caseNumber.split('-');
+    for (int i; i < t.length; i++){
+      caseSearchList.add(t[i]);
+    }
+    t = caseNumber.split('.');
+    for (int i; i < t.length; i++){
+      caseSearchList.add(t[i]);
     }
     return caseSearchList;
   }
@@ -258,6 +274,7 @@ class DatabaseServices implements BaseDatabase {
         {
           'movie_id': movieID,
           'movie_name': movieName,
+          'timestamp':DateTime.now()
         },
       ).whenComplete(() {
         print("Done");
@@ -272,6 +289,7 @@ class DatabaseServices implements BaseDatabase {
           {
             'movie_id': movieID,
             'movie_name': movieName,
+            'timestamp':DateTime.now()
           },
         );
       } catch (ex) {
@@ -579,6 +597,7 @@ class DatabaseServices implements BaseDatabase {
     QuerySnapshot snap = await _usersCollection
         .document(this.uid)
         .collection("WatchList")
+        .orderBy('timestamp')
         .getDocuments();
     snap.documents.forEach((DocumentSnapshot snapShot) {
       details.add(snapShot["movie_id"]);
@@ -769,6 +788,30 @@ class DatabaseServices implements BaseDatabase {
         print(ex);
         return null;
       }
+    }
+  }
+
+  @override
+  Future<bool> isFirstTimeLogin() async {
+    DocumentSnapshot snap = await  _usersCollection.document(this.uid).get();
+    if (snap.data['is_first_time'] == null)
+      return true;
+    if (snap.data['is_first_time'] == true)
+      return true;
+
+    return false;
+  }
+
+  @override
+  Future setFirstTimeLogIn({bool state}) async {
+    try{
+      return await _usersCollection.document(this.uid).updateData({
+        'is_first_time' : state
+      });
+    }catch(e){
+      return await _usersCollection.document(this.uid).setData({
+        'is_first_time' : state
+      });
     }
   }
 }
