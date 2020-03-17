@@ -23,10 +23,10 @@ class _HomepageState extends State<Homepage> {
   void initState() {
     super.initState();
     userID = User.userdata.uid;
-    getRecomendedMovies();
+    getRecommendedMovies();
   }
 
-  Future getRecomendedMovies() async {
+  Future getRecommendedMovies() async {
     movies = await DatabaseServices(userID).getRecommendations();
     return movies;
   }
@@ -37,7 +37,7 @@ class _HomepageState extends State<Homepage> {
 
   Future getFaveRecs(int numberOfMovies) async {
     UserDetails temp = await getFaveGenre();
-    String favGenre = temp.favorite_category;
+    String favGenre = temp.favorite_category.toLowerCase();
     return await RecommendByGenre.getMovies(favGenre, numberOfMovies);
   }
 
@@ -102,7 +102,7 @@ class _HomepageState extends State<Homepage> {
         builder: (context, projectSnap) {
           return createScrollRecs(numberOfMovies, true, projectSnap);
         },
-        future: getRecomendedMovies(),
+        future: getRecommendedMovies(),
       ),
     );
   }
@@ -154,7 +154,7 @@ class _HomepageState extends State<Homepage> {
                     MovieContent(projectSnap.data[index]).cardBuilder(context),
               ),
             ),
-            Positioned(
+            (recentRecs ? Positioned(
               right: 10,
               top: 11,
               child: Material(
@@ -168,7 +168,7 @@ class _HomepageState extends State<Homepage> {
                       setState(() {
                         DatabaseServices(User.userdata.uid)
                             .removeRecommendation(
-                                movieID: movies[index].movie_id);
+                            movieID: movies[index].movie_id);
                         movies.removeAt(index);
                       });
                     } else {
@@ -179,7 +179,7 @@ class _HomepageState extends State<Homepage> {
                   },
                 ),
               ),
-            ),
+            ) : SizedBox()),
           ],
         ),
       );

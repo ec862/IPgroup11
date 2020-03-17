@@ -114,13 +114,15 @@ class RecommendByGenre {
   };
 
   static Future getMovies(String genre, int numberOfMovies) async {
-    Random rand = new Random();
+    Random rand = new Random(DateTime
+        .now()
+        .millisecondsSinceEpoch);
     List moviesRecs = [];
     List temp = movieGenres[genre];
     Set picked = new Set();
+    print(temp.length);
     while (picked.length < numberOfMovies) {
-      int index = rand.nextInt(temp.length - 1);
-      (index < 0) ? index = 0 : index = index;
+      int index = rand.nextInt(temp.length);
       if (!picked.contains(index)) {
         picked.add(index);
         MovieDetails a = await DatabaseServices(User.userdata.uid)
