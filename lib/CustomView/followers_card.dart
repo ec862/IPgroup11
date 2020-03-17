@@ -156,7 +156,7 @@ class _FollowersCardState extends State<FollowersCard> {
       builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
         if (!snapshot.hasData) return Text("Waiting...");
 
-        return snapshot.data ? Text("firend") : Text("");
+        return snapshot.data ? Text("friend") : Text("");
       },
       future: isFollowers
           ? DatabaseServices(User.userdata.uid).isFollowing(uid: widget.uid)
