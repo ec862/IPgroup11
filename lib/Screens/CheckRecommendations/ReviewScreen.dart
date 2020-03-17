@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:template/CustomView/BottomBar.dart';
+import 'package:template/Services/DatabaseServices.dart';
+import 'package:template/Models/User.dart';
+
 
 class ReviewScreen extends StatefulWidget {
+
+  final movieID;
+
+  ReviewScreen({Key key, @required this.movieID}) : super(key: key);
+
   @override
   _ReviewScreenState createState() => _ReviewScreenState();
 }
 
 class _ReviewScreenState extends State<ReviewScreen> {
-
   var rating = 0.0;
+  final myController = TextEditingController();
+  bool ratingNotZero = false;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +31,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
         ),
       ),
       //*******START OF NON-TEMPLATE***************
-      body: createReviewPage(),
+      body: createReviewPage(context),
 
       // **********END OF NON-TEMPLATE************
 
@@ -30,7 +39,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
     );
   }
 
-  ListView createReviewPage() {
+  ListView createReviewPage(context) {
     return ListView(
       children: <Widget>[
         SizedBox(
@@ -58,8 +67,9 @@ class _ReviewScreenState extends State<ReviewScreen> {
             borderColor: Colors.yellow[600],
             spacing:0.0,
             onRatingChanged: (v) {
-              rating = v;
-              setState(() {});
+              setState(() {
+                rating = v;
+              });
             },
           )
         ),
@@ -81,6 +91,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
             child: TextField(
               keyboardType: TextInputType.multiline,
               maxLines: null,
+              controller: myController,
             ),
           )
         ),
@@ -99,11 +110,50 @@ class _ReviewScreenState extends State<ReviewScreen> {
               left: 38, right: 38, top: 15, bottom: 15),
               shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(5)),
-              onPressed: () {}
+              onPressed: () async {
+                if (rating < 1) {
+                  _showDialog();
+                  ratingNotZero = true;
+                }
+                else {
+                  ratingNotZero = false;
+                }
+                if (ratingNotZero == false) {
+                  await DatabaseServices(User.userdata.uid)
+                      .reviewMovie(movieID: widget.movieID,
+                      rating: rating,
+                      comment: myController.text);
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                }
+              }
             ),
           ),
         ),
       ],
+    );
+  }
+
+  void _showDialog() {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Oops!"),
+          content: new Text("Please leave a valid rating"),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Close"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
