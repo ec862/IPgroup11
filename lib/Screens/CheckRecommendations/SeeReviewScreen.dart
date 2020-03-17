@@ -22,6 +22,7 @@ class _SeeReviewScreenState extends State<SeeReviewScreen> {
   String name;
   double rating;
   String profileUrl;
+  String comment;
   MovieScreenArguments args;
   bool dataRetrieved = false;
   ReviewDetails details;
@@ -39,6 +40,7 @@ class _SeeReviewScreenState extends State<SeeReviewScreen> {
 
     args = ModalRoute.of(context).settings.arguments;
     if (dataRetrieved != true && args != null) getMovieDetails(args.id);
+    getSingleReview(args.id);
 
     return Scaffold(
       body: CustomScrollView(
@@ -63,6 +65,39 @@ class _SeeReviewScreenState extends State<SeeReviewScreen> {
                     "Your Review",
                     style: TextStyle(fontSize: 25),
                   ),
+                ),
+              ]
+            )
+          ),
+//          SliverList(
+//              delegate: SliverChildListDelegate(
+//                  [
+//                    Padding(
+//                      padding: const EdgeInsets.all(8.0),
+//                      child: SmoothStarRating(
+//                        allowHalfRating: true,
+//                        starCount: 5,
+//                        rating: rating,
+//                        size: 40.0,
+//                        filledIconData: Icons.star,
+//                        halfFilledIconData: Icons.star_half,
+//                        color: Colors.yellow[600],
+//                        borderColor: Colors.yellow[600],
+//                        spacing:0.0,
+//                      ),
+//                    ),
+//                  ]
+//              )
+//          ),
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+
+                    child: Text(
+                      comment
+                    ),
                 ),
               ]
             )
@@ -115,11 +150,11 @@ class _SeeReviewScreenState extends State<SeeReviewScreen> {
     );
   }
 
-//  void getSingleReview(String id) async {
-//    await DatabaseServices(User.userdata.uid)
-//        .getSingleReview(movieID: id);
-//    details =
-//  }
+  void getSingleReview(String id) async {
+    details = await DatabaseServices(User.userdata.uid).getSingleReview(movieID: id);
+    rating = details.rating;
+    comment = details.comment;
+  }
 
   void getMovieDetails(String id) async {
     args = ModalRoute.of(context).settings.arguments;
@@ -128,9 +163,6 @@ class _SeeReviewScreenState extends State<SeeReviewScreen> {
     var data = json.decode(response.body);
     name = data["Title"];
     profileUrl = data["Poster"];
-    details = DatabaseServices(User.userdata.uid).getSingleReview(movieID: id);
-//    rating =
-//    print(rating);
     dataRetrieved = true;
     setState(() {});
   }
