@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:template/MovieScreen.dart';
+import 'package:template/Screens/CheckRecommendations/MovieScreen.dart';
 
 const Color BOTTOM_BAR_COLOR = Colors.redAccent;
 
