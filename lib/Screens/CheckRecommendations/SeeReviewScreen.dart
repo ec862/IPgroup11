@@ -32,6 +32,7 @@ class _SeeReviewScreenState extends State<SeeReviewScreen> {
     super.initState();
     name = "Loading...";
     profileUrl = "waiting..";
+    comment = "";
     rating = 5;
   }
 

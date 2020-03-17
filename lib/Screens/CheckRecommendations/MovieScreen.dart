@@ -18,7 +18,7 @@ import 'RecommendMovie.dart';
 const Color BOTTOM_BAR_COLOR = Colors.redAccent;
 
 class MovieScreen extends StatefulWidget {
-  MovieScreen({Key key}):super(key: key);
+  MovieScreen({Key key}) : super(key: key);
 
   @override
   createState() => new _MovieScreenState();
@@ -255,7 +255,7 @@ class _MovieScreenState extends State<MovieScreen> {
   void getMovieDetails(String id) async {
     args = ModalRoute.of(context).settings.arguments;
     dynamic response =
-    await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
+        await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
     var data = json.decode(response.body);
     actors = data["Actors"].split(",");
     directors = data["Director"].split(",");
@@ -270,8 +270,6 @@ class _MovieScreenState extends State<MovieScreen> {
     dataRetrieved = true;
     setState(() {});
   }
-
-
 }
 
 class SelectOption extends StatelessWidget {
@@ -294,7 +292,10 @@ class SelectOption extends StatelessWidget {
             trailing: Icon(Icons.keyboard_arrow_right),
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                return RecommendMovie(movieID: movieID, movieName: name,);
+                return RecommendMovie(
+                  movieID: movieID,
+                  movieName: name,
+                );
               }));
             },
           ),
@@ -317,9 +318,10 @@ class SelectOption extends StatelessWidget {
             title: Text("Rate and Review"),
             trailing: Icon(Icons.keyboard_arrow_right),
             onTap: () {
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (context) {
-                return ReviewScreen();
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                return ReviewScreen(
+                  movieID: movieID,
+                );
               }));
             },
           ),
@@ -338,7 +340,7 @@ class SelectOption extends StatelessWidget {
 class ProfileFullScreen extends StatelessWidget {
   final posterUrl;
 
-  ProfileFullScreen(this.posterUrl,{Key key}):super(key: key);
+  ProfileFullScreen(this.posterUrl, {Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -354,9 +356,9 @@ class ProfileFullScreen extends StatelessWidget {
             height: MediaQuery.of(context).size.height,
             decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: ImageServices.moviePoster(posterUrl),
-                  fit: BoxFit.fitWidth,
-                )),
+              image: ImageServices.moviePoster(posterUrl),
+              fit: BoxFit.fitWidth,
+            )),
           ),
         ),
       ),
@@ -373,8 +375,8 @@ class MovieInfoContent extends StatefulWidget {
 
   MovieInfoContent(
       {@required this.title,
-        @required this.shortTitle,
-        @required this.fullTitle});
+      @required this.shortTitle,
+      @required this.fullTitle});
 
   @override
   _MovieInfoContentState createState() => _MovieInfoContentState();
@@ -412,7 +414,7 @@ class _MovieInfoContentState extends State<MovieInfoContent>
             children: [
               TextSpan(
                 text:
-                "${expanded ? "${widget.title}:\n" : "${widget.title}:\n"}",
+                    "${expanded ? "${widget.title}:\n" : "${widget.title}:\n"}",
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,

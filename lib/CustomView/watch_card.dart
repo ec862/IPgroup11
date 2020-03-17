@@ -43,10 +43,10 @@ class _WatchCardState extends State<WatchCard> {
     dynamic response =
         await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
     var data = json.decode(response.body);
-    title = _getShorterText(data["Title"],18);
+    title = _getShorterText(data["Title"], 18);
     img = data["Poster"];
     genre = data["Genre"].split(",").toString();
-    genre = _getShorterText(genre.substring(1, genre.length - 1),26);
+    genre = _getShorterText(genre.substring(1, genre.length - 1), 26);
     dataRetrieved = true;
     setState(() {});
   }
@@ -55,15 +55,23 @@ class _WatchCardState extends State<WatchCard> {
   Widget build(BuildContext context) {
     if (dataRetrieved != true) getMovieDetails(widget.movieID);
     return GestureDetector(
-      onTap: widget.isReview ? (){
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return SelectOptions(widget.movieID, isReview: false, movieName: title,);
-        }));
-      } : (){
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return SelectOptions(widget.movieID, isReview: false, movieName: title,);
-        }));
-      },
+      onTap: widget.isReview
+          ? () {
+              Navigator.pushNamed(
+                context,
+                '/seereview',
+                arguments: MovieScreenArguments(id: widget.movieID),
+              );
+            }
+          : () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return SelectOptions(
+                  widget.movieID,
+                  isReview: false,
+                  movieName: title,
+                );
+              }));
+            },
       child: Card(
         margin: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
         child: Padding(
@@ -115,47 +123,55 @@ class _WatchCardState extends State<WatchCard> {
                             color: Colors.grey[800],
                           ),
                         ),
-                        SizedBox(height: 8.0,),
-                        widget.isReview ? SmoothStarRating( // --- Star Rating ---
-                            allowHalfRating: false,
-                            onRatingChanged: (v) {},
-                            starCount: 5,
-                            rating: widget.rating,
-                            size: 30.0,
-                            filledIconData: Icons.star,
-                            halfFilledIconData: Icons.star_half,
-                            defaultIconData: Icons.star_border,
-                            color: Colors.yellow,
-                            borderColor: Colors.yellow,
-                            spacing:0.0
-                        ): Text("") ,
-                      ]
-                  ),
+                        SizedBox(
+                          height: 8.0,
+                        ),
+                        widget.isReview
+                            ? SmoothStarRating(
+                                // --- Star Rating ---
+                                allowHalfRating: false,
+                                onRatingChanged: (v) {},
+                                starCount: 5,
+                                rating: widget.rating,
+                                size: 30.0,
+                                filledIconData: Icons.star,
+                                halfFilledIconData: Icons.star_half,
+                                defaultIconData: Icons.star_border,
+                                color: Colors.yellow,
+                                borderColor: Colors.yellow,
+                                spacing: 0.0)
+                            : Text(""),
+                      ]),
                 ],
               ),
-              SizedBox(width: 4.0,),
-          IconButton(
-            // --- Show Movie Button ---
-            onPressed: widget.isReview
-                ? () {
-              Navigator.pushNamed(
-                context,
-                '/seereview',
-                arguments: MovieScreenArguments(id: widget.movieID),
-              );
-            }
-                : () {
-              Navigator.pushNamed(
-                context,
-                '/moviepage',
-                arguments: MovieScreenArguments(id: widget.movieID),
-              );
-            },
-            icon: Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.grey,
-            ),
-          ),
+              SizedBox(
+                width: 4.0,
+              ),
+              IconButton(
+                // --- Show Movie Button ---
+                onPressed: widget.isReview
+                    ? () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                          return SelectOptions(
+                            widget.movieID,
+                            isReview: false,
+                            movieName: title,
+                          );
+                        }));
+                      }
+                    : () {
+                        Navigator.pushNamed(
+                          context,
+                          '/moviepage',
+                          arguments: MovieScreenArguments(id: widget.movieID),
+                        );
+                      },
+                icon: Icon(
+                  Icons.arrow_forward_ios,
+                  color: Colors.grey,
+                ),
+              ),
             ],
           ),
         ),
