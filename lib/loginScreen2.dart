@@ -173,22 +173,6 @@ class _LoginPageState extends State<LoginPage> {
                     SizedBox(
                       height: 20,
                     ),
-//                    Container(
-//                      padding: EdgeInsets.all(10.0),
-//                      child: Column(
-//                        children: <Widget>[
-//                          new CheckboxListTile(
-//                              value: checkBoxValue,
-//                              title: Text('Remember me'),
-//                              activeColor: Colors.blue,
-//                              onChanged: (bool newValue) {
-//                                setState(() {
-//                                  checkBoxValue = newValue;
-//                                });
-//                              }),
-//                        ],
-//                      ),
-//                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
@@ -392,15 +376,16 @@ class _LoginPageState extends State<LoginPage> {
                             // sign up
                             if (_signUpFormKey.currentState.validate()) {
                               if (signUpPassword == signUpConfirmPassword) {
-                                dynamic result = await Authentication().signUp(
+                                FirebaseUser result = await Authentication().signUp(
                                     email: signUpEmail,
                                     password: signUpPassword);
                                 if (result != null) {
-                                  await DatabaseServices(User.userdata.uid)
-                                      .setUsername(username: signUpUsername);
-                                  await DatabaseServices(User.userdata.uid)
-                                      .setFirstTimeLogIn(state: true);
                                   User.userdata.uid = result.uid;
+                                  await DatabaseServices(result.uid)
+                                      .setUsername(username: signUpUsername);
+
+                                  await DatabaseServices(result.uid)
+                                      .setFirstTimeLogIn(state: true);
                                 }
                               } else {
                                 Fluttertoast.showToast(

@@ -116,16 +116,17 @@ class DatabaseServices implements BaseDatabase {
       temp = temp + caseNumber[i];
       caseSearchList.add(temp);
     }
+
     List<String> t = caseNumber.split('_');
-    for (int i; i < t.length; i++) {
+    for (int i = 0; i < t.length; i++) {
       caseSearchList.add(t[i]);
     }
     t = caseNumber.split('-');
-    for (int i; i < t.length; i++) {
+    for (int i = 0; i < t.length; i++) {
       caseSearchList.add(t[i]);
     }
     t = caseNumber.split('.');
-    for (int i; i < t.length; i++) {
+    for (int i = 0; i < t.length; i++) {
       caseSearchList.add(t[i]);
     }
     return caseSearchList;
