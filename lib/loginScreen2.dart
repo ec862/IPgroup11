@@ -42,6 +42,7 @@ class _LoginPageState extends State<LoginPage> {
     if (user == null) return;
     if (user.isEmailVerified) {
       User.userdata.uid = user.uid;
+      User.userdata.firstLogIn =  await DatabaseServices(User.userdata.uid).isFirstTimeLogin();
       Navigator.of(context)
           .pushReplacement(MaterialPageRoute(builder: (context) {
         return MainApp();
@@ -212,6 +213,8 @@ class _LoginPageState extends State<LoginPage> {
                             } else {
                               if (user.isEmailVerified) {
                                 User.userdata.uid = user.uid;
+                                User.userdata.firstLogIn =  await DatabaseServices(User.userdata.uid).isFirstTimeLogin();
+                                print('hello');
                                 return Navigator.of(context).pushReplacement(
                                     MaterialPageRoute(builder: (context) {
                                   return MainApp();
