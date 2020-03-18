@@ -2,6 +2,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_page_transition/flutter_page_transition.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:template/Models/User.dart';
 import 'package:template/Screens/Chats/chat_messages.dart';
 import 'package:template/Screens/Chats/chats.dart';
 import 'package:template/Screens/CheckRecommendations/CheckRecomendations.dart';
@@ -72,7 +73,7 @@ class _MainAppState extends State<MainApp> {
                 case '/checkrecomendations':
                   return new CheckRecomendations();
                 case '/watchlist':
-                  return new WatchList();
+                  return new WatchList(uid: User.userdata.uid, index: 0,);
                 case '/profile':
                   return new Profile();
                 case '/moviepage':

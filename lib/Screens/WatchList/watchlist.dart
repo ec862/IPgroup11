@@ -10,6 +10,10 @@ import 'package:template/Models/User.dart';
 const Color BOTTOM_BAR_COLOR = Colors.redAccent;
 
 class WatchList extends StatefulWidget {
+  final uid;
+  final index;
+
+  WatchList({@required this.uid, @required this.index});
   @override
   _WatchListState createState() => _WatchListState();
 }
@@ -20,10 +24,12 @@ class _WatchListState extends State<WatchList> {
 
   @override
   Widget build(BuildContext context) {
-    watchlist = DatabaseServices(User.userdata.uid).getWatchList();
-    reviewlist = DatabaseServices(User.userdata.uid).getReviewList();
+    watchlist = DatabaseServices(widget.uid).getWatchList();
+    reviewlist = DatabaseServices(widget.uid).getReviewList();
+    bool isUser = (widget.uid == User.userdata.uid);
 
     return DefaultTabController(
+      initialIndex: widget.index,
       length: 2,
       child: Scaffold(
         appBar: AppBar(
@@ -68,7 +74,7 @@ class _WatchListState extends State<WatchList> {
                     return WatchCard(
                       movieID: content[index],
                       isReview: false,
-                      options: () {},
+                      isUser: isUser,
                     );
                   },
                 );
@@ -90,14 +96,14 @@ class _WatchListState extends State<WatchList> {
                         movieID: content[index].movie_id,
                         isReview: true,
                         rating: content[index].rating,
-                        options: () {});
+                        isUser: isUser,);
                   },
                 );
               },
             ),
           ],
         ),
-        bottomNavigationBar: BottomBar().createBar(context, 3),
+        bottomNavigationBar: isUser ? BottomBar().createBar(context, 3) : null,
       ),
     );
   }
@@ -120,26 +126,6 @@ class SelectOptions extends StatelessWidget {
       body: ListView(
         children: <Widget>[
           ListTile(
-            title: !isReview
-                ? Text("Remove from WatchList")
-                : Text("Remove Review"),
-            trailing: Icon(Icons.keyboard_arrow_right),
-            onTap: !isReview
-                ? () {
-                    DatabaseServices(User.userdata.uid)
-                        .removeFromWatchList(movieID: id);
-                    Fluttertoast.showToast(
-                      msg: "Movie delted",
-                      gravity: ToastGravity.CENTER,
-                    );
-                    Navigator.of(context).pop();
-                  }
-                : () {
-                    Navigator.of(context).pop();
-                  },
-          ),
-          fullDivider(),
-          ListTile(
             title: Text("Recommend Movie"),
             trailing: Icon(Icons.keyboard_arrow_right),
             onTap: () {
@@ -149,6 +135,26 @@ class SelectOptions extends StatelessWidget {
                   movieName: movieName,
                 );
               }));
+            },
+          ),
+          fullDivider(),
+          ListTile(
+            title: !isReview
+                ? Text("Remove from WatchList")
+                : Text("Remove Review"),
+            trailing: Icon(Icons.keyboard_arrow_right),
+            onTap: !isReview
+                ? () {
+              DatabaseServices(User.userdata.uid)
+                  .removeFromWatchList(movieID: id);
+              Fluttertoast.showToast(
+                msg: "Movie deleted",
+                gravity: ToastGravity.CENTER,
+              );
+              Navigator.of(context).pop();
+            }
+                : () {
+              Navigator.of(context).pop();
             },
           ),
           fullDivider(),

@@ -8,13 +8,13 @@ import 'package:template/Services/ImageServices.dart';
 import 'package:template/Models/Arguments.dart';
 
 class WatchCard extends StatefulWidget {
-  final Function options;
+  final bool isUser;
   final String movieID;
   final bool isReview;
   final double rating;
 
   WatchCard(
-      {this.options,
+      {this.isUser,
       @required this.movieID,
       @required this.isReview,
       this.rating});
@@ -55,14 +55,20 @@ class _WatchCardState extends State<WatchCard> {
   Widget build(BuildContext context) {
     if (dataRetrieved != true) getMovieDetails(widget.movieID);
     return GestureDetector(
-      onTap: widget.isReview ? (){
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return SelectOptions(widget.movieID, isReview: false, movieName: title,);
-        }));
-      } : (){
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return SelectOptions(widget.movieID, isReview: false, movieName: title,);
-        }));
+      onTap:widget.isReview
+          ? () {
+        Navigator.pushNamed(
+          context,
+          '/seereview',
+          arguments: MovieScreenArguments(id: widget.movieID),
+        );
+      }
+          : () {
+        Navigator.pushNamed(
+          context,
+          '/moviepage',
+          arguments: MovieScreenArguments(id: widget.movieID),
+        );
       },
       child: Card(
         margin: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
@@ -134,28 +140,21 @@ class _WatchCardState extends State<WatchCard> {
                 ],
               ),
               SizedBox(width: 4.0,),
-          IconButton(
-            // --- Show Movie Button ---
-            onPressed: widget.isReview
-                ? () {
-              Navigator.pushNamed(
-                context,
-                '/seereview',
-                arguments: MovieScreenArguments(id: widget.movieID),
-              );
-            }
-                : () {
-              Navigator.pushNamed(
-                context,
-                '/moviepage',
-                arguments: MovieScreenArguments(id: widget.movieID),
-              );
+          widget.isUser ? IconButton(
+            onPressed: widget.isReview ? (){
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return SelectOptions(widget.movieID, isReview: true, movieName: title,);
+              }));
+            } : (){
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return SelectOptions(widget.movieID, isReview: false, movieName: title,);
+              }));
             },
             icon: Icon(
-              Icons.arrow_forward_ios,
+              Icons.more_horiz,
               color: Colors.grey,
             ),
-          ),
+          ) : Container(),
             ],
           ),
         ),
