@@ -22,7 +22,8 @@ class EditProfile extends StatefulWidget {
 
 class _EditProfileState extends State<EditProfile> {
   String gender = "Male";
-  String dob = "08/09/2000";
+ //String dob = "08/09/2000";
+  DateTime dob;
 
   UserDetails userDetails;
 
@@ -37,12 +38,14 @@ class _EditProfileState extends State<EditProfile> {
 
   void getCurrentUser() async {
     userDetails = await DatabaseServices(User.userdata.uid).getUserInfo();
+    dob = userDetails.dob.toDate();
     nameController.text = userDetails.name;
     userNameController.text = userDetails.user_name;
     favMovieController.text = userDetails.favorite_movie;
     currentSelectedValueCat = userDetails.favorite_category;
     currentSelectedValue = userDetails.gender;
-    dob = userDetails.dob;
+    selectedDate = userDetails.dob.toDate();
+
 
     setState(() {});
   }
@@ -74,22 +77,24 @@ class _EditProfileState extends State<EditProfile> {
   void initState() {
     super.initState();
     getCurrentUser();
+    print("righthere$dob");
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomPadding: false,
       appBar: AppBar(
         backgroundColor: Colors.blue[900],
         title: Text('Edit Profile'),
       ),
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            //crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Container(
                 margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
@@ -197,7 +202,8 @@ class _EditProfileState extends State<EditProfile> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Container(
-                padding: EdgeInsets.only(left: 20),
+                padding: EdgeInsets.fromLTRB(20, 30, 0, 0),
+                //padding: EdgeInsets.only(left: 20),
                 child: Text('Favorite Movie',
                     style: TextStyle(
                         fontSize: 18,
@@ -205,6 +211,7 @@ class _EditProfileState extends State<EditProfile> {
                         color: Colors.grey[600])),
               ),
               Container(
+                padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
                 width: 120,
                 child: new TextField(
                   controller: favMovieController,
@@ -219,7 +226,7 @@ class _EditProfileState extends State<EditProfile> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Container(
-                padding: EdgeInsets.only(left: 20),
+                padding: EdgeInsets.fromLTRB(20, 30, 0, 0),
                 child: Text('Favorite Category',
                     style: TextStyle(
                         fontSize: 18,
@@ -227,6 +234,7 @@ class _EditProfileState extends State<EditProfile> {
                         color: Colors.grey[600])),
               ),
               Container(
+                padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
                 width: 120,
                 child: DropdownButton<String>(
                   value: currentSelectedValueCat.isNotEmpty ? currentSelectedValueCat : null,
@@ -255,7 +263,7 @@ class _EditProfileState extends State<EditProfile> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Container(
-                padding: EdgeInsets.only(left: 20),
+                padding: EdgeInsets.fromLTRB(20, 30, 0, 0),
                 child: Text(
                   'Gender',
                   style: TextStyle(
@@ -266,6 +274,7 @@ class _EditProfileState extends State<EditProfile> {
                 ),
               ),
               Container(
+                padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
                 width: 120,
                 child: DropdownButton<String>(
                   value: currentSelectedValue.isNotEmpty ? currentSelectedValue : null,
@@ -290,7 +299,7 @@ class _EditProfileState extends State<EditProfile> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Container(
-                padding: EdgeInsets.only(left: 20),
+                padding: EdgeInsets.fromLTRB(20, 50, 0, 0),
                 child: Text(
                   'Date of birth',
                   style: TextStyle(
@@ -303,7 +312,7 @@ class _EditProfileState extends State<EditProfile> {
             ],
           ),
           Transform(
-            transform: Matrix4.translationValues(275, -80, 0.0),
+            transform: Matrix4.translationValues(275, -40, 0.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
@@ -314,7 +323,7 @@ class _EditProfileState extends State<EditProfile> {
                       controller: _date,
                       //keyboardType: TextInputType.datetime,
                       decoration: InputDecoration(
-                        hintText: dob,
+                        hintText: DateFormat('d/MM/yyyy').format(selectedDate),
                         border: InputBorder.none,
                         //hasFloatingPlaceholder: true
                       ),

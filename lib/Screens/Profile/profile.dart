@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:template/CustomView/BottomBar.dart';
@@ -401,10 +402,35 @@ class _ProfileState extends State<Profile> {
                     return AuthScreen();
                   }));
                 },
-                child: Text(
+                child:
+
+                Container(
+                  width: 180,
+                child: ButtonTheme(
+
+                  height:40,
+                  child: RaisedButton(
+                    shape: new RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(50.0),
+                        side: BorderSide(color: Colors.black)
+                    ),
+                    color: Colors.white,
+                    disabledColor: Colors.blue[900],
+                    child: Center(
+                      child: Text(
+                        "Logout",
+                        style: TextStyle(color: Colors.white, fontSize: 20),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ),
+                ),
+
+                /*Text(
                   "Logout",
                   style: TextStyle(color: Colors.blue[900], fontSize: 20),
-                ),
+                ),*/
               ),
             ],
           );
