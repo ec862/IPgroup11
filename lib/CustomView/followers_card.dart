@@ -103,13 +103,13 @@ class _FollowersCardState extends State<FollowersCard> {
                             content: Text("Choose what to do with follow request"),
                             actions: <Widget>[
                               FlatButton(
-                                child: Text('close'),
+                                child: Text('Close'),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                 },
                               ),
                               FlatButton(
-                                child: Text("decline"),
+                                child: Text("Decline"),
                                 onPressed: () async {
                                   await DatabaseServices(User.userdata.uid)
                                       .declineFollowing(widget.uid);
@@ -118,7 +118,7 @@ class _FollowersCardState extends State<FollowersCard> {
                                 },
                               ),
                               FlatButton(
-                                child: Text("Accepted"),
+                                child: Text("Accept"),
                                 onPressed: () async {
                                   await DatabaseServices(User.userdata.uid)
                                       .acceptFollowing(widget.uid);
