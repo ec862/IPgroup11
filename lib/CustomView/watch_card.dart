@@ -64,13 +64,11 @@ class _WatchCardState extends State<WatchCard> {
               );
             }
           : () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return SelectOptions(
-                  widget.movieID,
-                  isReview: false,
-                  movieName: title,
-                );
-              }));
+              Navigator.pushNamed(
+                context,
+                '/moviepage',
+                arguments: MovieScreenArguments(id: widget.movieID),
+              );
             },
       child: Card(
         margin: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
@@ -156,11 +154,13 @@ class _WatchCardState extends State<WatchCard> {
               );
             }
                 : () {
-              Navigator.pushNamed(
-                context,
-                '/moviepage',
-                arguments: MovieScreenArguments(id: widget.movieID),
-              );
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return SelectOptions(
+                  widget.movieID,
+                  isReview: false,
+                  movieName: title,
+                );
+              }));
             },
             icon: Icon(
               Icons.arrow_forward_ios,

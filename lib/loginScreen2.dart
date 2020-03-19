@@ -380,12 +380,12 @@ class _LoginPageState extends State<LoginPage> {
                             if (_signUpFormKey.currentState.validate()) {
                               if (signUpPassword == signUpConfirmPassword) {
                                 FirebaseUser result = await Authentication().signUp(
-                                    email: signUpEmail,
+                                    email: signUpEmail.trim(),
                                     password: signUpPassword);
                                 if (result != null) {
                                   User.userdata.uid = result.uid;
                                   await DatabaseServices(result.uid)
-                                      .setUsername(username: signUpUsername);
+                                      .setUsername(username: signUpUsername.trim());
 
                                   await DatabaseServices(result.uid)
                                       .setFirstTimeLogIn(state: true);
