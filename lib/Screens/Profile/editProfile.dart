@@ -148,7 +148,15 @@ class _EditProfileState extends State<EditProfile> {
                           onTap: () {
                             setCurrentUser();
                             print("new Info saved");
-                            Navigator.pop(context);
+                            if(User.userdata.firstLogIn){
+                              User.userdata.firstLogIn = false;
+                              DatabaseServices(User.userdata.uid).setFirstTimeLogIn(state: false);
+                              Navigator.pushNamedAndRemoveUntil(
+                                context,
+                                '/',
+                                ModalRoute.withName('/'),
+                              );
+                            } else Navigator.pop(context);
                           },
                           // button pressed
                           child: Column(

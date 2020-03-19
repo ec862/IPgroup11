@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:template/Models/Arguments.dart';
 import 'package:template/Models/User.dart';
+import 'package:template/Screens/WatchList/watchlist.dart';
 import 'package:template/Services/DatabaseServices.dart';
 
 const Color BOTTOM_BAR_COLOR = Colors.redAccent;
@@ -117,7 +118,14 @@ class _OtherProfileState extends State<OtherProfile> {
                   shape: new RoundedRectangleBorder(
                       borderRadius: new BorderRadius.circular(50.0),
                       side: BorderSide(color: Colors.blue)),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => WatchList(uid: args.id, index: 0,),
+                      ),
+                    );
+                  },
                   color: Colors.white,
                   textColor: Colors.black,
                   child: Text("Watch List", style: TextStyle(fontSize: 16)),
@@ -130,7 +138,14 @@ class _OtherProfileState extends State<OtherProfile> {
                   shape: new RoundedRectangleBorder(
                       borderRadius: new BorderRadius.circular(50.0),
                       side: BorderSide(color: Colors.blue)),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => WatchList(uid: args.id, index: 1,),
+                      ),
+                    );
+                  },
                   color: Colors.white,
                   textColor: Colors.black,
                   child: Text("Review list", style: TextStyle(fontSize: 16)),

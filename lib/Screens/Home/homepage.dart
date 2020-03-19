@@ -6,6 +6,7 @@ import 'package:template/Models/User.dart';
 import 'package:template/Models/UserDetails.dart';
 import 'package:template/Screens/CheckRecommendations/CheckRecomendations.dart';
 import 'package:template/Screens/Home/recommendByGenre.dart';
+import 'package:template/Screens/Profile/editProfile.dart';
 import 'package:template/Screens/SearchTab/searchpage.dart';
 import 'package:template/Services/DatabaseServices.dart';
 import '../main.dart';
@@ -45,7 +46,8 @@ class _HomepageState extends State<Homepage> {
   Widget build(BuildContext context) {
     final double headPadding = MediaQuery.of(context).size.height / 100;
 
-    return Scaffold(
+    return User.userdata.firstLogIn ? EditProfile(text: 'Thriller',)
+        : Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(52.0), // here the desired height
         child: AppBar(

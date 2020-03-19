@@ -8,13 +8,13 @@ import 'package:template/Services/ImageServices.dart';
 import 'package:template/Models/Arguments.dart';
 
 class WatchCard extends StatefulWidget {
-  final Function options;
+  final bool isUser;
   final String movieID;
   final bool isReview;
   final double rating;
 
   WatchCard(
-      {this.options,
+      {this.isUser,
       @required this.movieID,
       @required this.isReview,
       this.rating});
@@ -43,10 +43,10 @@ class _WatchCardState extends State<WatchCard> {
     dynamic response =
         await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
     var data = json.decode(response.body);
-    title = _getShorterText(data["Title"], 18);
+    title = _getShorterText(data["Title"],18);
     img = data["Poster"];
     genre = data["Genre"].split(",").toString();
-    genre = _getShorterText(genre.substring(1, genre.length - 1), 26);
+    genre = _getShorterText(genre.substring(1, genre.length - 1),26);
     dataRetrieved = true;
     setState(() {});
   }
@@ -144,34 +144,29 @@ class _WatchCardState extends State<WatchCard> {
                       ]),
                 ],
               ),
-              SizedBox(
-                width: 4.0,
-              ),
-              IconButton(
-                // --- Show Movie Button ---
-                onPressed: widget.isReview
-                    ? () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) {
-                          return SelectOptions(
-                            widget.movieID,
-                            isReview: false,
-                            movieName: title,
-                          );
-                        }));
-                      }
-                    : () {
-                        Navigator.pushNamed(
-                          context,
-                          '/moviepage',
-                          arguments: MovieScreenArguments(id: widget.movieID),
-                        );
-                      },
-                icon: Icon(
-                  Icons.arrow_forward_ios,
-                  color: Colors.grey,
-                ),
-              ),
+              SizedBox(width: 4.0,),
+              widget.isUser ? IconButton(
+            // --- Show Movie Button ---
+            onPressed: widget.isReview
+                ? () {
+              Navigator.pushNamed(
+                context,
+                '/seereview',
+                arguments: MovieScreenArguments(id: widget.movieID),
+              );
+            }
+                : () {
+              Navigator.pushNamed(
+                context,
+                '/moviepage',
+                arguments: MovieScreenArguments(id: widget.movieID),
+              );
+            },
+            icon: Icon(
+              Icons.arrow_forward_ios,
+              color: Colors.grey,
+            ),
+          ): Container(),
             ],
           ),
         ),
