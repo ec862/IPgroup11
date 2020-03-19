@@ -22,7 +22,8 @@ class EditProfile extends StatefulWidget {
 
 class _EditProfileState extends State<EditProfile> {
   String gender = "Male";
-  String dob = "08/09/2000";
+ //String dob = "08/09/2000";
+  DateTime dob;
 
   UserDetails userDetails;
 
@@ -37,12 +38,14 @@ class _EditProfileState extends State<EditProfile> {
 
   void getCurrentUser() async {
     userDetails = await DatabaseServices(User.userdata.uid).getUserInfo();
+    dob = userDetails.dob.toDate();
     nameController.text = userDetails.name;
     userNameController.text = userDetails.user_name;
     favMovieController.text = userDetails.favorite_movie;
     currentSelectedValueCat = userDetails.favorite_category;
     currentSelectedValue = userDetails.gender;
-    dob = userDetails.dob;
+    selectedDate = userDetails.dob.toDate();
+
 
     setState(() {});
   }
@@ -74,6 +77,7 @@ class _EditProfileState extends State<EditProfile> {
   void initState() {
     super.initState();
     getCurrentUser();
+    print("righthere$dob");
   }
 
   @override
@@ -314,7 +318,7 @@ class _EditProfileState extends State<EditProfile> {
                       controller: _date,
                       //keyboardType: TextInputType.datetime,
                       decoration: InputDecoration(
-                        hintText: dob,
+                        hintText: DateFormat('d/MM/yyyy').format(selectedDate),
                         border: InputBorder.none,
                         //hasFloatingPlaceholder: true
                       ),
