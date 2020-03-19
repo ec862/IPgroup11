@@ -163,7 +163,7 @@ class _WatchCardState extends State<WatchCard> {
               }));
             },
             icon: Icon(
-              Icons.arrow_forward_ios,
+              Icons.more_horiz,
               color: Colors.grey,
             ),
           ): Container(),

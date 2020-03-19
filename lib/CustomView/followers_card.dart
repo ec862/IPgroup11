@@ -129,12 +129,12 @@ class _FollowersCardState extends State<FollowersCard> {
                                 },
                               )
                             ],
-                          );;
+                          );
                         },
                       );
                     },
                     icon: Icon(
-                      Icons.menu
+                      Icons.more_horiz
                     ),
                   ))
             : Icon(
