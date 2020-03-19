@@ -415,7 +415,7 @@ class _ProfileState extends State<Profile> {
                         side: BorderSide(color: Colors.black)
                     ),
                     color: Colors.white,
-                    disabledColor: Colors.blue,
+                    disabledColor: Colors.blue[900],
                     child: Center(
                       child: Text(
                         "Logout",
