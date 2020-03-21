@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:developer';
 import 'package:template/Models/UserDetails.dart';
 import 'package:template/Models/User.dart';
+import 'package:flutter/services.dart';
 
 const Color BOTTOM_BAR_COLOR = Colors.redAccent;
 
@@ -28,7 +29,6 @@ class _EditProfileState extends State<EditProfile> {
   UserDetails userDetails;
 
   TextEditingController nameController = new TextEditingController();
-  TextEditingController userNameController = new TextEditingController();
   TextEditingController favMovieController = new TextEditingController();
   String currentSelectedValue = 'Male';
   String currentSelectedValueCat = "Action";
@@ -40,7 +40,7 @@ class _EditProfileState extends State<EditProfile> {
     userDetails = await DatabaseServices(User.userdata.uid).getUserInfo();
     dob = userDetails.dob.toDate();
     nameController.text = userDetails.name;
-    userNameController.text = userDetails.user_name;
+    //userNameController.text = userDetails.user_name;
     favMovieController.text = userDetails.favorite_movie;
     currentSelectedValueCat = userDetails.favorite_category;
     currentSelectedValue = userDetails.gender;
@@ -53,7 +53,6 @@ class _EditProfileState extends State<EditProfile> {
   void setCurrentUser() async {
     DatabaseServices dbs = new DatabaseServices(User.userdata.uid);
     dbs.setName(name: this.nameController.text);
-    dbs.setUsername(username: this.userNameController.text);
     dbs.setFavMovie(movieName: this.favMovieController.text);
     dbs.setFavCategory(category: currentSelectedValueCat);
     dbs.setDOB(date: selectedDate);
@@ -179,6 +178,9 @@ class _EditProfileState extends State<EditProfile> {
                 child: Container(
                   width: 200,
                   child: new TextField(
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(30),
+                    ],
                     controller: nameController,
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -189,7 +191,7 @@ class _EditProfileState extends State<EditProfile> {
               ),
             ],
           ),
-          Row(
+          /*Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               Flexible(
@@ -205,11 +207,12 @@ class _EditProfileState extends State<EditProfile> {
                 ),
               ),
             ],
-          ),
+          ),*/
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Container(
+
                 padding: EdgeInsets.fromLTRB(20, 30, 0, 0),
                 //padding: EdgeInsets.only(left: 20),
                 child: Text('Favorite Movie',
@@ -218,17 +221,27 @@ class _EditProfileState extends State<EditProfile> {
                         fontWeight: FontWeight.bold,
                         color: Colors.grey[600])),
               ),
-              Container(
-                padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
-                width: 120,
-                child: new TextField(
-                  controller: favMovieController,
-                  //textAlign: TextAlign.center,
-                  style:
-                      TextStyle(fontSize: 18.0, height: 0, color: Colors.black),
+
+              Container(//
+              // padding: EdgeInsets.only(left: 20),
+              //padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+              child: Flexible(
+                child: Container(
+                  width: 120,
+                  child: new TextField(
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(50),
+                    ],
+                    controller: favMovieController,
+                    //textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 18.0, height: 1.0, color: Colors.black),
+                    decoration: InputDecoration(),
+                  ),
                 ),
               ),
-            ],
+              ),
+          ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
