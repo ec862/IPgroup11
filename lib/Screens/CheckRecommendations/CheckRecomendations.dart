@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:template/Models/Arguments.dart';
@@ -53,8 +52,7 @@ class _CheckRecomendationsState extends State<CheckRecomendations> {
             return Center(
               child: Text("Loading"),
             );
-          }
-          else {
+          } else {
             return ListView.builder(
               shrinkWrap: false,
               physics: BouncingScrollPhysics(),
@@ -64,16 +62,12 @@ class _CheckRecomendationsState extends State<CheckRecomendations> {
                   builder: (context, projectSnap) {
                     if (projectSnap.connectionState != ConnectionState.done) {
                       return Container(
-                        height: MediaQuery
-                            .of(context)
-                            .size
-                            .height * 0.72,
+                        height: MediaQuery.of(context).size.height * 0.72,
                         child: Center(
                           child: CircularProgressIndicator(),
                         ),
                       );
-                    }
-                    else {
+                    } else {
                       return projectSnap.data;
                     }
                   },
@@ -97,7 +91,7 @@ class MovieContent {
 
   Future<String> getURL(String movieID) async {
     MovieDetails posterURl =
-    await DatabaseServices(User.userdata.uid).getMovieDetails(id: movieID);
+        await DatabaseServices(User.userdata.uid).getMovieDetails(id: movieID);
     return posterURl.profileUrl;
   }
 
@@ -118,23 +112,14 @@ class MovieContent {
           );
         },
         child: Container(
-          height: MediaQuery
-              .of(context)
-              .size
-              .height * 0.72,
+          height: MediaQuery.of(context).size.height * 0.72,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Container(
-                width: MediaQuery
-                    .of(context)
-                    .size
-                    .width,
-                height: MediaQuery
-                    .of(context)
-                    .size
-                    .height * 0.61,
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height * 0.61,
                 decoration: BoxDecoration(
                   image: DecorationImage(
                     image: poster,
@@ -147,10 +132,7 @@ class MovieContent {
                   title: Text(
                     "${_getShorterText(info.movie_name)}",
                     style: TextStyle(
-                        fontSize: (MediaQuery
-                            .of(context)
-                            .size
-                            .height / 30)),
+                        fontSize: (MediaQuery.of(context).size.height / 30)),
                   ),
                   subtitle: FutureBuilder(
                     builder: (context, projectSnap) {
@@ -159,10 +141,12 @@ class MovieContent {
                           "Rec. by: ",
                           style: TextStyle(fontSize: 30),
                         );
-                      }
-                      else {
+                      } else {
                         StringBuffer a = new StringBuffer("Rec. by: ");
-                        a.write(projectSnap.data.name);
+                        a.write(projectSnap.data != null
+                            ? (projectSnap.data['name'] ??
+                                projectSnap.data['user_name'])
+                            : 'Person no longer has account');
                         return Text(
                           a.toString(),
                           style: TextStyle(fontSize: 16),
