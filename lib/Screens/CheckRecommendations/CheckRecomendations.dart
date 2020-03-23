@@ -144,8 +144,8 @@ class MovieContent {
                       } else {
                         StringBuffer a = new StringBuffer("Rec. by: ");
                         a.write(projectSnap.data != null
-                            ? (projectSnap.data['name'] ??
-                                projectSnap.data['user_name'])
+                            ? (projectSnap.data.name ??
+                                projectSnap.data.user_name)
                             : 'Person no longer has account');
                         return Text(
                           a.toString(),
