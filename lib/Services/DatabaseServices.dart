@@ -49,6 +49,8 @@ abstract class BaseDatabase {
 
   Future removeFromWatchList({@required String movieID});
 
+  Future removeFromReviewList({@required String movieID});
+
   Future removeRecommendation({String movieID});
 
   Future reviewMovie(
@@ -634,6 +636,20 @@ class DatabaseServices implements BaseDatabase {
       return _usersCollection
           .document(this.uid)
           .collection("WatchList")
+          .document(movieID)
+          .delete();
+    } catch (e) {
+      print(e);
+      return null;
+    }
+  }
+
+  @override
+  Future removeFromReviewList({String movieID}) {
+    try {
+      return _usersCollection
+          .document(this.uid)
+          .collection("ReviewList")
           .document(movieID)
           .delete();
     } catch (e) {

@@ -38,6 +38,14 @@ class _CheckRecomendationsState extends State<CheckRecomendations> {
       appBar: AppBar(
         backgroundColor: Colors.blue[900],
         title: Text('Check Recommendations'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.message),
+            onPressed: () {
+              Navigator.of(context).pushNamed('/chats');
+            },
+          )
+        ],
       ),
       body: FutureBuilder(
         builder: (context, projectSnap) {

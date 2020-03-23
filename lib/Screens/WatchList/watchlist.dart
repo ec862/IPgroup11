@@ -33,6 +33,7 @@ class _WatchListState extends State<WatchList> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
+
           bottom: TabBar(
             tabs: <Widget>[
               Tab(
@@ -44,7 +45,15 @@ class _WatchListState extends State<WatchList> {
             ],
           ),
           backgroundColor: Colors.blue[900],
-          title: Text('My WatchList'),
+          title: Text(''),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.message),
+              onPressed: () {
+                Navigator.of(context).pushNamed('/chats');
+              },
+            )
+          ],
         ),
         body: TabBarView(
           children: <Widget>[
@@ -154,6 +163,12 @@ class SelectOptions extends StatelessWidget {
               Navigator.of(context).pop();
             }
                 : () {
+              DatabaseServices(User.userdata.uid)
+                  .removeFromReviewList(movieID: id);
+              Fluttertoast.showToast(
+                msg: "Review deleted",
+                gravity: ToastGravity.CENTER,
+              );
               Navigator.of(context).pop();
             },
           ),

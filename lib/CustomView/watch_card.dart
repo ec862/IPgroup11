@@ -147,11 +147,13 @@ class _WatchCardState extends State<WatchCard> {
             // --- Show Movie Button ---
             onPressed: widget.isReview
                 ? () {
-              Navigator.pushNamed(
-                context,
-                '/seereview',
-                arguments: MovieScreenArguments(id: widget.movieID),
-              );
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return SelectOptions(
+                  widget.movieID,
+                  isReview: true,
+                  movieName: title,
+                );
+              }));
             }
                 : () {
               Navigator.push(context, MaterialPageRoute(builder: (context) {

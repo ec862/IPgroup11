@@ -53,6 +53,14 @@ class _HomepageState extends State<Homepage> {
         child: AppBar(
           backgroundColor: Colors.blue[900],
           title: Text('Home Page'),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.message),
+              onPressed: () {
+                Navigator.of(context).pushNamed('/chats');
+              },
+            )
+          ],
         ),
       ),
       body: createHomePage(headPadding),

@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:template/CustomView/BottomBar.dart';
 import 'package:template/Models/MovieDetails.dart';
+import 'package:template/Models/ReviewDetails.dart';
 import 'package:template/Models/User.dart';
 import 'package:template/Screens/main.dart';
 import 'package:template/Services/AuthenticationServices.dart';
@@ -67,6 +68,10 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
+    Future<List<FollowerDetails>> following = DatabaseServices(User.userdata.uid).getFollowing();
+    Future<List<FollowerDetails>> followers = DatabaseServices(User.userdata.uid).getFollowers();
+    Future<List<ReviewDetails>> reviewlist = DatabaseServices(User.userdata.uid).getReviewList();
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue[900],
@@ -182,10 +187,19 @@ class _ProfileState extends State<Profile> {
                           side: BorderSide(color: Colors.blue)),
                       color: Colors.white,
                       child: Center(
-                        child: Text(
-                          "Followers \n$followers",
-                          textAlign: TextAlign.center,
-                        ),
+                        child: FutureBuilder(future: followers,
+                            builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+                              if (!snapshot.hasData)
+                                return Text(
+                                  "Followers \n0}",
+                                  textAlign: TextAlign.center,
+                                );
+                              List<FollowerDetails> content = snapshot.data;
+                              return Text(
+                                "Followers \n${content.length}",
+                                textAlign: TextAlign.center,
+                              );
+                            }),
                       ),
                       onPressed: () {
                         Navigator.pushNamed(context, '/followers');
@@ -202,10 +216,19 @@ class _ProfileState extends State<Profile> {
                           side: BorderSide(color: Colors.blue)),
                       color: Colors.white,
                       child: Center(
-                        child: Text(
-                          "Following \n$following",
-                          textAlign: TextAlign.center,
-                        ),
+                        child: FutureBuilder(future: following,
+                        builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+                          if (!snapshot.hasData)
+                            return Text(
+                              "Following \n0}",
+                              textAlign: TextAlign.center,
+                            );
+                          List<FollowerDetails> content = snapshot.data;
+                          return Text(
+                            "Following \n${content.length}",
+                            textAlign: TextAlign.center,
+                          );
+                        }),
                       ),
                       onPressed: () {
                         Navigator.pushNamed(context, '/followings');
@@ -268,10 +291,19 @@ class _ProfileState extends State<Profile> {
                   ),
                   Container(
                     width: 120,
-                    child: Text(followers,
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    child: FutureBuilder(future: followers,
+                        builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+                          if (!snapshot.hasData)
+                            return Text('0',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold));
+                          List<FollowerDetails> content = snapshot.data;
+                          return Text('${content.length}',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold));
+                        }),
                   ),
                 ],
               ),
@@ -312,14 +344,28 @@ class _ProfileState extends State<Profile> {
                   ),
                   Container(
                     width: 120,
-                    child: Text(
-                      reviewedMovies,
-                      textAlign: TextAlign.left,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    child: FutureBuilder(future: reviewlist,
+                        builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+                          if (!snapshot.hasData)
+                            return Text(
+                              '0',
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            );
+                          List<ReviewDetails> content = snapshot.data;
+                          return Text(
+                            '${content.length}',
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        }),
+
                   ),
                 ],
               ),
@@ -339,10 +385,28 @@ class _ProfileState extends State<Profile> {
                   ),
                   Container(
                     width: 120,
-                    child: Text(catMostWatched,
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    child: FutureBuilder(future: reviewlist,
+                        builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+                          if (!snapshot.hasData)
+                            return Text(
+                              'Waiting...',
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            );
+                          List<ReviewDetails> content = snapshot.data;
+                          return Text(
+                            'Waiting...',
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        }),
+
                   ),
                 ],
               ),
