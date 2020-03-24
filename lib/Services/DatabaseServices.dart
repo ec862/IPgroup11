@@ -370,6 +370,7 @@ class DatabaseServices implements BaseDatabase {
 
       ).whenComplete(() async {
         _addToFollowing(uid, accepted: true);
+        // check if you're following them to can add as friends
         if (await isFollowing(uid: uid))
           addFriend(uid);
       });
