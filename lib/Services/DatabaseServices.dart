@@ -65,7 +65,11 @@ abstract class BaseDatabase {
 
   Future<bool> isFollowing({@required String uid});
 
+  Future<FollowerDetails> getFollower({@required String uid});
+
   Future<bool> isFollower({@required String uid});
+
+  Future<bool> isFriend({String uid});
 
   ///getters
   Future<List<String>> getWatchList();
@@ -847,5 +851,25 @@ class DatabaseServices implements BaseDatabase {
           comment: snapshot.data['comment']);
 
     return null;
+  }
+
+  @override
+  Future<FollowerDetails> getFollower({String uid}) async {
+    DocumentSnapshot snap = await _usersCollection
+        .document(this.uid)
+        .collection("Following")
+        .document(uid)
+        .get();
+    if (snap.data == null) return null;
+
+    return FollowerDetails(
+        user_id: snap.data['user_id'],
+        accepted: snap.data['accepted'] ?? false);
+  }
+
+  Future<bool> isFriend({String uid}) async {
+    bool following = await isFollowing(uid: uid);
+    bool follower = await isFollower(uid: uid);
+    return (follower && following);
   }
 }

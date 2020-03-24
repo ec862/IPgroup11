@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:template/Models/Arguments.dart';
 import 'package:template/Models/User.dart';
+import 'package:template/Models/UserDetails.dart';
 import 'package:template/Screens/WatchList/watchlist.dart';
 import 'package:template/Services/DatabaseServices.dart';
 
@@ -8,6 +9,7 @@ const Color BOTTOM_BAR_COLOR = Colors.redAccent;
 
 class OtherProfile extends StatefulWidget {
   OtherProfile({Key key}) : super(key: key);
+
   @override
   _OtherProfileState createState() => _OtherProfileState();
 }
@@ -19,9 +21,17 @@ class _OtherProfileState extends State<OtherProfile> {
   bool dataRetrieved = false;
 
   void getData() async {
-    if (await DatabaseServices(User.userdata.uid).isFollowing(uid: args.id)) {
+    FollowerDetails details = await DatabaseServices(User.userdata.uid)
+        .getFollower(uid: args.id);
+    if (details == null)
+      return;
+
+    if (!details.accepted){
       pressed = false;
-      strText = 'UnFollow';
+      strText = 'Request Not \n Accepted';
+    }else{
+      pressed = false;
+      strText = 'Following';
     }
     dataRetrieved = true;
     setState(() {});
@@ -122,7 +132,10 @@ class _OtherProfileState extends State<OtherProfile> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => WatchList(uid: args.id, index: 0,),
+                        builder: (context) => WatchList(
+                          uid: args.id,
+                          index: 0,
+                        ),
                       ),
                     );
                   },
@@ -142,7 +155,10 @@ class _OtherProfileState extends State<OtherProfile> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => WatchList(uid: args.id, index: 1,),
+                        builder: (context) => WatchList(
+                          uid: args.id,
+                          index: 1,
+                        ),
                       ),
                     );
                   },
