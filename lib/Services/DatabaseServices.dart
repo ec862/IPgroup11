@@ -663,9 +663,9 @@ class DatabaseServices implements BaseDatabase {
   }
 
   @override
-  Future removeRecommendation({String movieID}) async {
+  Future removeRecommendation({String movieID, @required String recFrom}) async {
     try {
-      return await _usersCollection.document("${this.uid}$movieID").delete();
+      return await _usersCollection.document(this.uid).collection('RecommendedMovies').document("$recFrom$movieID").delete();
     } catch (e) {
       return null;
     }

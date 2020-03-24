@@ -46,26 +46,29 @@ class _HomepageState extends State<Homepage> {
   Widget build(BuildContext context) {
     final double headPadding = MediaQuery.of(context).size.height / 100;
 
-    return User.userdata.firstLogIn ? EditProfile(text: 'Thriller',)
+    return User.userdata.firstLogIn
+        ? EditProfile(
+            text: 'Thriller',
+          )
         : Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(52.0), // here the desired height
-        child: AppBar(
-          backgroundColor: Colors.blue[900],
-          title: Text('Home Page'),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.message),
-              onPressed: () {
-                Navigator.of(context).pushNamed('/chats');
-              },
-            )
-          ],
-        ),
-      ),
-      body: createHomePage(headPadding),
-      bottomNavigationBar: BottomBar().createBar(context, 0),
-    );
+            appBar: PreferredSize(
+              preferredSize: Size.fromHeight(52.0), // here the desired height
+              child: AppBar(
+                backgroundColor: Colors.blue[900],
+                title: Text('Home Page'),
+                actions: <Widget>[
+                  IconButton(
+                    icon: Icon(Icons.message),
+                    onPressed: () {
+                      Navigator.of(context).pushNamed('/chats');
+                    },
+                  )
+                ],
+              ),
+            ),
+            body: createHomePage(headPadding),
+            bottomNavigationBar: BottomBar().createBar(context, 0),
+          );
   }
 
   ListView createHomePage(double headPadding) {
@@ -164,32 +167,38 @@ class _HomepageState extends State<Homepage> {
                     MovieContent(projectSnap.data[index]).cardBuilder(context),
               ),
             ),
-            (recentRecs ? Positioned(
-              right: 10,
-              top: 11,
-              child: Material(
-                color: Colors.transparent,
-                child: IconButton(
-                  color: Colors.blueAccent,
-                  splashColor: Colors.red,
-                  icon: Icon(Icons.close),
-                  onPressed: () {
-                    if (recentRecs) {
-                      setState(() {
-                        DatabaseServices(User.userdata.uid)
-                            .removeRecommendation(
-                            movieID: movies[index].movie_id);
-                        movies.removeAt(index);
-                      });
-                    } else {
-                      setState(() {
-                        RecommendByGenre.action.remove(movies[index].movie_id);
-                      });
-                    }
-                  },
-                ),
-              ),
-            ) : SizedBox()),
+            (recentRecs
+                ? Positioned(
+                    right: 10,
+                    top: 11,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: IconButton(
+                        color: Colors.blueAccent,
+                        splashColor: Colors.red,
+                        icon: Icon(Icons.close),
+                        onPressed: () {
+                          print(movies[index].rec_by);
+                          if (recentRecs) {
+                            setState(() {
+                              DatabaseServices(User.userdata.uid)
+                                  .removeRecommendation(
+                                movieID: movies[index].movie_id,
+                                recFrom: movies[index].rec_by,
+                              );
+                              movies.removeAt(index);
+                            });
+                          } else {
+                            setState(() {
+                              RecommendByGenre.action
+                                  .remove(movies[index].movie_id);
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                  )
+                : SizedBox()),
           ],
         ),
       );
