@@ -174,7 +174,7 @@ class SelectOptions extends StatelessWidget {
           ),
           fullDivider(),
           ListTile(
-            title: Text("Review"),
+            title: Text("Rate and Review"),
             trailing: Icon(Icons.keyboard_arrow_right),
             onTap: () {},
           ),

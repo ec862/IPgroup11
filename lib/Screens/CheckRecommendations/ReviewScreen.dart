@@ -119,6 +119,9 @@ class _ReviewScreenState extends State<ReviewScreen> {
                   ratingNotZero = false;
                 }
                 if (ratingNotZero == false) {
+                  if (myController.text == "") {
+                    myController.text = "No comment added";
+                  }
                   await DatabaseServices(User.userdata.uid)
                       .reviewMovie(movieID: widget.movieID,
                       rating: rating,
