@@ -71,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
             _authMode == AuthMode.LOGIN
                 ? loginCard(context)
                 : signUpCard(context),
-            pageTitle(),
+            //pageTitle(),
           ],
         ),
       ),
@@ -79,15 +79,28 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget upperHalf(BuildContext context) {
-    return Container(height: screenHeight / 2);
+    return Container(
+      height: screenHeight / 3.3,
+      //child: Padding(
+        //padding: const EdgeInsets.all(8.0),
+        child: Image.asset(
+          'asserts/MofloLogo2.png',
+          fit: BoxFit.cover,
+        ),
+      );
+    //);
   }
 
   Widget lowerHalf(BuildContext context) {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Container(
-        height: screenHeight / 2,
-        color: Color(0xFFECF0F3),
+        height: screenHeight / 1,
+        child: Image.asset(
+        'asserts/Bottom.png',
+        fit: BoxFit.cover,
+        ),
+        //color: Color(0xFFECF0F3),
       ),
     );
   }
@@ -229,6 +242,31 @@ class _LoginPageState extends State<LoginPage> {
                               }
                             }
                           },
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        SizedBox(
+                          height: 40,
+                        ),
+                        Text(
+                          "Don't have an account?",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        FlatButton(
+                          onPressed: () {
+                            setState(() {
+                              _authMode = AuthMode.SIGNUP;
+                            });
+                          },
+                          textColor: Colors.black87,
+                          child: Text("Create Account"),
                         )
                       ],
                     )
@@ -238,28 +276,6 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
         ),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(
-              height: 40,
-            ),
-            Text(
-              "Don't have an account?",
-              style: TextStyle(color: Colors.grey),
-            ),
-            FlatButton(
-              onPressed: () {
-                setState(() {
-                  _authMode = AuthMode.SIGNUP;
-                });
-              },
-              textColor: Colors.black87,
-              child: Text("Create Account"),
-            )
-          ],
-        )
       ],
     );
   }
