@@ -259,7 +259,7 @@ class _EditProfileState extends State<EditProfile> {
                   width: 120,
                   child: new TextField(
                     inputFormatters: [
-                      LengthLimitingTextInputFormatter(30),
+                      LengthLimitingTextInputFormatter(100),
                     ],
                     controller: favMovieController,
                     //textAlign: TextAlign.center,
