@@ -284,7 +284,7 @@ class _LoginPageState extends State<LoginPage> {
     return Column(
       children: <Widget>[
         Container(
-          margin: EdgeInsets.only(top: screenHeight / 5),
+          margin: EdgeInsets.only(top: screenHeight / 4),
           padding: EdgeInsets.only(left: 10, right: 10),
           child: Card(
             shape: RoundedRectangleBorder(
@@ -417,46 +417,46 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ],
                     ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        SizedBox(
+                          height: 40,
+                        ),
+                        Text(
+                          "Already have an account?",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        FlatButton(
+                          onPressed: () {
+                            setState(() {
+                              _authMode = AuthMode.LOGIN;
+                            });
+                          },
+                          textColor: Colors.black87,
+                          child: Text("Login"),
+                        )
+                      ],
+                    ),
                   ],
                 ),
               ),
             ),
           ),
         ),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(
-              height: 40,
-            ),
-            Text(
-              "Already have an account?",
-              style: TextStyle(color: Colors.grey),
-            ),
-            FlatButton(
-              onPressed: () {
-                setState(() {
-                  _authMode = AuthMode.LOGIN;
-                });
-              },
-              textColor: Colors.black87,
-              child: Text("Login"),
-            )
-          ],
-        ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: FlatButton(
-            child: Text(
-              "Terms & Conditions",
-              style: TextStyle(
-                color: Colors.grey,
-              ),
-            ),
-            onPressed: () {},
-          ),
-        ),
+//        Align(
+//          alignment: Alignment.bottomCenter,
+//          child: FlatButton(
+//            child: Text(
+//              "Terms & Conditions",
+//              style: TextStyle(
+//                color: Colors.grey,
+//              ),
+//            ),
+//            onPressed: () {},
+//          ),
+//        ),
       ],
     );
   }
@@ -512,7 +512,7 @@ class _ForgotPageState extends State<ForgotPage> {
             lowerHalf(context),
             upperHalf(context),
             forgotCard(context),
-            pageTitle(),
+            //pageTitle(),
           ],
         ),
       ),
@@ -520,11 +520,12 @@ class _ForgotPageState extends State<ForgotPage> {
   }
 
   Widget upperHalf(BuildContext context) {
-    return Container(height: screenHeight / 2
-//      child: Image.asset(
-//        'assets/house.jpg',
-//        fit: BoxFit.cover,
-//      ),
+    return Container(
+      height: screenHeight / 3.3,
+      child: Image.asset(
+        'asserts/MofloLogo2.png',
+        fit: BoxFit.cover,
+      ),
         );
   }
 
@@ -532,8 +533,12 @@ class _ForgotPageState extends State<ForgotPage> {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Container(
-        height: screenHeight / 2,
-        color: Color(0xFFECF0F3),
+        height: screenHeight / 1,
+        child: Image.asset(
+          'asserts/Bottom.png',
+          fit: BoxFit.cover,
+        ),
+        //color: Color(0xFFECF0F3),
       ),
     );
   }
