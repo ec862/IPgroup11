@@ -335,7 +335,10 @@ class DatabaseServices implements BaseDatabase {
             'user_id': this.uid,
             'accepted': false,
           },
-        ).whenComplete(() {
+        ).whenComplete(() async {
+          await _usersCollection
+              .document(uid)
+              .updateData({"friend_requests": FieldValue.increment(1)});
           print("done");
           _addToYourFollowing(uid);
         });
@@ -358,6 +361,10 @@ class DatabaseServices implements BaseDatabase {
           'accepted': true,
         },
       ).whenComplete(() async {
+        await _usersCollection
+            .document(this.uid)
+            .updateData({"friend_requests": FieldValue.increment(-1)});
+
         _addToFollowing(uid, accepted: true);
       });
     } catch (ex) {
@@ -378,6 +385,9 @@ class DatabaseServices implements BaseDatabase {
         .collection("Following")
         .document(this.uid)
         .delete();
+    await _usersCollection
+        .document(this.uid)
+        .updateData({"friend_requests": FieldValue.increment(-1)});
   }
 
   Future _addToFollowing(uid, {accepted = false}) async {
@@ -809,7 +819,7 @@ class DatabaseServices implements BaseDatabase {
     try {
       return await _usersCollection
           .document(this.uid)
-          .updateData({'is_first_time': state});
+          .updateData({'is_first_time': state, 'friend_requests': 0});
     } catch (e) {
       return await _usersCollection
           .document(this.uid)
@@ -831,5 +841,16 @@ class DatabaseServices implements BaseDatabase {
           comment: snapshot.data['comment']);
 
     return null;
+  }
+
+  Future<int> getFriendReqNumb() async {
+    DocumentSnapshot snapshot = await _usersCollection.document(this.uid).get();
+    int numb = snapshot.data['friend_requests'];
+    if (numb != null && numb != 0) {
+      return numb;
+    }
+    else {
+      return 0;
+    }
   }
 }
