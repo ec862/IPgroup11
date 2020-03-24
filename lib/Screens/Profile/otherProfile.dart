@@ -21,15 +21,14 @@ class _OtherProfileState extends State<OtherProfile> {
   bool dataRetrieved = false;
 
   void getData() async {
-    FollowerDetails details = await DatabaseServices(User.userdata.uid)
-        .getFollower(uid: args.id);
-    if (details == null)
-      return;
+    FollowerDetails details =
+        await DatabaseServices(User.userdata.uid).getFollower(uid: args.id);
+    if (details == null) return;
 
-    if (!details.accepted){
+    if (!details.accepted) {
       pressed = false;
-      strText = 'Request Not \n Accepted';
-    }else{
+      strText = 'Request Pending';
+    } else {
       pressed = false;
       strText = 'Following';
     }
@@ -47,30 +46,19 @@ class _OtherProfileState extends State<OtherProfile> {
         title: Text(args.userName),
         actions: <Widget>[
           FutureBuilder(
-            future:
-                DatabaseServices(User.userdata.uid).isFollower(uid: args.id),
+            future: DatabaseServices(User.userdata.uid).isFriend(uid: args.id),
             builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
               if (!snapshot.hasData) return Text("");
 
               return snapshot.data
-                  ? FutureBuilder(
-                      future: DatabaseServices(User.userdata.uid)
-                          .isFollowing(uid: args.id),
-                      builder: (context, snap) {
-                        if (!snapshot.hasData) return Text("");
-                        return snapshot.data
-                            ? IconButton(
-                                onPressed: () {
-                                  Navigator.of(context).pushNamed(
-                                    '/chatMessages',
-                                    arguments:
-                                        ChatMessagesArgument(id: args.id),
-                                  );
-                                },
-                                icon: Icon(Icons.message),
-                              )
-                            : Text("");
+                  ? IconButton(
+                      onPressed: () {
+                        Navigator.of(context).pushNamed(
+                          '/chatMessages',
+                          arguments: ChatMessagesArgument(id: args.id),
+                        );
                       },
+                      icon: Icon(Icons.message),
                     )
                   : Text("");
             },
