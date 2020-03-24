@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:template/Models/Arguments.dart';
 import 'package:template/Models/User.dart';
 import 'package:template/Models/UserDetails.dart';
@@ -19,17 +20,17 @@ class _OtherProfileState extends State<OtherProfile> {
   String strText = 'Follow';
   OtherProfileArgument args;
   bool dataRetrieved = false;
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   void getData() async {
-    FollowerDetails details = await DatabaseServices(User.userdata.uid)
-        .getFollower(uid: args.id);
-    if (details == null)
-      return;
+    FollowerDetails details =
+        await DatabaseServices(User.userdata.uid).getFollower(uid: args.id);
+    if (details == null) return;
 
-    if (!details.accepted){
+    if (!details.accepted) {
       pressed = false;
-      strText = 'Request Not \n Accepted';
-    }else{
+      strText = 'Request Pending';
+    } else {
       pressed = false;
       strText = 'Following';
     }
@@ -42,35 +43,24 @@ class _OtherProfileState extends State<OtherProfile> {
     args = ModalRoute.of(context).settings.arguments;
     if (!dataRetrieved) getData();
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         backgroundColor: Colors.blue[900],
         title: Text(args.userName),
         actions: <Widget>[
           FutureBuilder(
-            future:
-                DatabaseServices(User.userdata.uid).isFollower(uid: args.id),
+            future: DatabaseServices(User.userdata.uid).isFriend(uid: args.id),
             builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
               if (!snapshot.hasData) return Text("");
-
               return snapshot.data
-                  ? FutureBuilder(
-                      future: DatabaseServices(User.userdata.uid)
-                          .isFollowing(uid: args.id),
-                      builder: (context, snap) {
-                        if (!snapshot.hasData) return Text("");
-                        return snapshot.data
-                            ? IconButton(
-                                onPressed: () {
-                                  Navigator.of(context).pushNamed(
-                                    '/chatMessages',
-                                    arguments:
-                                        ChatMessagesArgument(id: args.id),
-                                  );
-                                },
-                                icon: Icon(Icons.message),
-                              )
-                            : Text("");
+                  ? IconButton(
+                      onPressed: () {
+                        Navigator.of(context).pushNamed(
+                          '/chatMessages',
+                          arguments: ChatMessagesArgument(id: args.id),
+                        );
                       },
+                      icon: Icon(Icons.message),
                     )
                   : Text("");
             },
@@ -128,16 +118,26 @@ class _OtherProfileState extends State<OtherProfile> {
                   shape: new RoundedRectangleBorder(
                       borderRadius: new BorderRadius.circular(50.0),
                       side: BorderSide(color: Colors.blue)),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => WatchList(
-                          uid: args.id,
-                          index: 0,
+                  onPressed: () async {
+                    if (await DatabaseServices(User.userdata.uid)
+                        .isFriend(uid: args.id)) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => WatchList(
+                            uid: args.id,
+                            index: 0,
+                          ),
                         ),
-                      ),
-                    );
+                      );
+                    } else {
+                      Fluttertoast.showToast(
+                        msg: "You're not friends with the person therefore you "
+                            "cannot view the watch list of the person",
+                        gravity: ToastGravity.CENTER,
+                        toastLength: Toast.LENGTH_SHORT
+                      );
+                    }
                   },
                   color: Colors.white,
                   textColor: Colors.black,
@@ -151,16 +151,26 @@ class _OtherProfileState extends State<OtherProfile> {
                   shape: new RoundedRectangleBorder(
                       borderRadius: new BorderRadius.circular(50.0),
                       side: BorderSide(color: Colors.blue)),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => WatchList(
-                          uid: args.id,
-                          index: 1,
+                  onPressed: () async {
+                    if (await DatabaseServices(User.userdata.uid).isFriend(uid: args.id)) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              WatchList(
+                                uid: args.id,
+                                index: 1,
+                              ),
                         ),
-                      ),
-                    );
+                      );
+                    }else{
+                      Fluttertoast.showToast(
+                          msg: "You're not friends with the person therefore you "
+                              "cannot view the review list of the person",
+                          gravity: ToastGravity.CENTER,
+                          toastLength: Toast.LENGTH_SHORT,
+                      );
+                    }
                   },
                   color: Colors.white,
                   textColor: Colors.black,

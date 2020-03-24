@@ -53,15 +53,13 @@ abstract class BaseDatabase {
 
   Future removeRecommendation({String movieID});
 
-  Future reviewMovie(
-      {@required String movieID,
-      @required double rating,
-      @required String comment});
+  Future reviewMovie({@required String movieID,
+    @required double rating,
+    @required String comment});
 
-  Future recommendMovie(
-      {@required String uid,
-      @required String movieID,
-      @required String movieName});
+  Future recommendMovie({@required String uid,
+    @required String movieID,
+    @required String movieName});
 
   Future<bool> isFollowing({@required String uid});
 
@@ -99,6 +97,12 @@ abstract class BaseDatabase {
   Stream<UserDetails> get userStream;
 
   Future<ReviewDetails> getSingleReview({String movieID});
+
+  Future<List<FollowerDetails>> getFriends();
+
+  Future removeFriend({String uid});
+
+  Future addFriend(String uid);
 }
 
 class DatabaseServices implements BaseDatabase {
@@ -363,8 +367,12 @@ class DatabaseServices implements BaseDatabase {
         {
           'accepted': true,
         },
+
       ).whenComplete(() async {
         _addToFollowing(uid, accepted: true);
+        // check if you're following them to can add as friends
+        if (await isFollowing(uid: uid))
+          addFriend(uid);
       });
     } catch (ex) {
       print(ex);
@@ -407,10 +415,9 @@ class DatabaseServices implements BaseDatabase {
   }
 
   @override
-  Future recommendMovie(
-      {@required String uid,
-      @required String movieID,
-      @required String movieName}) async {
+  Future recommendMovie({@required String uid,
+    @required String movieID,
+    @required String movieName}) async {
     try {
       return await _usersCollection
           .document(uid)
@@ -432,10 +439,9 @@ class DatabaseServices implements BaseDatabase {
   }
 
   @override
-  Future reviewMovie(
-      {@required String movieID,
-      @required double rating,
-      @required String comment}) async {
+  Future reviewMovie({@required String movieID,
+    @required double rating,
+    @required String comment}) async {
     try {
       return await _usersCollection
           .document(this.uid)
@@ -487,6 +493,7 @@ class DatabaseServices implements BaseDatabase {
           .collection("Following")
           .document(uid)
           .delete();
+      await removeFriend(uid: uid);
     } catch (e) {
       print(e);
       return null;
@@ -552,7 +559,7 @@ class DatabaseServices implements BaseDatabase {
   @override
   Future<MovieDetails> getMovieDetails({@required String id}) async {
     dynamic response =
-        await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
+    await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
     var data = json.decode(response.body);
     return MovieDetails(
       actors: data["Actors"].split(","),
@@ -621,7 +628,7 @@ class DatabaseServices implements BaseDatabase {
   Future _upLoadImage({@required Function onData, @required File image}) async {
     try {
       StorageUploadTask uploadTask =
-          _storageReference.child("${DateTime.now()}.jpeg").putFile(image);
+      _storageReference.child("${DateTime.now()}.jpeg").putFile(image);
       StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
       taskSnapshot.ref.getDownloadURL().then((dynamic) {
         onData(dynamic);
@@ -663,9 +670,11 @@ class DatabaseServices implements BaseDatabase {
   }
 
   @override
-  Future removeRecommendation({String movieID}) async {
+  Future removeRecommendation(
+      {String movieID, @required String recFrom}) async {
     try {
-      return await _usersCollection.document("${this.uid}$movieID").delete();
+      return await _usersCollection.document(this.uid).collection(
+          'RecommendedMovies').document("$recFrom$movieID").delete();
     } catch (e) {
       return null;
     }
@@ -733,7 +742,10 @@ class DatabaseServices implements BaseDatabase {
         'sender_id': this.uid,
         'reciever_id': uid,
         'message': message,
-        'timestamp': DateTime.now().millisecondsSinceEpoch.toString()
+        'timestamp': DateTime
+            .now()
+            .millisecondsSinceEpoch
+            .toString()
       },
     );
   }
@@ -872,4 +884,61 @@ class DatabaseServices implements BaseDatabase {
     bool follower = await isFollower(uid: uid);
     return (follower && following);
   }
+
+  @override
+  Future<List<FollowerDetails>> getFriends() async {
+    List<FollowerDetails> details = [];
+    QuerySnapshot snap = await _usersCollection
+        .document(this.uid)
+        .collection("Friends")
+        .getDocuments();
+
+    snap.documents.forEach((DocumentSnapshot snapShot) {
+      details.add(FollowerDetails(
+        user_id: snapShot.data['user_id'],));
+    });
+    return details;
+  }
+
+  @override
+  Future removeFriend({String uid}) async {
+    try {
+      await _usersCollection
+          .document(uid)
+          .collection("Friends")
+          .document(this.uid)
+          .delete();
+      await _usersCollection
+          .document(this.uid)
+          .collection("Friends")
+          .document(uid)
+          .delete();
+    } catch (e) {
+      print(e);
+      return null;
+    }
+  }
+
+  @override
+  Future addFriend(String uid) async {
+    try {
+      await _usersCollection
+          .document(uid)
+          .collection("Friends")
+          .document(this.uid)
+          .setData({
+        'user_id': this.uid
+      });
+      await _usersCollection
+          .document(this.uid)
+          .collection("Friends")
+          .document(uid).setData({
+        'user_id': uid
+      });
+    } catch (e) {
+      return null;
+    }
+  }
+
+
 }

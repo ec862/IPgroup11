@@ -29,6 +29,7 @@ class _EditProfileState extends State<EditProfile> {
   UserDetails userDetails;
 
   TextEditingController nameController = new TextEditingController();
+  TextEditingController userNameController = new TextEditingController();
   TextEditingController favMovieController = new TextEditingController();
   String currentSelectedValue = 'Male';
   String currentSelectedValueCat = "Action";
@@ -40,7 +41,7 @@ class _EditProfileState extends State<EditProfile> {
     userDetails = await DatabaseServices(User.userdata.uid).getUserInfo();
     dob = userDetails.dob.toDate();
     nameController.text = userDetails.name;
-    //userNameController.text = userDetails.user_name;
+    userNameController.text = userDetails.user_name;
     favMovieController.text = userDetails.favorite_movie;
     currentSelectedValueCat = userDetails.favorite_category;
     currentSelectedValue = userDetails.gender;
@@ -53,6 +54,7 @@ class _EditProfileState extends State<EditProfile> {
   void setCurrentUser() async {
     DatabaseServices dbs = new DatabaseServices(User.userdata.uid);
     dbs.setName(name: this.nameController.text);
+    dbs.setUsername(username: this.userNameController.text);
     dbs.setFavMovie(movieName: this.favMovieController.text);
     dbs.setFavCategory(category: currentSelectedValueCat);
     dbs.setDOB(date: selectedDate);
@@ -76,7 +78,6 @@ class _EditProfileState extends State<EditProfile> {
   void initState() {
     super.initState();
     getCurrentUser();
-    print("righthere$dob");
   }
 
   @override
@@ -145,17 +146,47 @@ class _EditProfileState extends State<EditProfile> {
                         child: InkWell(
                           splashColor: Colors.blue, // splash color
                           onTap: () {
-                            setCurrentUser();
-                            print("new Info saved");
-                            if(User.userdata.firstLogIn){
-                              User.userdata.firstLogIn = false;
-                              DatabaseServices(User.userdata.uid).setFirstTimeLogIn(state: false);
-                              Navigator.pushNamedAndRemoveUntil(
-                                context,
-                                '/',
-                                ModalRoute.withName('/'),
+                            String errorMsg = "";
+                            if (favMovieController.text.replaceAll(' ', '') == ""){
+                              errorMsg = "Please type in your favorite Movie.\n";
+                            }
+
+                            if (nameController.text.replaceAll(' ', '') == ""){
+                              errorMsg += "Please type in your name.";
+                            }
+
+                            if (errorMsg != ""){
+
+                              Widget okButton = FlatButton(
+                                child: Text("OK"),
+                                onPressed: () {
+                                  Navigator.of(context, rootNavigator: true).pop('dialog');
+                                },
                               );
-                            } else Navigator.pop(context);
+                              showDialog(context: context, child:
+                              new AlertDialog(
+                                title: new Text("Validation Message."),
+                                content: new Text(errorMsg),
+                                actions: [
+                                  okButton,
+                                ],
+                              )
+                              );
+                            } else {
+                              setCurrentUser();
+                              print("new Info saved");
+                              if(User.userdata.firstLogIn){
+                                User.userdata.firstLogIn = false;
+                                DatabaseServices(User.userdata.uid).setFirstTimeLogIn(state: false);
+                                Navigator.pushNamedAndRemoveUntil(
+                                  context,
+                                  '/',
+                                  ModalRoute.withName('/'),
+                                );
+                              } else Navigator.pop(context);
+                            }
+
+
                           },
                           // button pressed
                           child: Column(
@@ -211,8 +242,8 @@ class _EditProfileState extends State<EditProfile> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Container(
 
+              Container(
                 padding: EdgeInsets.fromLTRB(20, 30, 0, 0),
                 //padding: EdgeInsets.only(left: 20),
                 child: Text('Favorite Movie',
@@ -222,26 +253,33 @@ class _EditProfileState extends State<EditProfile> {
                         color: Colors.grey[600])),
               ),
 
-              Container(//
-              // padding: EdgeInsets.only(left: 20),
-              //padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-              child: Flexible(
+              Flexible(
                 child: Container(
+                  padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
                   width: 120,
                   child: new TextField(
                     inputFormatters: [
-                      LengthLimitingTextInputFormatter(50),
+                      LengthLimitingTextInputFormatter(100),
                     ],
                     controller: favMovieController,
                     //textAlign: TextAlign.center,
                     style: TextStyle(
-                        fontSize: 18.0, height: 1.0, color: Colors.black),
-                    decoration: InputDecoration(),
+                        fontSize: 12.0, height: 1.0, color: Colors.black),
                   ),
                 ),
               ),
-              ),
-          ],
+
+              /*Container(
+                padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+                width: 120,
+                child: new TextField(
+                  controller: favMovieController,
+                  //textAlign: TextAlign.center,
+                  style:
+                      TextStyle(fontSize: 18.0, height: 0, color: Colors.black),
+                ),
+              ),*/
+            ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
