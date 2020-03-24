@@ -74,7 +74,7 @@ class _HomepageState extends State<Homepage> {
   ListView createHomePage(double headPadding) {
     return ListView(
       children: <Widget>[
-        topButtons(context, headPadding),
+        //topButtons(context, headPadding),
         Divider(
           height: 1,
         ),
