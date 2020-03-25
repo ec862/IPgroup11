@@ -346,10 +346,7 @@ class DatabaseServices implements BaseDatabase {
             'accepted': false,
           },
         ).whenComplete(() async {
-          await _usersCollection
-              .document(uid)
-              .updateData({"friend_requests": FieldValue.increment(1)});
-          print("done");
+          await setFriendRequests(number: 1);
           _addToYourFollowing(uid);
         });
       } catch (ex) {
@@ -372,9 +369,7 @@ class DatabaseServices implements BaseDatabase {
         },
 
       ).whenComplete(() async {
-        await _usersCollection
-            .document(this.uid)
-            .updateData({"friend_requests": FieldValue.increment(-1)});
+        await setFriendRequests(number: -1);
 
         _addToFollowing(uid, accepted: true);
         // check if you're following them to can add as friends
@@ -399,9 +394,7 @@ class DatabaseServices implements BaseDatabase {
         .collection("Following")
         .document(this.uid)
         .delete();
-    await _usersCollection
-        .document(this.uid)
-        .updateData({"friend_requests": FieldValue.increment(-1)});
+    await setFriendRequests(number: -1);
   }
 
   Future _addToFollowing(uid, {accepted = false}) async {
@@ -851,7 +844,7 @@ class DatabaseServices implements BaseDatabase {
     try {
       return await _usersCollection
           .document(this.uid)
-          .updateData({'is_first_time': state, 'friend_requests': 0});
+          .updateData({'is_first_time': state});
     } catch (e) {
       return await _usersCollection
           .document(this.uid)
@@ -960,4 +953,37 @@ class DatabaseServices implements BaseDatabase {
       return 0;
     }
   }
+
+  @override
+  Future setFriendRequests({@required int number}) async {
+    try {
+      if (number == -1) {
+        return await _usersCollection.document(this.uid).updateData(
+          {'friend_requests': FieldValue.increment(-1)},
+        ).whenComplete(() {});
+      }
+      else if (number == 1) {
+        return await _usersCollection.document(this.uid).updateData(
+          {'friend_requests': FieldValue.increment(1)},
+        ).whenComplete(() {});
+      }
+      else {
+        return await _usersCollection.document(this.uid).updateData(
+          {'friend_requests': number},
+        ).whenComplete(() {});
+      }
+    }
+    catch (e) {
+      try {
+        return await _usersCollection.document(this.uid).setData(
+          {'friend_requests': 0},
+        );
+      }
+      catch (ex) {
+        print(ex);
+        return null;
+      }
+    }
+  }
+
 }
