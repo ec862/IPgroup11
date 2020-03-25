@@ -16,6 +16,7 @@ class OtherProfile extends StatefulWidget {
 }
 
 class _OtherProfileState extends State<OtherProfile> {
+  bool blocked;
   bool pressed = true;
   String strText = 'Follow';
   OtherProfileArgument args;
@@ -24,7 +25,7 @@ class _OtherProfileState extends State<OtherProfile> {
 
   void getData() async {
     FollowerDetails details =
-        await DatabaseServices(User.userdata.uid).getFollower(uid: args.id);
+    await DatabaseServices(User.userdata.uid).getFollower(uid: args.id);
     if (details == null) return;
 
     if (!details.accepted) {
@@ -54,14 +55,14 @@ class _OtherProfileState extends State<OtherProfile> {
               if (!snapshot.hasData) return Text("");
               return snapshot.data
                   ? IconButton(
-                      onPressed: () {
-                        Navigator.of(context).pushNamed(
-                          '/chatMessages',
-                          arguments: ChatMessagesArgument(id: args.id),
-                        );
-                      },
-                      icon: Icon(Icons.message),
-                    )
+                onPressed: () {
+                  Navigator.of(context).pushNamed(
+                    '/chatMessages',
+                    arguments: ChatMessagesArgument(id: args.id),
+                  );
+                },
+                icon: Icon(Icons.message),
+              )
                   : Text("");
             },
           )
@@ -71,11 +72,68 @@ class _OtherProfileState extends State<OtherProfile> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          CircleAvatar(
-            radius: 70,
-            backgroundImage: NetworkImage(
-              'https://images.unsplash.com/photo-1501549538842-2f24e2dd6520?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80',
-            ),
+          Stack(
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  CircleAvatar(
+                    radius: 70,
+                    backgroundImage: NetworkImage(
+                      'https://images.unsplash.com/photo-1501549538842-2f24e2dd6520?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80',
+                    ),
+                  ),
+                ],
+              ),
+              new Positioned(
+                right: 10,
+                top: 0,
+                child: new FutureBuilder(
+                  builder: (context, projectSnap) {
+                    if (!projectSnap.hasError &&
+                        projectSnap.hasData &&
+                        projectSnap.connectionState == ConnectionState.done) {
+                      if (blocked == null) {
+                        blocked = projectSnap.data;
+                      }
+                      return new RaisedButton(
+                        shape: RoundedRectangleBorder(
+                            side: BorderSide.none,
+                            borderRadius: new BorderRadius.circular(15.0)),
+                        onPressed: () {
+                          if (blocked == false) {
+                            DatabaseServices(User.userdata.uid)
+                                .blockUser(theirUID: args.id);
+                            setState(() {
+                              blocked = !blocked;
+                            });
+                          }
+                          else {
+                            DatabaseServices(User.userdata.uid)
+                                .unBlockUser(theirUID: args.id);
+                            setState(() {
+                              blocked = !blocked;
+                            });
+                          }
+                        },
+                        splashColor: Colors.redAccent,
+                        child: new Text(
+                          (blocked) ? "Unblock" : "Block",
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      );
+                    }
+                    else {
+                      return SizedBox(
+                        width: 1,
+                      );
+                    }
+                  },
+                  future: DatabaseServices(User.userdata.uid)
+                      .checkYouBlocked(theirUID: args.id),
+                ),
+              ),
+            ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -132,11 +190,11 @@ class _OtherProfileState extends State<OtherProfile> {
                       );
                     } else {
                       Fluttertoast.showToast(
-                        msg: "You're not friends with the person therefore you "
-                            "cannot view the watch list of the person",
-                        gravity: ToastGravity.CENTER,
-                        toastLength: Toast.LENGTH_SHORT
-                      );
+                          msg:
+                          "You're not friends with the person therefore you "
+                              "cannot view the watch list of the person",
+                          gravity: ToastGravity.CENTER,
+                          toastLength: Toast.LENGTH_SHORT);
                     }
                   },
                   color: Colors.white,
@@ -152,7 +210,8 @@ class _OtherProfileState extends State<OtherProfile> {
                       borderRadius: new BorderRadius.circular(50.0),
                       side: BorderSide(color: Colors.blue)),
                   onPressed: () async {
-                    if (await DatabaseServices(User.userdata.uid).isFriend(uid: args.id)) {
+                    if (await DatabaseServices(User.userdata.uid)
+                        .isFriend(uid: args.id)) {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -163,12 +222,13 @@ class _OtherProfileState extends State<OtherProfile> {
                               ),
                         ),
                       );
-                    }else{
+                    }
+                    else {
                       Fluttertoast.showToast(
-                          msg: "You're not friends with the person therefore you "
-                              "cannot view the review list of the person",
-                          gravity: ToastGravity.CENTER,
-                          toastLength: Toast.LENGTH_SHORT,
+                        msg: "You're not friends with the person therefore you "
+                            "cannot view the review list of the person",
+                        gravity: ToastGravity.CENTER,
+                        toastLength: Toast.LENGTH_SHORT,
                       );
                     }
                   },
@@ -195,7 +255,7 @@ class _OtherProfileState extends State<OtherProfile> {
                 child: Text('Joker',
                     textAlign: TextAlign.left,
                     style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -215,7 +275,7 @@ class _OtherProfileState extends State<OtherProfile> {
                 child: Text('Thriller',
                     textAlign: TextAlign.left,
                     style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -235,7 +295,7 @@ class _OtherProfileState extends State<OtherProfile> {
                 child: Text('22',
                     textAlign: TextAlign.left,
                     style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -255,7 +315,7 @@ class _OtherProfileState extends State<OtherProfile> {
                 child: Text('10',
                     textAlign: TextAlign.left,
                     style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -275,7 +335,7 @@ class _OtherProfileState extends State<OtherProfile> {
                 child: Text('30',
                     textAlign: TextAlign.left,
                     style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -295,7 +355,7 @@ class _OtherProfileState extends State<OtherProfile> {
                 child: Text('Action',
                     textAlign: TextAlign.left,
                     style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -315,7 +375,7 @@ class _OtherProfileState extends State<OtherProfile> {
                 child: Text('Male',
                     textAlign: TextAlign.left,
                     style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -335,7 +395,7 @@ class _OtherProfileState extends State<OtherProfile> {
                 child: Text('08/09/2000',
                     textAlign: TextAlign.left,
                     style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),

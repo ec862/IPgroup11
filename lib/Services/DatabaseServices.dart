@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:template/Models/Message.dart';
 import 'package:template/Models/MovieDetails.dart';
 import 'package:template/Models/ReviewDetails.dart';
 import 'package:template/Models/UserDetails.dart';
@@ -43,9 +42,6 @@ abstract class BaseDatabase {
   Future declineFollowing(uid);
 
   Future unFollow(uid);
-
-  // not implemented yet
-  Future block(uid);
 
   Future addToWatchList({@required String movieID, @required String movieName});
 
@@ -107,6 +103,16 @@ abstract class BaseDatabase {
   Future addFriend(String uid);
 
   Future<List<ReviewDetails>> getFriendReview({String movieID});
+
+  Future setFriendRequests({@required int number});
+
+  Future blockUser({@required String theirUID});
+
+  Future unBlockUser({@required String theirUID});
+
+  Future checkYouBlocked({@required String theirUID});
+
+  Future checkBlockedBy({@required String theirUID});
 }
 
 class DatabaseServices implements BaseDatabase {
@@ -318,12 +324,11 @@ class DatabaseServices implements BaseDatabase {
   }
 
   @override
-  Future block(uid) {
-    return null;
-  }
-
-  @override
   Future follow(uid) async {
+    bool blocked = await checkBlockedBy(theirUID: uid);
+    if (blocked) {
+      return false;
+    }
     try {
       return await _usersCollection
           .document(uid)
@@ -350,7 +355,7 @@ class DatabaseServices implements BaseDatabase {
             'accepted': false,
           },
         ).whenComplete(() async {
-          await setFriendRequests(number: 1);
+          await setFriendRequests(number: 1, theirUID: uid);
           _addToYourFollowing(uid);
         });
       } catch (ex) {
@@ -372,12 +377,11 @@ class DatabaseServices implements BaseDatabase {
           'accepted': true,
         },
       ).whenComplete(() async {
-        await setFriendRequests(number: -1);
+        await setFriendRequests(number: -1, theirUID: this.uid);
 
         _addToFollowing(uid, accepted: true);
         // check if you're following them to can add as friends
-        if (await isFollowing(uid: uid))
-          addFriend(uid);
+        if (await isFollowing(uid: uid)) addFriend(uid);
       });
     } catch (ex) {
       print(ex);
@@ -386,7 +390,16 @@ class DatabaseServices implements BaseDatabase {
   }
 
   @override
-  Future declineFollowing(uid) async {
+  Future removeFollowing(uid) async {
+    DocumentSnapshot snap = await _usersCollection
+        .document(this.uid)
+        .collection("Followers")
+        .document(uid)
+        .get();
+    bool accepted = snap.data['accepted'];
+    if (snap.exists && !accepted) {
+      setFriendRequests(number: -1, theirUID: this.uid);
+    }
     await _usersCollection
         .document(this.uid)
         .collection("Followers")
@@ -397,7 +410,11 @@ class DatabaseServices implements BaseDatabase {
         .collection("Following")
         .document(this.uid)
         .delete();
-    await setFriendRequests(number: -1);
+  }
+
+  @override
+  Future declineFollowing(uid) async {
+    removeFollowing(uid);
   }
 
   Future _addToFollowing(uid, {accepted = false}) async {
@@ -491,6 +508,15 @@ class DatabaseServices implements BaseDatabase {
   @override
   Future unFollow(uid) async {
     try {
+      DocumentSnapshot snap = await _usersCollection
+          .document(uid)
+          .collection("Followers")
+          .document(this.uid)
+          .get();
+      bool accepted = snap.data['accepted'];
+      if (snap.exists && !accepted) {
+        setFriendRequests(number: -1, theirUID: uid);
+      }
       await _usersCollection
           .document(uid)
           .collection("Followers")
@@ -984,27 +1010,28 @@ class DatabaseServices implements BaseDatabase {
   }
 
   @override
-  Future setFriendRequests({@required int number}) async {
+  Future setFriendRequests(
+      {@required int number, @required String theirUID}) async {
     try {
       if (number == -1) {
-        return await _usersCollection.document(this.uid).updateData(
+        return await _usersCollection.document(theirUID).updateData(
           {'friend_requests': FieldValue.increment(-1)},
         ).whenComplete(() {});
       }
       else if (number == 1) {
-        return await _usersCollection.document(this.uid).updateData(
+        return await _usersCollection.document(theirUID).updateData(
           {'friend_requests': FieldValue.increment(1)},
         ).whenComplete(() {});
       }
       else {
-        return await _usersCollection.document(this.uid).updateData(
+        return await _usersCollection.document(theirUID).updateData(
           {'friend_requests': number},
         ).whenComplete(() {});
       }
     }
     catch (e) {
       try {
-        return await _usersCollection.document(this.uid).setData(
+        return await _usersCollection.document(theirUID).setData(
           {'friend_requests': 0},
         );
       }
@@ -1015,4 +1042,56 @@ class DatabaseServices implements BaseDatabase {
     }
   }
 
+  @override
+  Future blockUser({@required String theirUID}) async {
+    print("blocked");
+    await _usersCollection
+        .document(theirUID)
+        .collection("BlockedBy")
+        .document(this.uid)
+        .setData({}).whenComplete(() {
+      unFollow(theirUID);
+      removeFollowing(theirUID);
+    });
+  }
+
+  @override
+  Future unBlockUser({@required String theirUID}) async {
+    print("unblocked");
+    return await _usersCollection
+        .document(theirUID)
+        .collection("BlockedBy")
+        .document(this.uid)
+        .delete();
+  }
+
+  @override
+  Future checkYouBlocked({@required String theirUID}) async {
+    DocumentSnapshot snap = await _usersCollection
+        .document(theirUID)
+        .collection("BlockedBy")
+        .document(this.uid)
+        .get();
+    if (snap.exists && snap != null) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> checkBlockedBy({@required String theirUID}) async {
+    DocumentSnapshot snap = await _usersCollection
+        .document(this.uid)
+        .collection("BlockedBy")
+        .document(theirUID)
+        .get();
+    if (snap.exists && snap != null) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
 }
