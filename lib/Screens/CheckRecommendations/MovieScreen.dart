@@ -34,6 +34,7 @@ class _MovieScreenState extends State<MovieScreen> {
   bool dataRetrieved = false;
   String name;
   String profileUrl;
+  String watchingRating = 'Not Rated';
 
   @override
   void initState() {
@@ -106,6 +107,7 @@ class _MovieScreenState extends State<MovieScreen> {
             return SelectOption(
               movieID: args.id,
               name: name,
+              rating: watchingRating,
             );
           }));
         },
@@ -265,6 +267,7 @@ class _MovieScreenState extends State<MovieScreen> {
     profileUrl = data["Poster"];
     rating = double.parse(data["imdbRating"]);
     rating = rating / 2;
+    watchingRating = data['Rated'];
     print(rating);
     print(actors[0]);
     dataRetrieved = true;
@@ -275,8 +278,9 @@ class _MovieScreenState extends State<MovieScreen> {
 class SelectOption extends StatelessWidget {
   String name = "";
   String movieID = "";
+  String rating;
 
-  SelectOption({@required this.movieID, @required this.name});
+  SelectOption({@required this.movieID, @required this.name, @required this.rating});
 
   @override
   Widget build(BuildContext context) {
@@ -295,6 +299,7 @@ class SelectOption extends StatelessWidget {
                 return RecommendMovie(
                   movieID: movieID,
                   movieName: name,
+                  movieRating: rating,
                 );
               }));
             },
