@@ -12,6 +12,8 @@ import 'package:template/Models/UserDetails.dart';
 abstract class BaseDatabase {
   // set details
 
+  Future setFriendRequests({@required int number});
+
   Future setFirstTimeLogIn({bool state});
 
   Future<bool> isFirstTimeLogin();
