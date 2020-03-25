@@ -961,6 +961,3 @@ class DatabaseServices implements BaseDatabase {
     }
   }
 }
-
-
-}
