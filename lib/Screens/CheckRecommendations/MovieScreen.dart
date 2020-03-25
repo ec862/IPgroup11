@@ -7,6 +7,7 @@ import 'package:template/CustomView/comment_view.dart';
 import 'package:template/Models/Arguments.dart';
 import 'package:http/http.dart' as http;
 import 'package:template/Models/User.dart';
+import 'package:template/Screens/CheckRecommendations/ViewFriendsRating.dart';
 import 'package:template/Services/DatabaseServices.dart';
 import 'package:template/Screens/CheckRecommendations/ReviewScreen.dart';
 import 'package:template/Models/User.dart';
@@ -85,16 +86,9 @@ class _MovieScreenState extends State<MovieScreen> {
                     style: TextStyle(fontSize: 25),
                   ),
                 ),
-                _getFriendRatings(),
                 Padding(
-                  padding: EdgeInsets.fromLTRB(30, 5, 8, 5),
-                  child: InkWell(
-                    onTap: () {},
-                    child: Text(
-                      "Load More",
-                      style: TextStyle(color: Colors.blue),
-                    ),
-                  ),
+                  padding: const EdgeInsets.fromLTRB(20, 0 , 20.0, 10),
+                  child: FriendsRating(args.id),
                 ),
               ],
             ),
@@ -280,7 +274,8 @@ class SelectOption extends StatelessWidget {
   String movieID = "";
   String rating;
 
-  SelectOption({@required this.movieID, @required this.name, @required this.rating});
+  SelectOption(
+      {@required this.movieID, @required this.name, @required this.rating});
 
   @override
   Widget build(BuildContext context) {
