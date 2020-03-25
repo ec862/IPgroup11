@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
-import 'profile.dart';
 import 'package:intl/intl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:template/Services/AuthenticationServices.dart';
 import 'package:template/Services/DatabaseServices.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'dart:developer';
 import 'package:template/Models/UserDetails.dart';
 import 'package:template/Models/User.dart';
 import 'package:flutter/services.dart';
@@ -29,7 +24,6 @@ class _EditProfileState extends State<EditProfile> {
   UserDetails userDetails;
 
   TextEditingController nameController = new TextEditingController();
-  TextEditingController userNameController = new TextEditingController();
   TextEditingController favMovieController = new TextEditingController();
   String currentSelectedValue = 'Male';
   String currentSelectedValueCat = "Action";
@@ -41,7 +35,6 @@ class _EditProfileState extends State<EditProfile> {
     userDetails = await DatabaseServices(User.userdata.uid).getUserInfo();
     dob = userDetails.dob.toDate();
     nameController.text = userDetails.name;
-    userNameController.text = userDetails.user_name;
     favMovieController.text = userDetails.favorite_movie;
     currentSelectedValueCat = userDetails.favorite_category;
     currentSelectedValue = userDetails.gender;
@@ -54,7 +47,6 @@ class _EditProfileState extends State<EditProfile> {
   void setCurrentUser() async {
     DatabaseServices dbs = new DatabaseServices(User.userdata.uid);
     dbs.setName(name: this.nameController.text);
-    dbs.setUsername(username: this.userNameController.text);
     dbs.setFavMovie(movieName: this.favMovieController.text);
     dbs.setFavCategory(category: currentSelectedValueCat);
     dbs.setDOB(date: selectedDate);
