@@ -104,8 +104,6 @@ abstract class BaseDatabase {
 
   Future<List<ReviewDetails>> getFriendReview({String movieID});
 
-  Future setFriendRequests({@required int number});
-
   Future blockUser({@required String theirUID});
 
   Future unBlockUser({@required String theirUID});

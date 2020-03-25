@@ -389,6 +389,7 @@ class _LoginPageState extends State<LoginPage> {
 
                                   await DatabaseServices(result.uid)
                                       .setFirstTimeLogIn(state: true);
+
                                   await DatabaseServices(result.uid)
                                       .setFriendRequests(number: 0);
                                 }
