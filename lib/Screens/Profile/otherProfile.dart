@@ -1,6 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:template/Models/Arguments.dart';
+import 'package:template/Models/MovieDetails.dart';
+import 'package:template/Models/ReviewDetails.dart';
 import 'package:template/Models/User.dart';
 import 'package:template/Models/UserDetails.dart';
 import 'package:template/Screens/WatchList/watchlist.dart';
@@ -38,10 +41,52 @@ class _OtherProfileState extends State<OtherProfile> {
     setState(() {});
   }
 
+  String getTimeText(Timestamp t){
+    if (t == null) return '';
+    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(t.millisecondsSinceEpoch);
+    return '${dateTime.year}-${dateTime.month}-${dateTime.day}';
+  }
+
+  String _getMostCommon(List<String> array){
+    if(array.length == 0)
+      return null;
+    var modeMap = {};
+    var maxEl = array[0], maxCount = 1;
+    for(var i = 0; i < array.length; i++)
+    {
+      var el = array[i];
+      if(modeMap[el] == null)
+        modeMap[el] = 1;
+      else
+        modeMap[el]++;
+      if(modeMap[el] > maxCount)
+      {
+        maxEl = el;
+        maxCount = modeMap[el];
+      }
+    }
+    return maxEl;
+  }
+
+  Future<String> _getMostWatched(List<String> movie_ids) async{
+    Future<List<MovieDetails>> tempList = Future.wait(movie_ids.map(
+            (id) async =>
+        await DatabaseServices(args.id).getMovieDetails(id: id))
+        .toList());
+    List<MovieDetails> movieList = await tempList;
+    List<List<String>> genresList = movieList.map((movie) => (movie.genres)).toList();
+    List<String> flatList = genresList.expand((i) => i).toList();
+    return _getMostCommon(flatList);
+  }
+
   @override
   Widget build(BuildContext context) {
     args = ModalRoute.of(context).settings.arguments;
     if (!dataRetrieved) getData();
+    Future<List<FollowerDetails>> following = DatabaseServices(args.id).getFollowing();
+    Future<List<FollowerDetails>> followers = DatabaseServices(args.id).getFollowers();
+    Future<List<ReviewDetails>> reviewlist = DatabaseServices(args.id).getReviewList();
+
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
@@ -190,12 +235,33 @@ class _OtherProfileState extends State<OtherProfile> {
                         fontWeight: FontWeight.bold,
                         color: Colors.grey[600])),
               ),
-              Container(
-                width: 120,
-                child: Text('Joker',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              FutureBuilder( future: DatabaseServices(args.id).getFriendInfo(uid: args.id),
+                builder: (BuildContext context, AsyncSnapshot<UserDetails> snapshot){
+                  if (!snapshot.hasData)
+                    return Text('Waiting',
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey[600]));
+                  UserDetails content = snapshot.data;
+                  return FlatButton(
+                    onPressed: () {
+                      showDialog(context: context, child:
+                      new AlertDialog(
+                        content: new Text(content.favorite_movie),
+                      )
+                      );
+                    },
+                    child: Container(
+                      width: 105,
+                      child: RichText(
+                        overflow: TextOverflow.ellipsis,
+                        text: TextSpan(
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.black),
+                            text: content.favorite_movie),
+                      ),
+                    ),
+                  );
+                },
               ),
             ],
           ),
@@ -212,10 +278,19 @@ class _OtherProfileState extends State<OtherProfile> {
               ),
               Container(
                 width: 120,
-                child: Text('Thriller',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                child: FutureBuilder( future: DatabaseServices(args.id).getFriendInfo(uid: args.id),
+                    builder: (BuildContext context, AsyncSnapshot<UserDetails> snapshot){
+                      if (!snapshot.hasData)
+                        return Text('Waiting...',
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold));
+                      UserDetails content = snapshot.data;
+                      return Text('${content.favorite_category}',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold));
+                    }),
               ),
             ],
           ),
@@ -232,10 +307,19 @@ class _OtherProfileState extends State<OtherProfile> {
               ),
               Container(
                 width: 120,
-                child: Text('22',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                child: FutureBuilder(future: followers,
+                    builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+                      if (!snapshot.hasData)
+                        return Text('0',
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold));
+                      List<FollowerDetails> content = snapshot.data;
+                      return Text('${content.length}',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold));
+                    }),
               ),
             ],
           ),
@@ -252,10 +336,19 @@ class _OtherProfileState extends State<OtherProfile> {
               ),
               Container(
                 width: 120,
-                child: Text('10',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                child: FutureBuilder(future: DatabaseServices(args.id).getFriends(),
+                    builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+                      if (!snapshot.hasData)
+                        return Text('0',
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold));
+                      List<FollowerDetails> content = snapshot.data;
+                      return Text('${content.length}',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold));
+                    }),
               ),
             ],
           ),
@@ -272,10 +365,27 @@ class _OtherProfileState extends State<OtherProfile> {
               ),
               Container(
                 width: 120,
-                child: Text('30',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                child: FutureBuilder(future: reviewlist,
+                    builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+                      if (!snapshot.hasData)
+                        return Text(
+                          '0',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      List<ReviewDetails> content = snapshot.data;
+                      return Text(
+                        '${content.length}',
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      );
+                    }),
               ),
             ],
           ),
@@ -292,10 +402,41 @@ class _OtherProfileState extends State<OtherProfile> {
               ),
               Container(
                 width: 120,
-                child: Text('Action',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                child: FutureBuilder(future: reviewlist,
+                    builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+                      if (!snapshot.hasData)
+                        return Text(
+                          'Waiting',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      List<ReviewDetails> content = snapshot.data;
+                      List<String> movieList = content.map((review) => (review.movie_id)).toList();
+                      return FutureBuilder(future: _getMostWatched(movieList),
+                        builder: (BuildContext context, AsyncSnapshot<String> mostWatched){
+                          if (!mostWatched.hasData)
+                            return Text(
+                              'Waiting',
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            );
+                          return Text(
+                            '${mostWatched.data}',
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        },
+                      );
+                    }),
               ),
             ],
           ),
@@ -312,10 +453,19 @@ class _OtherProfileState extends State<OtherProfile> {
               ),
               Container(
                 width: 120,
-                child: Text('Male',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                child: FutureBuilder( future: DatabaseServices(args.id).getFriendInfo(uid: args.id),
+                    builder: (BuildContext context, AsyncSnapshot<UserDetails> snapshot){
+                      if (!snapshot.hasData)
+                        return Text('Waiting...',
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold));
+                      UserDetails content = snapshot.data;
+                      return Text('${content.gender}',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold));
+                    }),
               ),
             ],
           ),
@@ -332,10 +482,19 @@ class _OtherProfileState extends State<OtherProfile> {
               ),
               Container(
                 width: 120,
-                child: Text('08/09/2000',
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                child: FutureBuilder( future: DatabaseServices(args.id).getFriendInfo(uid: args.id),
+                    builder: (BuildContext context, AsyncSnapshot<UserDetails> snapshot){
+                      if (!snapshot.hasData)
+                        return Text('Waiting...',
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold));
+                      UserDetails content = snapshot.data;
+                      return Text('${getTimeText(content.dob)}',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold));
+                    }),
               ),
             ],
           ),
