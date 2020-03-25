@@ -103,6 +103,8 @@ abstract class BaseDatabase {
   Future removeFriend({String uid});
 
   Future addFriend(String uid);
+
+  Future<List<ReviewDetails>> getFriendReview({String movieID});
 }
 
 class DatabaseServices implements BaseDatabase {
@@ -367,7 +369,6 @@ class DatabaseServices implements BaseDatabase {
         {
           'accepted': true,
         },
-
       ).whenComplete(() async {
         await setFriendRequests(number: -1);
 
@@ -418,9 +419,10 @@ class DatabaseServices implements BaseDatabase {
   }
 
   @override
-  Future recommendMovie({@required String uid,
-    @required String movieID,
-    @required String movieName}) async {
+  Future recommendMovie(
+      {@required String uid,
+      @required String movieID,
+      @required String movieName}) async {
     try {
       return await _usersCollection
           .document(uid)
@@ -442,9 +444,10 @@ class DatabaseServices implements BaseDatabase {
   }
 
   @override
-  Future reviewMovie({@required String movieID,
-    @required double rating,
-    @required String comment}) async {
+  Future reviewMovie(
+      {@required String movieID,
+      @required double rating,
+      @required String comment}) async {
     try {
       return await _usersCollection
           .document(this.uid)
@@ -562,7 +565,7 @@ class DatabaseServices implements BaseDatabase {
   @override
   Future<MovieDetails> getMovieDetails({@required String id}) async {
     dynamic response =
-    await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
+        await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
     var data = json.decode(response.body);
     return MovieDetails(
       actors: data["Actors"].split(","),
@@ -631,7 +634,7 @@ class DatabaseServices implements BaseDatabase {
   Future _upLoadImage({@required Function onData, @required File image}) async {
     try {
       StorageUploadTask uploadTask =
-      _storageReference.child("${DateTime.now()}.jpeg").putFile(image);
+          _storageReference.child("${DateTime.now()}.jpeg").putFile(image);
       StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
       taskSnapshot.ref.getDownloadURL().then((dynamic) {
         onData(dynamic);
@@ -676,8 +679,11 @@ class DatabaseServices implements BaseDatabase {
   Future removeRecommendation(
       {String movieID, @required String recFrom}) async {
     try {
-      return await _usersCollection.document(this.uid).collection(
-          'RecommendedMovies').document("$recFrom$movieID").delete();
+      return await _usersCollection
+          .document(this.uid)
+          .collection('RecommendedMovies')
+          .document("$recFrom$movieID")
+          .delete();
     } catch (e) {
       return null;
     }
@@ -898,7 +904,8 @@ class DatabaseServices implements BaseDatabase {
 
     snap.documents.forEach((DocumentSnapshot snapShot) {
       details.add(FollowerDetails(
-        user_id: snapShot.data['user_id'],));
+        user_id: snapShot.data['user_id'],
+      ));
     });
     return details;
   }
@@ -929,15 +936,12 @@ class DatabaseServices implements BaseDatabase {
           .document(uid)
           .collection("Friends")
           .document(this.uid)
-          .setData({
-        'user_id': this.uid
-      });
+          .setData({'user_id': this.uid});
       await _usersCollection
           .document(this.uid)
           .collection("Friends")
-          .document(uid).setData({
-        'user_id': uid
-      });
+          .document(uid)
+          .setData({'user_id': uid});
     } catch (e) {
       return null;
     }
@@ -948,10 +952,33 @@ class DatabaseServices implements BaseDatabase {
     int numb = snapshot.data['friend_requests'];
     if (numb != null && numb != 0) {
       return numb;
-    }
-    else {
+    } else {
       return 0;
     }
+  }
+
+  @override
+  Future<List<ReviewDetails>> getFriendReview({String movieID}) async {
+    List<FollowerDetails> friends = await getFriends();
+    if (friends == null) return null;
+    List<ReviewDetails> reviews = [];
+
+    for (int i = 0; i < friends.length; i++) {
+      QuerySnapshot snapshot = await _usersCollection
+          .document(friends[i].user_id)
+          .collection('ReviewList')
+          .where('movie_id', isEqualTo: movieID)
+          .getDocuments();
+      snapshot.documents.forEach((DocumentSnapshot snap) {
+        reviews.add(ReviewDetails(
+          movie_id: snap.data['movie_id'],
+          rating: snap.data['rating'] ?? 0.0,
+          comment: snap.data['comment'],
+          userId: friends[i].user_id,
+        ));
+      });
+    }
+    return reviews;
   }
 
   @override

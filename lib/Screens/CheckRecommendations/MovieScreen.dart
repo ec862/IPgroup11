@@ -7,6 +7,7 @@ import 'package:template/CustomView/comment_view.dart';
 import 'package:template/Models/Arguments.dart';
 import 'package:http/http.dart' as http;
 import 'package:template/Models/User.dart';
+import 'package:template/Screens/CheckRecommendations/ViewFriendsRating.dart';
 import 'package:template/Services/DatabaseServices.dart';
 import 'package:template/Screens/CheckRecommendations/ReviewScreen.dart';
 import 'package:template/Models/User.dart';
@@ -34,6 +35,7 @@ class _MovieScreenState extends State<MovieScreen> {
   bool dataRetrieved = false;
   String name;
   String profileUrl;
+  String watchingRating = 'Not Rated';
 
   @override
   void initState() {
@@ -84,16 +86,9 @@ class _MovieScreenState extends State<MovieScreen> {
                     style: TextStyle(fontSize: 25),
                   ),
                 ),
-                _getFriendRatings(),
                 Padding(
-                  padding: EdgeInsets.fromLTRB(30, 5, 8, 5),
-                  child: InkWell(
-                    onTap: () {},
-                    child: Text(
-                      "Load More",
-                      style: TextStyle(color: Colors.blue),
-                    ),
-                  ),
+                  padding: const EdgeInsets.fromLTRB(20, 0 , 20.0, 10),
+                  child: FriendsRating(args.id),
                 ),
               ],
             ),
@@ -106,6 +101,7 @@ class _MovieScreenState extends State<MovieScreen> {
             return SelectOption(
               movieID: args.id,
               name: name,
+              rating: watchingRating,
             );
           }));
         },
@@ -265,6 +261,7 @@ class _MovieScreenState extends State<MovieScreen> {
     profileUrl = data["Poster"];
     rating = double.parse(data["imdbRating"]);
     rating = rating / 2;
+    watchingRating = data['Rated'];
     print(rating);
     print(actors[0]);
     dataRetrieved = true;
@@ -275,8 +272,10 @@ class _MovieScreenState extends State<MovieScreen> {
 class SelectOption extends StatelessWidget {
   String name = "";
   String movieID = "";
+  String rating;
 
-  SelectOption({@required this.movieID, @required this.name});
+  SelectOption(
+      {@required this.movieID, @required this.name, @required this.rating});
 
   @override
   Widget build(BuildContext context) {
@@ -295,6 +294,7 @@ class SelectOption extends StatelessWidget {
                 return RecommendMovie(
                   movieID: movieID,
                   movieName: name,
+                  movieRating: rating,
                 );
               }));
             },

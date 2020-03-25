@@ -27,6 +27,7 @@ class _WatchCardState extends State<WatchCard> {
   String title = "Waiting...";
   String genre = "Waiting...";
   String date = "Waiting...";
+  String movieRating = 'Not Rated';
   String img;
   bool dataRetrieved = false;
 
@@ -47,6 +48,7 @@ class _WatchCardState extends State<WatchCard> {
     img = data["Poster"];
     genre = data["Genre"].split(",").toString();
     genre = _getShorterText(genre.substring(1, genre.length - 1),26);
+    movieRating = data['Rated'];
     dataRetrieved = true;
     setState(() {});
   }
@@ -144,7 +146,6 @@ class _WatchCardState extends State<WatchCard> {
               ),
               SizedBox(width: 4.0,),
               widget.isUser ? IconButton(
-            // --- Show Movie Button ---
             onPressed: widget.isReview
                 ? () {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -152,6 +153,7 @@ class _WatchCardState extends State<WatchCard> {
                   widget.movieID,
                   isReview: true,
                   movieName: title,
+                  movieRating: movieRating,
                 );
               }));
             }
@@ -161,6 +163,7 @@ class _WatchCardState extends State<WatchCard> {
                   widget.movieID,
                   isReview: false,
                   movieName: title,
+                  movieRating: movieRating,
                 );
               }));
             },
