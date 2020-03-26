@@ -391,7 +391,8 @@ class _LoginPageState extends State<LoginPage> {
                                       .setFirstTimeLogIn(state: true);
 
                                   await DatabaseServices(result.uid)
-                                      .setFriendRequests(number: 0);
+                                      .setFriendRequests(
+                                      number: 0, theirUID: result.uid);
                                 }
                               } else {
                                 Fluttertoast.showToast(
