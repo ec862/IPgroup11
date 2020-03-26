@@ -25,7 +25,7 @@ class _OtherProfileState extends State<OtherProfile> {
 
   void getData() async {
     FollowerDetails details =
-    await DatabaseServices(User.userdata.uid).getFollower(uid: args.id);
+        await DatabaseServices(User.userdata.uid).getFollower(uid: args.id);
     if (details == null) return;
 
     if (!details.accepted) {
@@ -33,7 +33,7 @@ class _OtherProfileState extends State<OtherProfile> {
       strText = 'Request Pending';
     } else {
       pressed = false;
-      strText = 'Following';
+      strText = 'Un-Follow';
     }
     dataRetrieved = true;
     setState(() {});
@@ -55,14 +55,14 @@ class _OtherProfileState extends State<OtherProfile> {
               if (!snapshot.hasData) return Text("");
               return snapshot.data
                   ? IconButton(
-                onPressed: () {
-                  Navigator.of(context).pushNamed(
-                    '/chatMessages',
-                    arguments: ChatMessagesArgument(id: args.id),
-                  );
-                },
-                icon: Icon(Icons.message),
-              )
+                      onPressed: () {
+                        Navigator.of(context).pushNamed(
+                          '/chatMessages',
+                          arguments: ChatMessagesArgument(id: args.id),
+                        );
+                      },
+                      icon: Icon(Icons.message),
+                    )
                   : Text("");
             },
           )
@@ -107,8 +107,7 @@ class _OtherProfileState extends State<OtherProfile> {
                             setState(() {
                               blocked = !blocked;
                             });
-                          }
-                          else {
+                          } else {
                             DatabaseServices(User.userdata.uid)
                                 .unBlockUser(theirUID: args.id);
                             setState(() {
@@ -122,8 +121,7 @@ class _OtherProfileState extends State<OtherProfile> {
                           style: TextStyle(fontSize: 20),
                         ),
                       );
-                    }
-                    else {
+                    } else {
                       return SizedBox(
                         width: 1,
                       );
@@ -143,7 +141,7 @@ class _OtherProfileState extends State<OtherProfile> {
             ],
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
               ButtonTheme(
                 minWidth: 120.0,
@@ -158,7 +156,7 @@ class _OtherProfileState extends State<OtherProfile> {
                   onPressed: () {
                     setState(() {
                       if (pressed == true) {
-                        strText = 'Unfollow';
+                        strText = 'Request Pending';
                         DatabaseServices(User.userdata.uid).follow(args.id);
                       } else {
                         strText = 'Follow';
@@ -178,7 +176,7 @@ class _OtherProfileState extends State<OtherProfile> {
                       side: BorderSide(color: Colors.blue)),
                   onPressed: () async {
                     if (await DatabaseServices(User.userdata.uid)
-                        .isFriend(uid: args.id)) {
+                        .isFollowing(uid: args.id)) {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -191,7 +189,8 @@ class _OtherProfileState extends State<OtherProfile> {
                     } else {
                       Fluttertoast.showToast(
                           msg:
-                          "You're not friends with the person therefore you "
+                              "You're not a follower/ person hasnt accepted you "
+                              "therefore you "
                               "cannot view the watch list of the person",
                           gravity: ToastGravity.CENTER,
                           toastLength: Toast.LENGTH_SHORT);
@@ -211,21 +210,20 @@ class _OtherProfileState extends State<OtherProfile> {
                       side: BorderSide(color: Colors.blue)),
                   onPressed: () async {
                     if (await DatabaseServices(User.userdata.uid)
-                        .isFriend(uid: args.id)) {
+                        .isFollowing(uid: args.id)) {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              WatchList(
-                                uid: args.id,
-                                index: 1,
-                              ),
+                          builder: (context) => WatchList(
+                            uid: args.id,
+                            index: 1,
+                          ),
                         ),
                       );
-                    }
-                    else {
+                    } else {
                       Fluttertoast.showToast(
-                        msg: "You're not friends with the person therefore you "
+                        msg: "You're not a follower/ person hasnt accepted you "
+                            "therefore you "
                             "cannot view the review list of the person",
                         gravity: ToastGravity.CENTER,
                         toastLength: Toast.LENGTH_SHORT,
@@ -255,7 +253,7 @@ class _OtherProfileState extends State<OtherProfile> {
                 child: Text('Joker',
                     textAlign: TextAlign.left,
                     style:
-                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -275,7 +273,7 @@ class _OtherProfileState extends State<OtherProfile> {
                 child: Text('Thriller',
                     textAlign: TextAlign.left,
                     style:
-                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -295,7 +293,7 @@ class _OtherProfileState extends State<OtherProfile> {
                 child: Text('22',
                     textAlign: TextAlign.left,
                     style:
-                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -315,7 +313,7 @@ class _OtherProfileState extends State<OtherProfile> {
                 child: Text('10',
                     textAlign: TextAlign.left,
                     style:
-                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -335,7 +333,7 @@ class _OtherProfileState extends State<OtherProfile> {
                 child: Text('30',
                     textAlign: TextAlign.left,
                     style:
-                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -355,7 +353,7 @@ class _OtherProfileState extends State<OtherProfile> {
                 child: Text('Action',
                     textAlign: TextAlign.left,
                     style:
-                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -375,7 +373,7 @@ class _OtherProfileState extends State<OtherProfile> {
                 child: Text('Male',
                     textAlign: TextAlign.left,
                     style:
-                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -395,7 +393,7 @@ class _OtherProfileState extends State<OtherProfile> {
                 child: Text('08/09/2000',
                     textAlign: TextAlign.left,
                     style:
-                    TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),

@@ -1087,8 +1087,7 @@ class DatabaseServices implements BaseDatabase {
         .get();
     if (snap.exists && snap != null) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
