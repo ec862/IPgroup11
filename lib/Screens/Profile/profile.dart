@@ -7,6 +7,7 @@ import 'package:template/Models/User.dart';
 import 'package:template/Screens/main.dart';
 import 'package:template/Services/AuthenticationServices.dart';
 import 'package:template/Services/DatabaseServices.dart';
+import 'package:template/Services/ImageServices.dart';
 import 'editProfile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:template/Models/UserDetails.dart';
@@ -94,8 +95,7 @@ class _ProfileState extends State<Profile> {
                     ),
                     CircleAvatar(
                       radius: 70,
-                      backgroundImage: NetworkImage(
-                          'https://images.unsplash.com/photo-1501549538842-2f24e2dd6520?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80'),
+                      backgroundImage: ImageServices.profileImage(details.photo_profile),
                     ),
                     Container(
                       width: 40,
