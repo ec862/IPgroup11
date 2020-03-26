@@ -4,13 +4,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:template/Models/Message.dart';
 import 'package:template/Models/MovieDetails.dart';
 import 'package:template/Models/ReviewDetails.dart';
 import 'package:template/Models/UserDetails.dart';
 
 abstract class BaseDatabase {
   // set details
+
+  Future setFriendRequests({@required int number});
 
   Future setFirstTimeLogIn({bool state});
 
@@ -41,9 +42,6 @@ abstract class BaseDatabase {
   Future declineFollowing(uid);
 
   Future unFollow(uid);
-
-  // not implemented yet
-  Future block(uid);
 
   Future addToWatchList({@required String movieID, @required String movieName});
 
@@ -103,6 +101,16 @@ abstract class BaseDatabase {
   Future removeFriend({String uid});
 
   Future addFriend(String uid);
+
+  Future<List<ReviewDetails>> getFriendReview({String movieID});
+
+  Future blockUser({@required String theirUID});
+
+  Future unBlockUser({@required String theirUID});
+
+  Future checkYouBlocked({@required String theirUID});
+
+  Future checkBlockedBy({@required String theirUID});
 }
 
 class DatabaseServices implements BaseDatabase {
@@ -314,12 +322,11 @@ class DatabaseServices implements BaseDatabase {
   }
 
   @override
-  Future block(uid) {
-    return null;
-  }
-
-  @override
   Future follow(uid) async {
+    bool blocked = await checkBlockedBy(theirUID: uid);
+    if (blocked) {
+      return false;
+    }
     try {
       return await _usersCollection
           .document(uid)
@@ -345,8 +352,8 @@ class DatabaseServices implements BaseDatabase {
             'user_id': this.uid,
             'accepted': false,
           },
-        ).whenComplete(() {
-          print("done");
+        ).whenComplete(() async {
+          await setFriendRequests(number: 1, theirUID: uid);
           _addToYourFollowing(uid);
         });
       } catch (ex) {
@@ -367,12 +374,12 @@ class DatabaseServices implements BaseDatabase {
         {
           'accepted': true,
         },
-
       ).whenComplete(() async {
+        await setFriendRequests(number: -1, theirUID: this.uid);
+
         _addToFollowing(uid, accepted: true);
         // check if you're following them to can add as friends
-        if (await isFollowing(uid: uid))
-          addFriend(uid);
+        if (await isFollowing(uid: uid)) addFriend(uid);
       });
     } catch (ex) {
       print(ex);
@@ -381,7 +388,16 @@ class DatabaseServices implements BaseDatabase {
   }
 
   @override
-  Future declineFollowing(uid) async {
+  Future removeFollowing(uid) async {
+    DocumentSnapshot snap = await _usersCollection
+        .document(this.uid)
+        .collection("Followers")
+        .document(uid)
+        .get();
+    bool accepted = snap.data['accepted'];
+    if (snap.exists && !accepted) {
+      setFriendRequests(number: -1, theirUID: this.uid);
+    }
     await _usersCollection
         .document(this.uid)
         .collection("Followers")
@@ -392,6 +408,11 @@ class DatabaseServices implements BaseDatabase {
         .collection("Following")
         .document(this.uid)
         .delete();
+  }
+
+  @override
+  Future declineFollowing(uid) async {
+    removeFollowing(uid);
   }
 
   Future _addToFollowing(uid, {accepted = false}) async {
@@ -415,9 +436,10 @@ class DatabaseServices implements BaseDatabase {
   }
 
   @override
-  Future recommendMovie({@required String uid,
-    @required String movieID,
-    @required String movieName}) async {
+  Future recommendMovie(
+      {@required String uid,
+      @required String movieID,
+      @required String movieName}) async {
     try {
       return await _usersCollection
           .document(uid)
@@ -439,9 +461,10 @@ class DatabaseServices implements BaseDatabase {
   }
 
   @override
-  Future reviewMovie({@required String movieID,
-    @required double rating,
-    @required String comment}) async {
+  Future reviewMovie(
+      {@required String movieID,
+      @required double rating,
+      @required String comment}) async {
     try {
       return await _usersCollection
           .document(this.uid)
@@ -483,6 +506,15 @@ class DatabaseServices implements BaseDatabase {
   @override
   Future unFollow(uid) async {
     try {
+      DocumentSnapshot snap = await _usersCollection
+          .document(uid)
+          .collection("Followers")
+          .document(this.uid)
+          .get();
+      bool accepted = snap.data['accepted'];
+      if (snap.exists && !accepted) {
+        setFriendRequests(number: -1, theirUID: uid);
+      }
       await _usersCollection
           .document(uid)
           .collection("Followers")
@@ -559,7 +591,7 @@ class DatabaseServices implements BaseDatabase {
   @override
   Future<MovieDetails> getMovieDetails({@required String id}) async {
     dynamic response =
-    await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
+        await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
     var data = json.decode(response.body);
     return MovieDetails(
       actors: data["Actors"].split(","),
@@ -628,7 +660,7 @@ class DatabaseServices implements BaseDatabase {
   Future _upLoadImage({@required Function onData, @required File image}) async {
     try {
       StorageUploadTask uploadTask =
-      _storageReference.child("${DateTime.now()}.jpeg").putFile(image);
+          _storageReference.child("${DateTime.now()}.jpeg").putFile(image);
       StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
       taskSnapshot.ref.getDownloadURL().then((dynamic) {
         onData(dynamic);
@@ -673,8 +705,11 @@ class DatabaseServices implements BaseDatabase {
   Future removeRecommendation(
       {String movieID, @required String recFrom}) async {
     try {
-      return await _usersCollection.document(this.uid).collection(
-          'RecommendedMovies').document("$recFrom$movieID").delete();
+      return await _usersCollection
+          .document(this.uid)
+          .collection('RecommendedMovies')
+          .document("$recFrom$movieID")
+          .delete();
     } catch (e) {
       return null;
     }
@@ -895,7 +930,8 @@ class DatabaseServices implements BaseDatabase {
 
     snap.documents.forEach((DocumentSnapshot snapShot) {
       details.add(FollowerDetails(
-        user_id: snapShot.data['user_id'],));
+        user_id: snapShot.data['user_id'],
+      ));
     });
     return details;
   }
@@ -926,19 +962,134 @@ class DatabaseServices implements BaseDatabase {
           .document(uid)
           .collection("Friends")
           .document(this.uid)
-          .setData({
-        'user_id': this.uid
-      });
+          .setData({'user_id': this.uid});
       await _usersCollection
           .document(this.uid)
           .collection("Friends")
-          .document(uid).setData({
-        'user_id': uid
-      });
+          .document(uid)
+          .setData({'user_id': uid});
     } catch (e) {
       return null;
     }
   }
 
+  Future<int> getFriendReqNumb() async {
+    DocumentSnapshot snapshot = await _usersCollection.document(this.uid).get();
+    int numb = snapshot.data['friend_requests'];
+    if (numb != null && numb != 0) {
+      return numb;
+    } else {
+      return 0;
+    }
+  }
 
+  @override
+  Future<List<ReviewDetails>> getFriendReview({String movieID}) async {
+    List<FollowerDetails> friends = await getFriends();
+    if (friends == null) return null;
+    List<ReviewDetails> reviews = [];
+
+    for (int i = 0; i < friends.length; i++) {
+      QuerySnapshot snapshot = await _usersCollection
+          .document(friends[i].user_id)
+          .collection('ReviewList')
+          .where('movie_id', isEqualTo: movieID)
+          .getDocuments();
+      snapshot.documents.forEach((DocumentSnapshot snap) {
+        reviews.add(ReviewDetails(
+          movie_id: snap.data['movie_id'],
+          rating: snap.data['rating'] ?? 0.0,
+          comment: snap.data['comment'],
+          userId: friends[i].user_id,
+        ));
+      });
+    }
+    return reviews;
+  }
+
+  @override
+  Future setFriendRequests(
+      {@required int number, @required String theirUID}) async {
+    try {
+      if (number == -1) {
+        return await _usersCollection.document(theirUID).updateData(
+          {'friend_requests': FieldValue.increment(-1)},
+        ).whenComplete(() {});
+      }
+      else if (number == 1) {
+        return await _usersCollection.document(theirUID).updateData(
+          {'friend_requests': FieldValue.increment(1)},
+        ).whenComplete(() {});
+      }
+      else {
+        return await _usersCollection.document(theirUID).updateData(
+          {'friend_requests': number},
+        ).whenComplete(() {});
+      }
+    }
+    catch (e) {
+      try {
+        return await _usersCollection.document(theirUID).setData(
+          {'friend_requests': 0},
+        );
+      }
+      catch (ex) {
+        print(ex);
+        return null;
+      }
+    }
+  }
+
+  @override
+  Future blockUser({@required String theirUID}) async {
+    print("blocked");
+    await _usersCollection
+        .document(theirUID)
+        .collection("BlockedBy")
+        .document(this.uid)
+        .setData({}).whenComplete(() {
+      unFollow(theirUID);
+      removeFollowing(theirUID);
+    });
+  }
+
+  @override
+  Future unBlockUser({@required String theirUID}) async {
+    print("unblocked");
+    return await _usersCollection
+        .document(theirUID)
+        .collection("BlockedBy")
+        .document(this.uid)
+        .delete();
+  }
+
+  @override
+  Future checkYouBlocked({@required String theirUID}) async {
+    DocumentSnapshot snap = await _usersCollection
+        .document(theirUID)
+        .collection("BlockedBy")
+        .document(this.uid)
+        .get();
+    if (snap.exists && snap != null) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> checkBlockedBy({@required String theirUID}) async {
+    DocumentSnapshot snap = await _usersCollection
+        .document(this.uid)
+        .collection("BlockedBy")
+        .document(theirUID)
+        .get();
+    if (snap.exists && snap != null) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
 }

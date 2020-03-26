@@ -22,6 +22,9 @@ class _ReviewScreenState extends State<ReviewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print("herrereeee");
+    print(widget.movieID);
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(52.0), // here the desired height
@@ -111,6 +114,8 @@ class _ReviewScreenState extends State<ReviewScreen> {
               shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(5)),
               onPressed: () async {
+                print(widget.movieID);
+                print("hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
                 if (rating < 1) {
                   _showDialog();
                   ratingNotZero = true;

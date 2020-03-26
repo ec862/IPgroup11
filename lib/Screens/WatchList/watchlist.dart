@@ -14,6 +14,7 @@ class WatchList extends StatefulWidget {
   final index;
 
   WatchList({@required this.uid, @required this.index});
+
   @override
   _WatchListState createState() => _WatchListState();
 }
@@ -33,7 +34,6 @@ class _WatchListState extends State<WatchList> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-
           bottom: TabBar(
             tabs: <Widget>[
               Tab(
@@ -102,10 +102,11 @@ class _WatchListState extends State<WatchList> {
                   itemCount: content.length,
                   itemBuilder: (BuildContext context, int index) {
                     return WatchCard(
-                        movieID: content[index].movie_id,
-                        isReview: true,
-                        rating: content[index].rating,
-                        isUser: isUser,);
+                      movieID: content[index].movie_id,
+                      isReview: true,
+                      rating: content[index].rating,
+                      isUser: isUser,
+                    );
                   },
                 );
               },
@@ -122,8 +123,14 @@ class SelectOptions extends StatelessWidget {
   final isReview;
   final id;
   final movieName;
+  final movieRating;
 
-  SelectOptions(this.id, {@required this.isReview, @required this.movieName});
+  SelectOptions(
+    this.id, {
+    @required this.isReview,
+    @required this.movieName,
+    this.movieRating = 'Not Rated',
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -142,6 +149,7 @@ class SelectOptions extends StatelessWidget {
                 return RecommendMovie(
                   movieID: id,
                   movieName: movieName,
+                  movieRating: movieRating,
                 );
               }));
             },
@@ -154,23 +162,23 @@ class SelectOptions extends StatelessWidget {
             trailing: Icon(Icons.keyboard_arrow_right),
             onTap: !isReview
                 ? () {
-              DatabaseServices(User.userdata.uid)
-                  .removeFromWatchList(movieID: id);
-              Fluttertoast.showToast(
-                msg: "Movie deleted",
-                gravity: ToastGravity.CENTER,
-              );
-              Navigator.of(context).pop();
-            }
+                    DatabaseServices(User.userdata.uid)
+                        .removeFromWatchList(movieID: id);
+                    Fluttertoast.showToast(
+                      msg: "Movie deleted",
+                      gravity: ToastGravity.CENTER,
+                    );
+                    Navigator.of(context).pop();
+                  }
                 : () {
-              DatabaseServices(User.userdata.uid)
-                  .removeFromReviewList(movieID: id);
-              Fluttertoast.showToast(
-                msg: "Review deleted",
-                gravity: ToastGravity.CENTER,
-              );
-              Navigator.of(context).pop();
-            },
+                    DatabaseServices(User.userdata.uid)
+                        .removeFromReviewList(movieID: id);
+                    Fluttertoast.showToast(
+                      msg: "Review deleted",
+                      gravity: ToastGravity.CENTER,
+                    );
+                    Navigator.of(context).pop();
+                  },
           ),
           fullDivider(),
           ListTile(

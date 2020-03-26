@@ -6,7 +6,7 @@ import 'package:template/CustomView/ExpandableText.dart';
 class CommentView extends StatefulWidget {
   final String image;
   final String name;
-  final int rating;
+  final double rating;
   final String text;
 
   CommentView(
@@ -50,7 +50,7 @@ class _CommentView extends State<CommentView> {
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   SmoothStarRating(
-                    rating: widget.rating.toDouble(),
+                    rating: widget.rating,
                     color: Colors.yellow[600],
                     borderColor: Colors.yellow[600],
                   ),
@@ -60,7 +60,7 @@ class _CommentView extends State<CommentView> {
           ],
         ),
         Padding(
-          padding: EdgeInsets.all(8.0),
+          padding: EdgeInsets.fromLTRB(60, 8, 8, 8),
           child: ExpandableText(
             text: widget.text,
             limit: 100,

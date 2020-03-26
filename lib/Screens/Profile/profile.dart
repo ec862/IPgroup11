@@ -1,9 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:template/CustomView/BottomBar.dart';
-import 'package:template/Models/MovieDetails.dart';
 import 'package:template/Models/User.dart';
 import 'package:template/Screens/main.dart';
 import 'package:template/Services/AuthenticationServices.dart';
@@ -11,7 +9,6 @@ import 'package:template/Services/DatabaseServices.dart';
 import 'editProfile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:template/Models/UserDetails.dart';
-import 'package:flutter/scheduler.dart';
 
 class Profile extends StatefulWidget {
   @override
@@ -19,51 +16,48 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-//  String name = '';
-//  String userName = '';
-//  String favoriteMovie = '';
-//  String favoriteCategory = '';
-  String followers = "22";
-  String friends = "10";
-  String following = "103";
-//
-////int followers = 22;
-////int friends = 10;
-////int following = 103;
+  String name = '';
+  String userName = '';
+  String favoriteMovie = '';
+  String favoriteCategory = '';
+  String followers = "0";
+  String friends = "0";
+  String following = "0";
+
   String reviewedMovies = "30";
   String catMostWatched = "";
-//  String gender = "Male";
-//  String dob = "08/09/2000";
-//
-//  UserDetails userDetails;
-//
-//  Future getCurrentUser() async {
-//    FirebaseUser user = await Authentication().user;
-//    if (user == null) return;
-//    DatabaseServices dbs = await DatabaseServices(user.uid);
-//    userDetails = await DatabaseServices(User.userdata.uid).getUserInfo();
-//    name = userDetails.name ?? '';
-//    userName = userDetails.user_name ?? '';
-//    favoriteMovie = userDetails.favorite_movie ?? '';
-//    favoriteCategory = userDetails.favorite_category ?? '';
-//    //dob = await userDetails.dob;
-//    setState(() => name = userDetails.name ?? '');
-//    //print("right here $name");
-//    //this.followers = userDetails.num_followers;
-//    //this.friends = userDetails.
-//    //this.following = userDetails.num_following;
-//    //this.reviewedMovies = userDetails.
-//    //this.catMostWatched = userDetails.
-//
-//    //this.gender = userDetails.gender
-//  }
-//
-//  void initState() {
-//    super.initState();
-//    setState(() {
-//      getCurrentUser();
-//    });
-//  }
+  String gender = "Male";
+  String dob = "08/09/2000";
+
+  UserDetails userDetails;
+
+  Future getCurrentUser() async {
+    FirebaseUser user = await Authentication().user;
+    if (user == null) return;
+    DatabaseServices dbs = await DatabaseServices(user.uid);
+    userDetails = await DatabaseServices(User.userdata.uid).getUserInfo();
+    name = userDetails.name ?? '';
+    userName = userDetails.user_name ?? '';
+    favoriteMovie = userDetails.favorite_movie ?? '';
+    favoriteCategory = userDetails.favorite_category ?? '';
+    //dob = await userDetails.dob;
+    setState(() => name = userDetails.name ?? '');
+    //print("right here $name");
+    //this.followers = userDetails.num_followers;
+    //this.friends = userDetails.
+    //this.following = userDetails.num_following;
+    //this.reviewedMovies = userDetails.
+    //this.catMostWatched = userDetails.
+
+    //this.gender = userDetails.gender
+  }
+
+  void initState() {
+    super.initState();
+    setState(() {
+      getCurrentUser();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -226,14 +220,13 @@ class _ProfileState extends State<Profile> {
                             fontWeight: FontWeight.bold,
                             color: Colors.grey[600])),
                   ),
-
                   FlatButton(
                     onPressed: () {
-                      showDialog(context: context, child:
-                      new AlertDialog(
-                        content: new Text(details.favorite_movie),
-                      )
-                      );
+                      showDialog(
+                          context: context,
+                          child: new AlertDialog(
+                            content: new Text(details.favorite_movie),
+                          ));
                     },
                     child: Container(
                       width: 105,
@@ -255,13 +248,11 @@ class _ProfileState extends State<Profile> {
                       text: details.favorite_movie),
                     ),
                   ),*/
-                    /*child: Text(details.favorite_movie,
+                  /*child: Text(details.favorite_movie,
                         textAlign: TextAlign.left,
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),
                     ),*/
-
-
 
                   /*Container(
                     width: 120,
@@ -285,10 +276,14 @@ class _ProfileState extends State<Profile> {
                   ),
                   Container(
                     width: 120,
-                    child: Text(details.favorite_category,
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    child: Text(
+                      details.favorite_category,
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -439,29 +434,25 @@ class _ProfileState extends State<Profile> {
                     return AuthScreen();
                   }));
                 },
-                child:
-
-                Container(
+                child: Container(
                   width: 180,
-                child: ButtonTheme(
-
-                  height:40,
-                  child: RaisedButton(
-                    shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(50.0),
-                        side: BorderSide(color: Colors.black)
-                    ),
-                    color: Colors.white,
-                    disabledColor: Colors.blue[900],
-                    child: Center(
-                      child: Text(
-                        "Logout",
-                        style: TextStyle(color: Colors.white, fontSize: 20),
-                        textAlign: TextAlign.center,
+                  child: ButtonTheme(
+                    height: 40,
+                    child: RaisedButton(
+                      shape: new RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(50.0),
+                          side: BorderSide(color: Colors.black)),
+                      color: Colors.white,
+                      disabledColor: Colors.blue[900],
+                      child: Center(
+                        child: Text(
+                          "Logout",
+                          style: TextStyle(color: Colors.white, fontSize: 20),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     ),
                   ),
-                ),
                 ),
 
                 /*Text(
@@ -478,10 +469,10 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-
-  String getTimeText(Timestamp t){
+  String getTimeText(Timestamp t) {
     if (t == null) return '';
-    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(t.millisecondsSinceEpoch);
+    DateTime dateTime =
+        DateTime.fromMillisecondsSinceEpoch(t.millisecondsSinceEpoch);
     return '${dateTime.year}-${dateTime.month}-${dateTime.day}';
   }
 }
