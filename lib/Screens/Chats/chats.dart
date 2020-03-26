@@ -38,7 +38,7 @@ class _ChatsState extends State<Chats> {
                     return Center(child: Text("No friends"));
                   return ListTile(
                     leading: CircleAvatar(
-                      backgroundImage: ImageServices.profileImage(""),
+                      backgroundImage: ImageServices.profileImage(snapshot.data.photo_profile),
                     ),
                     title: Text(snapshot.data.user_name??"No username"),
                     onTap: () {
