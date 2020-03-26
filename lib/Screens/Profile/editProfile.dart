@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
+import 'profile.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:template/Services/AuthenticationServices.dart';
 import 'package:template/Services/DatabaseServices.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:developer';
 import 'package:template/Models/UserDetails.dart';
 import 'package:template/Models/User.dart';
 import 'package:flutter/services.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'dart:async';
+import 'package:permission_handler/permission_handler.dart';
 
 const Color BOTTOM_BAR_COLOR = Colors.redAccent;
 
@@ -20,26 +29,29 @@ class _EditProfileState extends State<EditProfile> {
   String gender = "Male";
  //String dob = "08/09/2000";
   DateTime dob;
-
   UserDetails userDetails;
 
   TextEditingController nameController = new TextEditingController();
+  TextEditingController userNameController = new TextEditingController();
   TextEditingController favMovieController = new TextEditingController();
+
   String currentSelectedValue = 'Male';
   String currentSelectedValueCat = "Action";
   DateTime selectedDate = DateTime.now();
   TextEditingController _date = new TextEditingController();
   var dateFormat = DateFormat('d/MM/yyyy');
+  File _pickedImage;
 
   void getCurrentUser() async {
     userDetails = await DatabaseServices(User.userdata.uid).getUserInfo();
     dob = userDetails.dob.toDate();
     nameController.text = userDetails.name;
+    userNameController.text = userDetails.user_name;
     favMovieController.text = userDetails.favorite_movie;
     currentSelectedValueCat = userDetails.favorite_category;
     currentSelectedValue = userDetails.gender;
     selectedDate = userDetails.dob.toDate();
-
+    //_pickedImage = userDetails.photo_profile;
 
     setState(() {});
   }
@@ -47,10 +59,12 @@ class _EditProfileState extends State<EditProfile> {
   void setCurrentUser() async {
     DatabaseServices dbs = new DatabaseServices(User.userdata.uid);
     dbs.setName(name: this.nameController.text);
+    dbs.setUsername(username: this.userNameController.text);
     dbs.setFavMovie(movieName: this.favMovieController.text);
     dbs.setFavCategory(category: currentSelectedValueCat);
     dbs.setDOB(date: selectedDate);
     dbs.setGender(gender: this.gender);
+    dbs.setProfilePhoto(image: _pickedImage);
   }
 
   _selectDate() async {
@@ -65,6 +79,33 @@ class _EditProfileState extends State<EditProfile> {
         _date.value =
             TextEditingValue(text: ('${dateFormat.format(picked)}').toString());
       });
+  }
+
+  void _pickImage() async {
+    final imageSource = await showDialog<ImageSource>(
+        context: context,
+        builder: (context) =>
+            AlertDialog(
+              title: Text("Add profile picture!"),
+              actions: <Widget>[
+                MaterialButton(
+                  child: Text("Camera"),
+                  onPressed: () => Navigator.pop(context, ImageSource.camera),
+                ),
+                MaterialButton(
+                  child: Text("Gallery"),
+                  onPressed: () => Navigator.pop(context, ImageSource.gallery),
+                )
+              ],
+            )
+    );
+
+    if(imageSource != null) {
+      final file = await ImagePicker.pickImage(source: imageSource);
+      if(file != null) {
+        setState(() => _pickedImage = file);
+      }
+    }
   }
 
   void initState() {
@@ -99,8 +140,9 @@ class _EditProfileState extends State<EditProfile> {
                     margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
                     child: CircleAvatar(
                       radius: 70,
-                      backgroundImage: NetworkImage(
-                          'https://images.unsplash.com/photo-1501549538842-2f24e2dd6520?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80'),
+                      backgroundImage: FileImage(_pickedImage),
+                      /*backgroundImage: NetworkImage(
+                          'https://images.unsplash.com/photo-1501549538842-2f24e2dd6520?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80'),*/
                     ),
                   ),
                   Container(
@@ -109,7 +151,9 @@ class _EditProfileState extends State<EditProfile> {
                     child: FloatingActionButton(
                       backgroundColor: Color.fromRGBO(0, 0, 0, 0.5),
                       elevation: 0,
-                      onPressed: () => {},
+                      onPressed: () => {
+                        _pickImage(),
+                      },
                       tooltip: 'Edit',
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
