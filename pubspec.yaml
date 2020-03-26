@@ -17,6 +17,8 @@ environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
+  permission_handler: '^4.4.0+hotfix.2'
+  image_picker: ^0.6.3+4
   flutter:
     sdk: flutter
   smooth_star_rating: 1.0.4+2
@@ -51,8 +53,9 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - asserts/no_picture.jpg
-    - asserts/no_picture_avatar.jpg
+    - asserts/AvengersPoster.jpg
+    - no_picture.jpg
+    - no_picture_avatar.jpg
   #  - images/a_dot_burr.jpeg
   #  - images/a_dot_ham.jpeg
 
