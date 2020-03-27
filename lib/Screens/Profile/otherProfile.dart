@@ -192,9 +192,36 @@ class _OtherProfileState extends State<OtherProfile> {
             return Text("Error");
           } else {
             return Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
+              children: (blockedBy == true)
+                  ? <Widget>[Stack(
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      FutureBuilder(
+                        future: DatabaseServices(User.userdata.uid).getFriendInfo(uid: args.id),
+                        builder: (context, AsyncSnapshot<UserDetails> snapshot){
+                          if (!snapshot.hasData)
+                            return CircularProgressIndicator();
+                          return CircleAvatar(
+                            radius: 70,
+                            backgroundImage: ImageServices.profileImage(snapshot.data.photo_profile),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                  new Positioned(
+                    right: 10,
+                    top: 0,
+                    child: BlockedButton(id: args.id),
+                  ),
+                ],
+              ),
+                Text("Unavailable")] :
+              <Widget>[
                 Stack(
                   children: <Widget>[
                     Row(
@@ -230,9 +257,7 @@ class _OtherProfileState extends State<OtherProfile> {
                 ),
                 Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: (blockedBy == true)
-                        ? <Widget>[Text("Unavailable")]
-                        : <Widget>[
+                    children: <Widget>[
                             ButtonTheme(
                               minWidth: 120.0,
                               height: 50.0,

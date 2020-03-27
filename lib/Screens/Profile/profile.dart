@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:template/CustomView/BottomBar.dart';
@@ -11,9 +10,7 @@ import 'package:template/Services/AuthenticationServices.dart';
 import 'package:template/Services/DatabaseServices.dart';
 import 'package:template/Services/ImageServices.dart';
 import 'editProfile.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:template/Models/UserDetails.dart';
-import 'package:flutter/scheduler.dart';
 
 class Profile extends StatefulWidget {
   @override
