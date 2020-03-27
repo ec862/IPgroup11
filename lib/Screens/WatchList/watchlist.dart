@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:template/CustomView/BottomBar.dart';
 import 'package:template/Models/ReviewDetails.dart';
 import 'package:template/Screens/CheckRecommendations/RecommendMovie.dart';
+import 'package:template/Screens/CheckRecommendations/ReviewScreen.dart';
 import '../../CustomView/watch_card.dart';
 import 'package:template/Services/DatabaseServices.dart';
 import 'package:template/Models/User.dart';
@@ -182,9 +183,15 @@ class SelectOptions extends StatelessWidget {
           ),
           fullDivider(),
           ListTile(
-            title: Text("Review"),
-            trailing: Icon(Icons.keyboard_arrow_right),
-            onTap: () {},
+            title: !isReview ? Text("Review") : Text(''),
+            trailing: !isReview ? Icon(Icons.keyboard_arrow_right) : null,
+            onTap:!isReview ? () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                return ReviewScreen(
+                  movieID: id,
+                 );
+              }));
+            } : () {},
           ),
         ],
       ),
