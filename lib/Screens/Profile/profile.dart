@@ -21,28 +21,26 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-
-
   @override
   Widget build(BuildContext context) {
-    Future<List<FollowerDetails>> following = DatabaseServices(User.userdata.uid).getFollowing();
-    Future<List<FollowerDetails>> followers = DatabaseServices(User.userdata.uid).getFollowers();
-    Future<List<ReviewDetails>> reviewlist = DatabaseServices(User.userdata.uid).getReviewList();
+    Future<List<FollowerDetails>> following =
+        DatabaseServices(User.userdata.uid).getFollowing();
+    Future<List<FollowerDetails>> followers =
+        DatabaseServices(User.userdata.uid).getFollowers();
+    Future<List<ReviewDetails>> reviewlist =
+        DatabaseServices(User.userdata.uid).getReviewList();
 
-    String _getMostCommon(List<String> array){
-      if(array.length == 0)
-        return null;
+    String _getMostCommon(List<String> array) {
+      if (array.length == 0) return null;
       var modeMap = {};
       var maxEl = array[0], maxCount = 1;
-      for(var i = 0; i < array.length; i++)
-      {
+      for (var i = 0; i < array.length; i++) {
         var el = array[i];
-        if(modeMap[el] == null)
+        if (modeMap[el] == null)
           modeMap[el] = 1;
         else
           modeMap[el]++;
-        if(modeMap[el] > maxCount)
-        {
+        if (modeMap[el] > maxCount) {
           maxEl = el;
           maxCount = modeMap[el];
         }
@@ -50,15 +48,16 @@ class _ProfileState extends State<Profile> {
       return maxEl;
     }
 
-    Future<String> _getMostWatched(List<String> movie_ids) async{
-       Future<List<MovieDetails>> tempList = Future.wait(movie_ids.map(
-              (id) async =>
+    Future<String> _getMostWatched(List<String> movie_ids) async {
+      Future<List<MovieDetails>> tempList = Future.wait(movie_ids
+          .map((id) async =>
               await DatabaseServices(User.userdata.uid).getMovieDetails(id: id))
           .toList());
-       List<MovieDetails> movieList = await tempList;
-       List<List<String>> genresList = movieList.map((movie) => (movie.genres)).toList();
-       List<String> flatList = genresList.expand((i) => i).toList();
-       return _getMostCommon(flatList);
+      List<MovieDetails> movieList = await tempList;
+      List<List<String>> genresList =
+          movieList.map((movie) => (movie.genres)).toList();
+      List<String> flatList = genresList.expand((i) => i).toList();
+      return _getMostCommon(flatList);
     }
 
     return Scaffold(
@@ -75,15 +74,14 @@ class _ProfileState extends State<Profile> {
         ],
       ),
       body: StreamBuilder(
-        stream: DatabaseServices(User.userdata.uid).userStream,
-        builder: (context, snap) {
-          if (!snap.hasData)
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          UserDetails details = snap.data;
-          return ListView(
-            children: <Widget>[
+          stream: DatabaseServices(User.userdata.uid).userStream,
+          builder: (context, snap) {
+            if (!snap.hasData)
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            UserDetails details = snap.data;
+            return ListView(children: <Widget>[
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -96,7 +94,8 @@ class _ProfileState extends State<Profile> {
                     ),
                     CircleAvatar(
                       radius: 70,
-                      backgroundImage: ImageServices.profileImage(details.photo_profile),
+                      backgroundImage:
+                          ImageServices.profileImage(details.photo_profile),
                     ),
                     Container(
                       width: 40,
@@ -177,9 +176,11 @@ class _ProfileState extends State<Profile> {
                           borderRadius: new BorderRadius.circular(50.0),
                           side: BorderSide(color: Colors.blue)),
                       color: Colors.white,
-                      child:  Center(
-                        child: FutureBuilder(future: followers,
-                            builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+                      child: Center(
+                        child: FutureBuilder(
+                            future: followers,
+                            builder: (BuildContext context,
+                                AsyncSnapshot<List> snapshot) {
                               if (!snapshot.hasData)
                                 return Text(
                                   "Followers \n0}",
@@ -206,9 +207,11 @@ class _ProfileState extends State<Profile> {
                           borderRadius: new BorderRadius.circular(50.0),
                           side: BorderSide(color: Colors.blue)),
                       color: Colors.white,
-                      child:  Center(
-                        child: FutureBuilder(future: following,
-                            builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+                      child: Center(
+                        child: FutureBuilder(
+                            future: following,
+                            builder: (BuildContext context,
+                                AsyncSnapshot<List> snapshot) {
                               if (!snapshot.hasData)
                                 return Text(
                                   "Following \n0}",
@@ -230,39 +233,38 @@ class _ProfileState extends State<Profile> {
                 ],
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Container(
-                      padding: EdgeInsets.only(left: 20),
-                      child: Text('Favorite Movie',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey[600])),
-                    ),
-                    FlatButton(
-                      onPressed: () {
-                        showDialog(
-                            context: context,
-                            child: new AlertDialog(
-                              content: new Text(details.favorite_movie),
-                            ));
-                      },
-                      child: Container(
-                        width: 105,
-                        child: RichText(
-                          overflow: TextOverflow.ellipsis,
-                          text: TextSpan(
-                              style: TextStyle(color: Colors.black),
-                              text: details.favorite_movie),
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Container(
+                        padding: EdgeInsets.only(left: 20),
+                        child: Text('Favorite Movie',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey[600])),
+                      ),
+                      FlatButton(
+                        onPressed: () {
+                          showDialog(
+                              context: context,
+                              child: new AlertDialog(
+                                content: new Text(details.favorite_movie),
+                              ));
+                        },
+                        child: Container(
+                          width: 105,
+                          child: RichText(
+                            overflow: TextOverflow.ellipsis,
+                            text: TextSpan(
+                                style: TextStyle(color: Colors.black),
+                                text: details.favorite_movie),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                )),
-              ),
+                    ],
+                  )),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -303,8 +305,11 @@ class _ProfileState extends State<Profile> {
                   ),
                   Container(
                     width: 120,
-                    child: FutureBuilder(future: DatabaseServices(User.userdata.uid).getFriends(),
-                        builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+                    child: FutureBuilder(
+                        future:
+                            DatabaseServices(User.userdata.uid).getFriends(),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<List> snapshot) {
                           if (!snapshot.hasData)
                             return Text('0',
                                 textAlign: TextAlign.left,
@@ -332,8 +337,10 @@ class _ProfileState extends State<Profile> {
                   ),
                   Container(
                     width: 120,
-                    child: FutureBuilder(future: reviewlist,
-                        builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+                    child: FutureBuilder(
+                        future: reviewlist,
+                        builder: (BuildContext context,
+                            AsyncSnapshot<List> snapshot) {
                           if (!snapshot.hasData)
                             return Text(
                               '0',
@@ -355,7 +362,7 @@ class _ProfileState extends State<Profile> {
                         }),
                   ),
                 ],
-          ),
+              ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -374,8 +381,10 @@ class _ProfileState extends State<Profile> {
                     ),
                     Container(
                       width: 120,
-                      child: FutureBuilder(future: reviewlist,
-                          builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+                      child: FutureBuilder(
+                          future: reviewlist,
+                          builder: (BuildContext context,
+                              AsyncSnapshot<List> snapshot) {
                             if (!snapshot.hasData)
                               return Text(
                                 'Waiting',
@@ -386,9 +395,13 @@ class _ProfileState extends State<Profile> {
                                 ),
                               );
                             List<ReviewDetails> content = snapshot.data;
-                            List<String> movieList = content.map((review) => (review.movie_id)).toList();
-                            return FutureBuilder(future: _getMostWatched(movieList),
-                              builder: (BuildContext context, AsyncSnapshot<String> mostWatched){
+                            List<String> movieList = content
+                                .map((review) => (review.movie_id))
+                                .toList();
+                            return FutureBuilder(
+                              future: _getMostWatched(movieList),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<String> mostWatched) {
                                 if (!mostWatched.hasData)
                                   return Text(
                                     'Waiting',
@@ -467,7 +480,7 @@ class _ProfileState extends State<Profile> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(75,8, 75, 8),
+                padding: const EdgeInsets.fromLTRB(75, 8, 75, 8),
                 child: ButtonTheme(
                   height: 50.0,
                   minWidth: 100.0,
@@ -481,21 +494,19 @@ class _ProfileState extends State<Profile> {
                     onPressed: () {
                       Authentication().signOut();
                       Navigator.popUntil(context, ModalRoute.withName('/'));
-                      Navigator.of(context)
-                          .pushReplacement(MaterialPageRoute(builder: (context) {
+                      Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(builder: (context) {
                         return AuthScreen();
                       }));
                     },
                   ),
                 ),
-                ),
               ),
-            ],
-          );
-        },
+            ]);
+          }),
       bottomNavigationBar: BottomBar().createBar(context, 4),
-      //bottomNavigationBar: BottomBar().createBar(context, 4),
     );
+    //bottomNavigationBar: BottomBar().createBar(context, 4),
   }
 
   String getTimeText(Timestamp t) {
