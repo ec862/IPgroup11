@@ -10,6 +10,18 @@ class ImageServices {
   }
 
   static ImageProvider profileImage(String url) {
-    return AssetImage("asserts/no_picture_avatar.jpg");
+    try {
+      return NetworkImage(url);
+    } catch(e){
+      return AssetImage("asserts/no_picture_avatar.jpg");
+    }
+  }
+
+  static ImageProvider profileFromFile(file){
+    try {
+      return FileImage(file);
+    } catch(e){
+      return AssetImage("asserts/no_picture_avatar.jpg");
+    }
   }
 }

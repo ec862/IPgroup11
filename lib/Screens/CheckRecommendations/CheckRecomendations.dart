@@ -139,7 +139,7 @@ class MovieContent {
                       if (projectSnap.connectionState != ConnectionState.done) {
                         return Text(
                           "Rec. by: ",
-                          style: TextStyle(fontSize: 30),
+                          style: TextStyle(fontSize: 16),
                         );
                       } else {
                         StringBuffer a = new StringBuffer("Rec. by: ");

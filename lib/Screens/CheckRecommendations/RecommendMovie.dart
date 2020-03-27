@@ -32,7 +32,7 @@ class _RecommendMovieState extends State<RecommendMovie> {
         title: Text("Recommend"),
       ),
       body: FutureBuilder(
-        future: DatabaseServices(User.userdata.uid).getFollowers(),
+        future: DatabaseServices(User.userdata.uid).getFollowing(),
         builder: (BuildContext context,
             AsyncSnapshot<List<FollowerDetails>> snapshot) {
           if (!snapshot.hasData)
@@ -44,7 +44,7 @@ class _RecommendMovieState extends State<RecommendMovie> {
           if (snapshot.data == null || snapshot.data.isEmpty)
             return Container(
               child: Center(
-                child: Text("No friends"),
+                child: Text("You're not following anyone"),
               ),
             );
           List<FollowerDetails> temp = snapshot.data;
@@ -54,6 +54,13 @@ class _RecommendMovieState extends State<RecommendMovie> {
               content.add(temp[i]);
             }
           }
+          if (content.length <= 0)
+            return Container(
+              child: Center(
+                child: Text("You're not following anyone"),
+              ),
+            );
+
           return ListView.builder(
             itemCount: content.length,
             itemBuilder: (context, index) {
@@ -106,7 +113,7 @@ class _RecommendMovieState extends State<RecommendMovie> {
                 ),
                 CircleAvatar(
                   radius: 20,
-                  backgroundImage: ImageServices.profileImage(""),
+                  backgroundImage: ImageServices.profileImage(snapshot.data.photo_profile),
                 ),
               ],
             ),

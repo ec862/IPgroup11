@@ -259,7 +259,7 @@ class DatabaseServices implements BaseDatabase {
   Future setProfilePhoto({@required File image}) async {
     return await _upLoadImage(
       onData: (String url) {
-        _uploadProfileUrl(image);
+        _uploadProfileUrl(url);
       },
       image: image,
     );
@@ -281,6 +281,22 @@ class DatabaseServices implements BaseDatabase {
         print(ex);
         return null;
       }
+    }
+  }
+
+  Future _upLoadImage({@required Function onData, @required File image}) async {
+    try {
+      StorageUploadTask uploadTask =
+      _storageReference.child("${DateTime.now()}.jpeg").putFile(image);
+      StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
+      taskSnapshot.ref.getDownloadURL().then((dynamic) {
+        onData(dynamic);
+      });
+      return taskSnapshot;
+    } catch (e) {
+      print(e);
+      onData(null);
+      return null;
     }
   }
 
@@ -657,21 +673,6 @@ class DatabaseServices implements BaseDatabase {
     return details;
   }
 
-  Future _upLoadImage({@required Function onData, @required File image}) async {
-    try {
-      StorageUploadTask uploadTask =
-          _storageReference.child("${DateTime.now()}.jpeg").putFile(image);
-      StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
-      taskSnapshot.ref.getDownloadURL().then((dynamic) {
-        onData(dynamic);
-      });
-      return taskSnapshot;
-    } catch (e) {
-      print(e);
-      onData(null);
-      return null;
-    }
-  }
 
   @override
   Future removeFromWatchList({String movieID}) {
@@ -1087,8 +1088,7 @@ class DatabaseServices implements BaseDatabase {
         .get();
     if (snap.exists && snap != null) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
