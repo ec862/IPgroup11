@@ -60,7 +60,7 @@ class _RecommendMovieState extends State<RecommendMovie> {
                 child: Text("You're not following anyone"),
               ),
             );
-          
+
           return ListView.builder(
             itemCount: content.length,
             itemBuilder: (context, index) {
