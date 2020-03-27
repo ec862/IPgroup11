@@ -79,8 +79,13 @@ class _OtherProfileState extends State<OtherProfile> {
       ),
       body: FutureBuilder(future: getData
         (), builder: (context, projectSnap) {
-        if (projectSnap.connectionState == ConnectionState.done &&
-            !projectSnap.hasError) {
+        if (projectSnap.connectionState != ConnectionState.done) {
+          return Center(child: CircularProgressIndicator());
+        }
+        else if (projectSnap.hasError) {
+          return Text("Error");
+        }
+        else {
           return Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -428,12 +433,6 @@ class _OtherProfileState extends State<OtherProfile> {
               ),
             ],
           );
-        }
-        else if (projectSnap.hasError) {
-          return Text("Error");
-        }
-        else {
-          return Center(child: CircularProgressIndicator());
         }
       }),
 
