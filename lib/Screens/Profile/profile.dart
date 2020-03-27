@@ -292,76 +292,82 @@ class _ProfileState extends State<Profile> {
                   ],
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Container(
-                    padding: EdgeInsets.only(left: 20),
-                    child: Text('Friends',
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey[600])),
-                  ),
-                  Container(
-                    width: 120,
-                    child: FutureBuilder(
-                        future:
-                            DatabaseServices(User.userdata.uid).getFriends(),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<List> snapshot) {
-                          if (!snapshot.hasData)
-                            return Text('0',
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Container(
+                      padding: EdgeInsets.only(left: 20),
+                      child: Text('Friends',
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[600])),
+                    ),
+                    Container(
+                      width: 120,
+                      child: FutureBuilder(
+                          future:
+                              DatabaseServices(User.userdata.uid).getFriends(),
+                          builder: (BuildContext context,
+                              AsyncSnapshot<List> snapshot) {
+                            if (!snapshot.hasData)
+                              return Text('0',
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                      fontSize: 18, fontWeight: FontWeight.bold));
+                            List<FollowerDetails> content = snapshot.data;
+                            return Text('${content.length}',
                                 textAlign: TextAlign.left,
                                 style: TextStyle(
                                     fontSize: 18, fontWeight: FontWeight.bold));
-                          List<FollowerDetails> content = snapshot.data;
-                          return Text('${content.length}',
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold));
-                        }),
-                  ),
-                ],
+                          }),
+                    ),
+                  ],
+                ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Container(
-                    padding: EdgeInsets.only(left: 20),
-                    child: Text('Reviewed movies',
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey[600])),
-                  ),
-                  Container(
-                    width: 120,
-                    child: FutureBuilder(
-                        future: reviewlist,
-                        builder: (BuildContext context,
-                            AsyncSnapshot<List> snapshot) {
-                          if (!snapshot.hasData)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Container(
+                      padding: EdgeInsets.only(left: 20),
+                      child: Text('Reviewed movies',
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[600])),
+                    ),
+                    Container(
+                      width: 120,
+                      child: FutureBuilder(
+                          future: reviewlist,
+                          builder: (BuildContext context,
+                              AsyncSnapshot<List> snapshot) {
+                            if (!snapshot.hasData)
+                              return Text(
+                                '0',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              );
+                            List<ReviewDetails> content = snapshot.data;
                             return Text(
-                              '0',
+                              '${content.length}',
                               textAlign: TextAlign.left,
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                             );
-                          List<ReviewDetails> content = snapshot.data;
-                          return Text(
-                            '${content.length}',
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          );
-                        }),
-                  ),
-                ],
+                          }),
+                    ),
+                  ],
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
