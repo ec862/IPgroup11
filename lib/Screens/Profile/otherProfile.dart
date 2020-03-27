@@ -8,6 +8,69 @@ import 'package:template/Services/DatabaseServices.dart';
 
 const Color BOTTOM_BAR_COLOR = Colors.redAccent;
 
+class BlockedButton extends StatefulWidget {
+  String id;
+
+  BlockedButton({Key key, @required this.id}) : super(key: key);
+
+  @override
+  _BlockedButtonState createState() => _BlockedButtonState();
+}
+
+class _BlockedButtonState extends State<BlockedButton> {
+  bool youBlocked;
+
+
+  @override
+  Widget build(BuildContext context) {
+    return new FutureBuilder(
+      builder: (context, projectSnap) {
+        if (!projectSnap.hasError &&
+            projectSnap.hasData &&
+            projectSnap.connectionState ==
+                ConnectionState.done) {
+          if (youBlocked == null) {
+            youBlocked = projectSnap.data;
+          }
+          return new RaisedButton(
+            shape: RoundedRectangleBorder(
+                side: BorderSide.none,
+                borderRadius: new BorderRadius.circular(15.0)),
+            onPressed: () {
+              if (youBlocked == false) {
+                DatabaseServices(User.userdata.uid)
+                    .blockUser(theirUID: widget.id);
+                setState(() {
+                  youBlocked = !youBlocked;
+                });
+              }
+              else {
+                DatabaseServices(User.userdata.uid)
+                    .unBlockUser(theirUID: widget.id);
+                setState(() {
+                  youBlocked = !youBlocked;
+                });
+              }
+            },
+            splashColor: Colors.redAccent,
+            child: new Text(
+              (youBlocked) ? "Unblock" : "Block",
+              style: TextStyle(fontSize: 20),
+            ),
+          );
+        }
+        else {
+          return SizedBox(
+            width: 1,
+          );
+        }
+      },
+      future: DatabaseServices(User.userdata.uid)
+          .checkYouBlocked(theirUID: widget.id),
+    );
+  }
+}
+
 class OtherProfile extends StatefulWidget {
   OtherProfile({Key key}) : super(key: key);
 
@@ -16,6 +79,7 @@ class OtherProfile extends StatefulWidget {
 }
 
 class _OtherProfileState extends State<OtherProfile> {
+  FollowerDetails details;
   bool youBlocked;
   bool blockedBy;
   bool pressed = true;
@@ -25,10 +89,14 @@ class _OtherProfileState extends State<OtherProfile> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   Future getData() async {
-    FollowerDetails details =
-    await DatabaseServices(User.userdata.uid).getFollower(uid: args.id);
     blockedBy = await DatabaseServices(User.userdata.uid)
         .checkBlockedBy(theirUID: args.id);
+    if (details != null && blockedBy != null) {
+      return;
+    }
+    details =
+    await DatabaseServices(User.userdata.uid).getFollower(uid: args.id);
+
 
     if (details == null) return;
 
@@ -41,7 +109,6 @@ class _OtherProfileState extends State<OtherProfile> {
       strText = 'Un-Follow';
     }
     dataRetrieved = true;
-    setState(() {});
   }
 
   @override
@@ -106,51 +173,7 @@ class _OtherProfileState extends State<OtherProfile> {
                   new Positioned(
                     right: 10,
                     top: 0,
-                    child: new FutureBuilder(
-                      builder: (context, projectSnap) {
-                        if (!projectSnap.hasError &&
-                            projectSnap.hasData &&
-                            projectSnap.connectionState ==
-                                ConnectionState.done) {
-                          if (youBlocked == null) {
-                            youBlocked = projectSnap.data;
-                          }
-                          return new RaisedButton(
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide.none,
-                                borderRadius: new BorderRadius.circular(15.0)),
-                            onPressed: () {
-                              if (youBlocked == false) {
-                                DatabaseServices(User.userdata.uid)
-                                    .blockUser(theirUID: args.id);
-                                setState(() {
-                                  youBlocked = !youBlocked;
-                                });
-                              }
-                              else {
-                                DatabaseServices(User.userdata.uid)
-                                    .unBlockUser(theirUID: args.id);
-                                setState(() {
-                                  youBlocked = !youBlocked;
-                                });
-                              }
-                            },
-                            splashColor: Colors.redAccent,
-                            child: new Text(
-                              (youBlocked) ? "Unblock" : "Block",
-                              style: TextStyle(fontSize: 20),
-                            ),
-                          );
-                        }
-                        else {
-                          return SizedBox(
-                            width: 1,
-                          );
-                        }
-                      },
-                      future: DatabaseServices(User.userdata.uid)
-                          .checkYouBlocked(theirUID: args.id),
-                    ),
+                    child: BlockedButton(id: args.id),
                   ),
                 ],
               ),
