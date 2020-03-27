@@ -54,6 +54,8 @@ flutter:
     - asserts/AvengersPoster.jpg
     - asserts/no_picture.jpg
     - asserts/no_picture_avatar.jpg
+    - asserts/MofloLogo2.png
+    - asserts/Bottom.png
   #  - images/a_dot_burr.jpeg
   #  - images/a_dot_ham.jpeg
 

@@ -183,7 +183,7 @@ class SelectOptions extends StatelessWidget {
           ),
           fullDivider(),
           ListTile(
-            title: !isReview ? Text("Review") : Text(''),
+            title: !isReview ? Text("Rate and Review") : Text(''),
             trailing: !isReview ? Icon(Icons.keyboard_arrow_right) : null,
             onTap:!isReview ? () {
               Navigator.of(context).push(MaterialPageRoute(builder: (context) {
