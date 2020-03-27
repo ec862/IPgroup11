@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:template/CustomView/BottomBar.dart';
+import 'package:template/Models/MovieDetails.dart';
 import 'package:template/Models/ReviewDetails.dart';
 import 'package:template/Models/User.dart';
 import 'package:template/Screens/main.dart';
@@ -11,6 +13,7 @@ import 'package:template/Services/ImageServices.dart';
 import 'editProfile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:template/Models/UserDetails.dart';
+import 'package:flutter/scheduler.dart';
 
 class Profile extends StatefulWidget {
   @override
@@ -18,38 +21,6 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  String name = '';
-  String userName = '';
-  String favoriteMovie = '';
-  String favoriteCategory = '';
-  String friends = "0";
-
-  String reviewedMovies = "30";
-  String catMostWatched = "";
-  String gender = "Male";
-  String dob = "08/09/2000";
-
-  UserDetails userDetails;
-
-  Future getCurrentUser() async {
-    FirebaseUser user = await Authentication().user;
-    if (user == null) return;
-    DatabaseServices dbs = await DatabaseServices(user.uid);
-    userDetails = await DatabaseServices(User.userdata.uid).getUserInfo();
-    name = userDetails.name ?? '';
-    userName = userDetails.user_name ?? '';
-    favoriteMovie = userDetails.favorite_movie ?? '';
-    favoriteCategory = userDetails.favorite_category ?? '';
-    setState(() => name = userDetails.name ?? '');
-  }
-
-  void initState() {
-    super.initState();
-    setState(() {
-      getCurrentUser();
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     Future<List<FollowerDetails>> following =
@@ -58,6 +29,36 @@ class _ProfileState extends State<Profile> {
         DatabaseServices(User.userdata.uid).getFollowers();
     Future<List<ReviewDetails>> reviewlist =
         DatabaseServices(User.userdata.uid).getReviewList();
+
+    String _getMostCommon(List<String> array) {
+      if (array.length == 0) return null;
+      var modeMap = {};
+      var maxEl = array[0], maxCount = 1;
+      for (var i = 0; i < array.length; i++) {
+        var el = array[i];
+        if (modeMap[el] == null)
+          modeMap[el] = 1;
+        else
+          modeMap[el]++;
+        if (modeMap[el] > maxCount) {
+          maxEl = el;
+          maxCount = modeMap[el];
+        }
+      }
+      return maxEl;
+    }
+
+    Future<String> _getMostWatched(List<String> movie_ids) async {
+      Future<List<MovieDetails>> tempList = Future.wait(movie_ids
+          .map((id) async =>
+              await DatabaseServices(User.userdata.uid).getMovieDetails(id: id))
+          .toList());
+      List<MovieDetails> movieList = await tempList;
+      List<List<String>> genresList =
+          movieList.map((movie) => (movie.genres)).toList();
+      List<String> flatList = genresList.expand((i) => i).toList();
+      return _getMostCommon(flatList);
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -73,16 +74,14 @@ class _ProfileState extends State<Profile> {
         ],
       ),
       body: StreamBuilder(
-        stream: DatabaseServices(User.userdata.uid).userStream,
-        builder: (context, snap) {
-          if (!snap.hasData)
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-
-          UserDetails details = snap.data;
-          return ListView(
-            children: <Widget>[
+          stream: DatabaseServices(User.userdata.uid).userStream,
+          builder: (context, snap) {
+            if (!snap.hasData)
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            UserDetails details = snap.data;
+            return ListView(children: <Widget>[
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -95,7 +94,8 @@ class _ProfileState extends State<Profile> {
                     ),
                     CircleAvatar(
                       radius: 70,
-                      backgroundImage: ImageServices.profileImage(details.photo_profile),
+                      backgroundImage:
+                          ImageServices.profileImage(details.photo_profile),
                     ),
                     Container(
                       width: 40,
@@ -165,21 +165,19 @@ class _ProfileState extends State<Profile> {
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: <Widget>[
-                    Spacer(),
-                    ButtonTheme(
-                      minWidth: 120.0,
-                      height: 50.0,
-                      child: RaisedButton(
-                        shape: new RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(50.0),
-                            side: BorderSide(color: Colors.blue)),
-                        color: Colors.white,
-                        child: Center(
-                          child: FutureBuilder(
+              Row(
+                children: <Widget>[
+                  Spacer(),
+                  ButtonTheme(
+                    minWidth: 120.0,
+                    height: 50.0,
+                    child: RaisedButton(
+                      shape: new RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(50.0),
+                          side: BorderSide(color: Colors.blue)),
+                      color: Colors.white,
+                      child: Center(
+                        child: FutureBuilder(
                             future: followers,
                             builder: (BuildContext context,
                                 AsyncSnapshot<List> snapshot) {
@@ -188,90 +186,85 @@ class _ProfileState extends State<Profile> {
                                   "Followers \n0}",
                                   textAlign: TextAlign.center,
                                 );
-
                               List<FollowerDetails> content = snapshot.data;
                               return Text(
                                 "Followers \n${content.length}",
                                 textAlign: TextAlign.center,
                               );
-                            },
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/followers');
-                        },
+                            }),
                       ),
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/followers');
+                      },
                     ),
-                    Spacer(),
-                    ButtonTheme(
-                      minWidth: 120.0,
-                      height: 50.0,
-                      child: RaisedButton(
-                        shape: new RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(50.0),
-                            side: BorderSide(color: Colors.blue)),
-                        color: Colors.white,
-                        child: Center(
-                          child: FutureBuilder(
-                              future: following,
-                              builder: (BuildContext context,
-                                  AsyncSnapshot<List> snapshot) {
-                                if (!snapshot.hasData)
-                                  return Text(
-                                    "Following \n0",
-                                    textAlign: TextAlign.center,
-                                  );
-
-                                List<FollowerDetails> content = snapshot.data;
+                  ),
+                  Spacer(),
+                  ButtonTheme(
+                    minWidth: 120.0,
+                    height: 50.0,
+                    child: RaisedButton(
+                      shape: new RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(50.0),
+                          side: BorderSide(color: Colors.blue)),
+                      color: Colors.white,
+                      child: Center(
+                        child: FutureBuilder(
+                            future: following,
+                            builder: (BuildContext context,
+                                AsyncSnapshot<List> snapshot) {
+                              if (!snapshot.hasData)
                                 return Text(
-                                  "Following \n${content.length}",
+                                  "Following \n0}",
                                   textAlign: TextAlign.center,
                                 );
-                              }),
-                        ),
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/followings');
-                        },
+                              List<FollowerDetails> content = snapshot.data;
+                              return Text(
+                                "Following \n${content.length}",
+                                textAlign: TextAlign.center,
+                              );
+                            }),
                       ),
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/followings');
+                      },
                     ),
-                    Spacer()
-                  ],
-                ),
+                  ),
+                  Spacer()
+                ],
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Container(
-                      padding: EdgeInsets.only(left: 20),
-                      child: Text('Favorite Movie',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey[600])),
-                    ),
-                    FlatButton(
-                      onPressed: () {
-                        showDialog(
-                            context: context,
-                            child: new AlertDialog(
-                              content: new Text(details.favorite_movie),
-                            ));
-                      },
-                      child: Container(
-                        width: 105,
-                        child: RichText(
-                          overflow: TextOverflow.ellipsis,
-                          text: TextSpan(
-                              style: TextStyle(color: Colors.black),
-                              text: details.favorite_movie),
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Container(
+                        padding: EdgeInsets.only(left: 20),
+                        child: Text('Favorite Movie',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey[600])),
+                      ),
+                      FlatButton(
+                        onPressed: () {
+                          showDialog(
+                              context: context,
+                              child: new AlertDialog(
+                                content: new Text(details.favorite_movie),
+                              ));
+                        },
+                        child: Container(
+                          width: 105,
+                          child: RichText(
+                            overflow: TextOverflow.ellipsis,
+                            text: TextSpan(
+                                style: TextStyle(color: Colors.black),
+                                text: details.favorite_movie),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
+                    ],
+                  )),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -299,49 +292,52 @@ class _ProfileState extends State<Profile> {
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Container(
-                      padding: EdgeInsets.only(left: 20),
-                      child: Text('Friends',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey[600])),
-                    ),
-                    Container(
-                      width: 120,
-                      child: Row(
-                        children: <Widget>[
-                          Text(friends,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.only(left: 20),
+                    child: Text('Friends',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[600])),
+                  ),
+                  Container(
+                    width: 120,
+                    child: FutureBuilder(
+                        future:
+                            DatabaseServices(User.userdata.uid).getFriends(),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<List> snapshot) {
+                          if (!snapshot.hasData)
+                            return Text('0',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold));
+                          List<FollowerDetails> content = snapshot.data;
+                          return Text('${content.length}',
                               textAlign: TextAlign.left,
                               style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                                  fontSize: 18, fontWeight: FontWeight.bold));
+                        }),
+                  ),
+                ],
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Container(
-                      padding: EdgeInsets.only(left: 20),
-                      child: Text('Reviewed movies',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey[600])),
-                    ),
-                    Container(
-                      width: 120,
-                      child: FutureBuilder(
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.only(left: 20),
+                    child: Text('Reviewed movies',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[600])),
+                  ),
+                  Container(
+                    width: 120,
+                    child: FutureBuilder(
                         future: reviewlist,
                         builder: (BuildContext context,
                             AsyncSnapshot<List> snapshot) {
@@ -363,11 +359,9 @@ class _ProfileState extends State<Profile> {
                               fontWeight: FontWeight.bold,
                             ),
                           );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
+                        }),
+                  ),
+                ],
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -387,10 +381,47 @@ class _ProfileState extends State<Profile> {
                     ),
                     Container(
                       width: 120,
-                      child: Text(catMostWatched,
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold)),
+                      child: FutureBuilder(
+                          future: reviewlist,
+                          builder: (BuildContext context,
+                              AsyncSnapshot<List> snapshot) {
+                            if (!snapshot.hasData)
+                              return Text(
+                                'Waiting',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              );
+                            List<ReviewDetails> content = snapshot.data;
+                            List<String> movieList = content
+                                .map((review) => (review.movie_id))
+                                .toList();
+                            return FutureBuilder(
+                              future: _getMostWatched(movieList),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<String> mostWatched) {
+                                if (!mostWatched.hasData)
+                                  return Text(
+                                    'Waiting',
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  );
+                                return Text(
+                                  '${mostWatched.data}',
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                );
+                              },
+                            );
+                          }),
                     ),
                   ],
                 ),
@@ -449,7 +480,7 @@ class _ProfileState extends State<Profile> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(75,8, 75, 8),
+                padding: const EdgeInsets.fromLTRB(75, 8, 75, 8),
                 child: ButtonTheme(
                   height: 50.0,
                   minWidth: 100.0,
@@ -463,21 +494,19 @@ class _ProfileState extends State<Profile> {
                     onPressed: () {
                       Authentication().signOut();
                       Navigator.popUntil(context, ModalRoute.withName('/'));
-                      Navigator.of(context)
-                          .pushReplacement(MaterialPageRoute(builder: (context) {
+                      Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(builder: (context) {
                         return AuthScreen();
                       }));
                     },
                   ),
                 ),
               ),
-            ],
-          );
-        },
-      ),
+            ]);
+          }),
       bottomNavigationBar: BottomBar().createBar(context, 4),
-      //bottomNavigationBar: BottomBar().createBar(context, 4),
     );
+    //bottomNavigationBar: BottomBar().createBar(context, 4),
   }
 
   String getTimeText(Timestamp t) {
