@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:http/http.dart' as http;
+import 'package:template/Models/User.dart';
 import 'package:template/Screens/WatchList/watchlist.dart';
 import 'package:template/Services/ImageServices.dart';
 import 'package:template/Models/Arguments.dart';
@@ -12,11 +13,13 @@ class WatchCard extends StatefulWidget {
   final String movieID;
   final bool isReview;
   final double rating;
+  String uid;
 
   WatchCard(
       {this.isUser,
       @required this.movieID,
       @required this.isReview,
+      this.uid,
       this.rating});
 
   @override
@@ -30,6 +33,7 @@ class _WatchCardState extends State<WatchCard> {
   String movieRating = 'Not Rated';
   String img;
   bool dataRetrieved = false;
+  String uid;
 
   String _getShorterText(String text, int maxLen) {
     String toReturn = text;
@@ -44,10 +48,10 @@ class _WatchCardState extends State<WatchCard> {
     dynamic response =
         await http.post("http://www.omdbapi.com/?i=$id&apikey=80246e40");
     var data = json.decode(response.body);
-    title = _getShorterText(data["Title"],18);
+    title = _getShorterText(data["Title"], 18);
     img = data["Poster"];
     genre = data["Genre"].split(",").toString();
-    genre = _getShorterText(genre.substring(1, genre.length - 1),26);
+    genre = _getShorterText(genre.substring(1, genre.length - 1), 26);
     movieRating = data['Rated'];
     dataRetrieved = true;
     setState(() {});
@@ -55,6 +59,9 @@ class _WatchCardState extends State<WatchCard> {
 
   @override
   Widget build(BuildContext context) {
+    uid = widget.uid;
+    if (uid == null) uid = User.userdata.uid;
+
     if (dataRetrieved != true) getMovieDetails(widget.movieID);
     return GestureDetector(
       onTap: widget.isReview
@@ -62,7 +69,7 @@ class _WatchCardState extends State<WatchCard> {
               Navigator.pushNamed(
                 context,
                 '/seereview',
-                arguments: MovieScreenArguments(id: widget.movieID),
+                arguments: MovieScreenArguments(id: widget.movieID, uid: this.uid),
               );
             }
           : () {
@@ -144,34 +151,40 @@ class _WatchCardState extends State<WatchCard> {
                       ]),
                 ],
               ),
-              SizedBox(width: 4.0,),
-              widget.isUser ? IconButton(
-            onPressed: widget.isReview
-                ? () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return SelectOptions(
-                  widget.movieID,
-                  isReview: true,
-                  movieName: title,
-                  movieRating: movieRating,
-                );
-              }));
-            }
-                : () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return SelectOptions(
-                  widget.movieID,
-                  isReview: false,
-                  movieName: title,
-                  movieRating: movieRating,
-                );
-              }));
-            },
-            icon: Icon(
-              Icons.more_horiz,
-              color: Colors.grey,
-            ),
-          ): Container(),
+              SizedBox(
+                width: 4.0,
+              ),
+              widget.isUser
+                  ? IconButton(
+                      onPressed: widget.isReview
+                          ? () {
+                              Navigator.push(context,
+                                  MaterialPageRoute(builder: (context) {
+                                return SelectOptions(
+                                  widget.movieID,
+                                  isReview: true,
+                                  movieName: title,
+                                  movieRating: movieRating,
+                                );
+                              }));
+                            }
+                          : () {
+                              Navigator.push(context,
+                                  MaterialPageRoute(builder: (context) {
+                                return SelectOptions(
+                                  widget.movieID,
+                                  isReview: false,
+                                  movieName: title,
+                                  movieRating: movieRating,
+                                );
+                              }));
+                            },
+                      icon: Icon(
+                        Icons.more_horiz,
+                        color: Colors.grey,
+                      ),
+                    )
+                  : Container(),
             ],
           ),
         ),

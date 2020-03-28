@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:template/Models/User.dart';
+import 'package:template/Models/UserDetails.dart';
 import 'package:template/Screens/main.dart';
 import 'package:template/Services/AuthenticationServices.dart';
 import 'package:template/Services/DatabaseServices.dart';
@@ -33,7 +34,6 @@ class _LoginPageState extends State<LoginPage> {
   String signUpPassword = "";
   String signUpUsername = "";
   String signUpConfirmPassword = "";
-
   String signInEmail = "";
   String signInPassword = "";
 

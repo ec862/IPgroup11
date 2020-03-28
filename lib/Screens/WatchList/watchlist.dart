@@ -82,6 +82,7 @@ class _WatchListState extends State<WatchList> {
                   itemCount: content.length,
                   itemBuilder: (BuildContext context, int index) {
                     return WatchCard(
+                      uid: widget.uid,
                       movieID: content[index],
                       isReview: false,
                       isUser: isUser,
@@ -103,6 +104,7 @@ class _WatchListState extends State<WatchList> {
                   itemCount: content.length,
                   itemBuilder: (BuildContext context, int index) {
                     return WatchCard(
+                      uid: widget.uid,
                       movieID: content[index].movie_id,
                       isReview: true,
                       rating: content[index].rating,

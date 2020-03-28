@@ -26,6 +26,7 @@ class _SeeReviewScreenState extends State<SeeReviewScreen> {
   MovieScreenArguments args;
   bool dataRetrieved = false;
   ReviewDetails details;
+  String uid;
 
   @override
   void initState() {
@@ -38,8 +39,11 @@ class _SeeReviewScreenState extends State<SeeReviewScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     args = ModalRoute.of(context).settings.arguments;
+    uid = args.uid;
+    if (uid == null)
+      this.uid = User.userdata.uid;
+
     if (dataRetrieved != true && args != null) getMovieDetails(args.id);
     getSingleReview(args.id);
 
@@ -152,7 +156,7 @@ class _SeeReviewScreenState extends State<SeeReviewScreen> {
   }
 
   void getSingleReview(String id) async {
-    details = await DatabaseServices(User.userdata.uid).getSingleReview(movieID: id);
+    details = await DatabaseServices(this.uid).getSingleReview(movieID: id);
     rating = details.rating;
     comment = details.comment;
   }

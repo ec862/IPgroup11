@@ -1,7 +1,9 @@
 class MovieScreenArguments{
   String id = "";
-  MovieScreenArguments({String id = "tt4154796"}){
+  String uid = "";
+  MovieScreenArguments({String id = "tt4154796", String uid}){
     this.id = id;
+    this.uid = uid;
   }
 }
 
