@@ -40,6 +40,7 @@ class _LoginPageState extends State<LoginPage> {
   void getCurrentUser() async {
     FirebaseUser user = await Authentication().user;
     if (user == null) return;
+
     if (user.isEmailVerified) {
       User.userdata.uid = user.uid;
       User.userdata.firstLogIn =  await DatabaseServices(User.userdata.uid).isFirstTimeLogin();

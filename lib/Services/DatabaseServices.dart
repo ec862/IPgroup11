@@ -424,7 +424,15 @@ class DatabaseServices implements BaseDatabase {
         .collection("Followers")
         .document(uid)
         .get();
-    bool accepted = snap.data['accepted'];
+
+    bool accepted = true;
+    try {
+      if (snap.data != null && snap.data['accepted'] != null)
+        accepted = snap.data['accepted'];
+    }catch(e){
+      accepted = true;
+    }
+
     if (snap.exists && !accepted) {
       setFriendRequests(number: -1, theirUID: this.uid);
     }
@@ -1093,6 +1101,7 @@ class DatabaseServices implements BaseDatabase {
         .collection("BlockedBy")
         .document(theirUID)
         .get();
+
     if (snap.exists && snap != null) {
       return true;
     } else {
