@@ -50,8 +50,7 @@ class _FollowersCardState extends State<FollowersCard> {
         UserDetails user = snapshot.data;
         return card(
           context,
-          profile:
-              'https://buildflutter.com/wp-content/uploads/2018/04/buildflutter_255.png',
+          profile: snapshot.data.photo_profile,
           username: user.user_name,
         );
       },
@@ -69,9 +68,7 @@ class _FollowersCardState extends State<FollowersCard> {
           ),
           child: CircleAvatar(
             radius: 30.0,
-            backgroundImage: ImageServices.profileImage(
-              'https://buildflutter.com/wp-content/uploads/2018/04/buildflutter_255.png',
-            ),
+            backgroundImage: ImageServices.profileImage(profile),
           ),
         ),
         title: Text(username),
@@ -100,7 +97,8 @@ class _FollowersCardState extends State<FollowersCard> {
                         builder: (BuildContext context) {
                           return AlertDialog(
                             title: Text('Options'),
-                            content: Text("Choose what to do with follow request"),
+                            content:
+                                Text("Choose what to do with follow request"),
                             actions: <Widget>[
                               FlatButton(
                                 child: Text('Close'),
@@ -133,9 +131,7 @@ class _FollowersCardState extends State<FollowersCard> {
                         },
                       );
                     },
-                    icon: Icon(
-                      Icons.more_horiz
-                    ),
+                    icon: Icon(Icons.more_horiz),
                   ))
             : Icon(
                 Icons.arrow_forward_ios,

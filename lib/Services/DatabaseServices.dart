@@ -7,9 +7,14 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:template/Models/MovieDetails.dart';
 import 'package:template/Models/ReviewDetails.dart';
 import 'package:template/Models/UserDetails.dart';
+import 'package:template/Services/AuthenticationServices.dart';
 
 abstract class BaseDatabase {
   // set details
+
+  Future setPrivate(bool privacy);
+
+  Future<bool> isPrivate({String uid});
 
   Future setFriendRequests({@required int number});
 
@@ -51,13 +56,15 @@ abstract class BaseDatabase {
 
   Future removeRecommendation({String movieID});
 
-  Future reviewMovie({@required String movieID,
-    @required double rating,
-    @required String comment});
+  Future reviewMovie(
+      {@required String movieID,
+      @required double rating,
+      @required String comment});
 
-  Future recommendMovie({@required String uid,
-    @required String movieID,
-    @required String movieName});
+  Future recommendMovie(
+      {@required String uid,
+      @required String movieID,
+      @required String movieName});
 
   Future<bool> isFollowing({@required String uid});
 
@@ -287,7 +294,7 @@ class DatabaseServices implements BaseDatabase {
   Future _upLoadImage({@required Function onData, @required File image}) async {
     try {
       StorageUploadTask uploadTask =
-      _storageReference.child("${DateTime.now()}.jpeg").putFile(image);
+          _storageReference.child("${DateTime.now()}.jpeg").putFile(image);
       StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
       taskSnapshot.ref.getDownloadURL().then((dynamic) {
         onData(dynamic);
@@ -343,6 +350,9 @@ class DatabaseServices implements BaseDatabase {
     if (blocked) {
       return false;
     }
+    bool private = await isPrivate(uid: uid);
+    bool isFol = await isFollower(uid: uid);
+
     try {
       return await _usersCollection
           .document(uid)
@@ -351,11 +361,11 @@ class DatabaseServices implements BaseDatabase {
           .updateData(
         {
           'user_id': this.uid,
-          'accepted': false,
+          'accepted': !private,
         },
-      ).whenComplete(() {
+      ).whenComplete(() async {
         print("Done");
-        _addToYourFollowing(uid);
+        _addToYourFollowing(uid, accepted: !private);
       });
     } catch (e) {
       try {
@@ -366,11 +376,15 @@ class DatabaseServices implements BaseDatabase {
             .setData(
           {
             'user_id': this.uid,
-            'accepted': false,
+            'accepted': !private,
           },
         ).whenComplete(() async {
-          await setFriendRequests(number: 1, theirUID: uid);
-          _addToYourFollowing(uid);
+          if (private) {
+            await setFriendRequests(number: 1, theirUID: uid);
+          } else {
+            if (isFol) addFriend(uid);
+          }
+          _addToYourFollowing(uid, accepted: !private);
         });
       } catch (ex) {
         print(ex);
@@ -568,6 +582,7 @@ class DatabaseServices implements BaseDatabase {
         photo_profile: documentSnapshot.data["photo_profile"] ?? '',
         isChatting: documentSnapshot.data['isChattingwith'],
         gender: documentSnapshot.data['gender'] ?? '',
+        is_private: documentSnapshot.data['is_private'] ?? true,
       );
     } catch (e) {
       return null;
@@ -673,7 +688,6 @@ class DatabaseServices implements BaseDatabase {
     return details;
   }
 
-
   @override
   Future removeFromWatchList({String movieID}) {
     try {
@@ -778,10 +792,7 @@ class DatabaseServices implements BaseDatabase {
         'sender_id': this.uid,
         'reciever_id': uid,
         'message': message,
-        'timestamp': DateTime
-            .now()
-            .millisecondsSinceEpoch
-            .toString()
+        'timestamp': DateTime.now().millisecondsSinceEpoch.toString()
       },
     );
   }
@@ -909,6 +920,7 @@ class DatabaseServices implements BaseDatabase {
         .document(uid)
         .get();
     if (snap.data == null) return null;
+    if (snap.data.isEmpty) return null;
 
     return FollowerDetails(
         user_id: snap.data['user_id'],
@@ -1016,25 +1028,21 @@ class DatabaseServices implements BaseDatabase {
         return await _usersCollection.document(theirUID).updateData(
           {'friend_requests': FieldValue.increment(-1)},
         ).whenComplete(() {});
-      }
-      else if (number == 1) {
+      } else if (number == 1) {
         return await _usersCollection.document(theirUID).updateData(
           {'friend_requests': FieldValue.increment(1)},
         ).whenComplete(() {});
-      }
-      else {
+      } else {
         return await _usersCollection.document(theirUID).updateData(
           {'friend_requests': number},
         ).whenComplete(() {});
       }
-    }
-    catch (e) {
+    } catch (e) {
       try {
         return await _usersCollection.document(theirUID).setData(
           {'friend_requests': 0},
         );
-      }
-      catch (ex) {
+      } catch (ex) {
         print(ex);
         return null;
       }
@@ -1073,8 +1081,7 @@ class DatabaseServices implements BaseDatabase {
         .get();
     if (snap.exists && snap != null) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
@@ -1090,6 +1097,38 @@ class DatabaseServices implements BaseDatabase {
       return true;
     } else {
       return false;
+    }
+  }
+
+  @override
+  Future<bool> isPrivate({String uid}) async {
+    try {
+      DocumentSnapshot snapshot = await _usersCollection.document(uid).get();
+      if (snapshot.data == null) return true;
+      if (snapshot.data['is_private'] == null) return true;
+      return snapshot.data['is_private'];
+    } catch (e) {
+      return true;
+    }
+  }
+
+  @override
+  Future setPrivate(bool privacy) async {
+    try {
+      return await _usersCollection.document(this.uid).updateData(
+        {'is_private': privacy},
+      ).whenComplete(() {
+        print("Done");
+      });
+    } catch (e) {
+      try {
+        return await _usersCollection.document(this.uid).setData(
+          {'is_private': privacy},
+        );
+      } catch (ex) {
+        print(ex);
+        return null;
+      }
     }
   }
 }

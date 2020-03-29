@@ -11,6 +11,7 @@ class UserDetails {
   int num_following = 0;
   List<dynamic> isChatting;
   String gender = null;
+  bool is_private;
 
   UserDetails({
     this.user_id,
@@ -25,6 +26,7 @@ class UserDetails {
     this.photo_profile,
     this.isChatting,
     this.gender,
+    this.is_private = true,
   });
 }
 

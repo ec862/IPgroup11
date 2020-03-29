@@ -91,13 +91,18 @@ class _OtherProfileState extends State<OtherProfile> {
   Future getData() async {
     blockedBy = await DatabaseServices(User.userdata.uid)
         .checkBlockedBy(theirUID: args.id);
-    if (details != null && blockedBy != null) {
-      return;
-    }
     details =
         await DatabaseServices(User.userdata.uid).getFollower(uid: args.id);
 
-    if (details == null) return;
+    if (blockedBy == null) {
+      return;
+    }
+
+    if (details == null) {
+      strText = 'Follow';
+      pressed = true;
+      return;
+    }
 
     if (!details.accepted) {
       pressed = false;
@@ -195,69 +200,77 @@ class _OtherProfileState extends State<OtherProfile> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: (blockedBy == true)
-                  ? <Widget>[Stack(
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      FutureBuilder(
-                        future: DatabaseServices(User.userdata.uid).getFriendInfo(uid: args.id),
-                        builder: (context, AsyncSnapshot<UserDetails> snapshot){
-                          if (!snapshot.hasData)
-                            return CircularProgressIndicator();
-                          return CircleAvatar(
-                            radius: 70,
-                            backgroundImage: ImageServices.profileImage(snapshot.data.photo_profile),
-                          );
-                        },
+                  ? <Widget>[
+                      Stack(
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              FutureBuilder(
+                                future: DatabaseServices(User.userdata.uid)
+                                    .getFriendInfo(uid: args.id),
+                                builder: (context,
+                                    AsyncSnapshot<UserDetails> snapshot) {
+                                  if (!snapshot.hasData)
+                                    return CircularProgressIndicator();
+                                  return CircleAvatar(
+                                    radius: 70,
+                                    backgroundImage: ImageServices.profileImage(
+                                        snapshot.data.photo_profile),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                          new Positioned(
+                            right: 10,
+                            top: 0,
+                            child: BlockedButton(id: args.id),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  new Positioned(
-                    right: 10,
-                    top: 0,
-                    child: BlockedButton(id: args.id),
-                  ),
-                ],
-              ),
-                Text("Unavailable")] :
-              <Widget>[
-                Stack(
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        FutureBuilder(
-                          future: DatabaseServices(User.userdata.uid).getFriendInfo(uid: args.id),
-                          builder: (context, AsyncSnapshot<UserDetails> snapshot){
-                            if (!snapshot.hasData)
-                              return CircularProgressIndicator();
-                            return CircleAvatar(
-                              radius: 70,
-                              backgroundImage: ImageServices.profileImage(snapshot.data.photo_profile),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                    new Positioned(
-                      right: 10,
-                      top: 0,
-                      child: BlockedButton(id: args.id),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(args.userName,
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-                Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
+                      Text("Unavailable")
+                    ]
+                  : <Widget>[
+                      Stack(
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              FutureBuilder(
+                                future: DatabaseServices(User.userdata.uid)
+                                    .getFriendInfo(uid: args.id),
+                                builder: (context,
+                                    AsyncSnapshot<UserDetails> snapshot) {
+                                  if (!snapshot.hasData)
+                                    return CircularProgressIndicator();
+                                  return CircleAvatar(
+                                    radius: 70,
+                                    backgroundImage: ImageServices.profileImage(
+                                        snapshot.data.photo_profile),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                          new Positioned(
+                            right: 10,
+                            top: 0,
+                            child: BlockedButton(id: args.id),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text(args.userName,
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
                             ButtonTheme(
                               minWidth: 120.0,
                               height: 50.0,
@@ -270,19 +283,19 @@ class _OtherProfileState extends State<OtherProfile> {
                                 textColor:
                                     pressed ? Colors.black : Colors.white,
                                 child: new Text(strText),
-                                onPressed: () {
-                                  setState(() {
-                                    if (pressed == true) {
-                                      strText = 'Request Pending';
-                                      DatabaseServices(User.userdata.uid)
-                                          .follow(args.id);
-                                    } else {
-                                      strText = 'Follow';
-                                      DatabaseServices(User.userdata.uid)
-                                          .unFollow(args.id);
-                                    }
-                                    pressed = !pressed;
-                                  });
+                                onPressed: () async {
+                                  if (pressed == true) {
+                                    strText = 'Request Pending';
+                                    await DatabaseServices(User.userdata.uid)
+                                        .follow(args.id);
+                                  } else {
+                                    strText = 'Follow';
+                                    await DatabaseServices(User.userdata.uid)
+                                        .unFollow(args.id);
+                                  }
+                                  pressed = !pressed;
+                                  dataRetrieved = false;
+                                  setState(() {});
                                 },
                               ),
                             ),
@@ -345,7 +358,7 @@ class _OtherProfileState extends State<OtherProfile> {
                                   } else {
                                     Fluttertoast.showToast(
                                         msg:
-                                        "You're not a follower/ person hasnt accepted you "
+                                            "You're not a follower/ person hasnt accepted you "
                                             "therefore you "
                                             "cannot view the Review list of the person",
                                         gravity: ToastGravity.CENTER,
@@ -359,315 +372,322 @@ class _OtherProfileState extends State<OtherProfile> {
                               ),
                             ),
                           ]),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Container(
-                      padding: EdgeInsets.only(left: 20),
-                      child: Text('Favorite Movie',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey[600])),
-                    ),
-                    FutureBuilder(
-                      future:
-                          DatabaseServices(args.id).getFriendInfo(uid: args.id),
-                      builder: (BuildContext context,
-                          AsyncSnapshot<UserDetails> snapshot) {
-                        if (!snapshot.hasData)
-                          return Text('Waiting',
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey[600]));
-                        UserDetails content = snapshot.data;
-                        return FlatButton(
-                          onPressed: () {
-                            showDialog(
-                                context: context,
-                                child: new AlertDialog(
-                                  content: new Text(content.favorite_movie),
-                                ));
-                          },
-                          child: Container(
-                            width: 105,
-                            child: RichText(
-                              overflow: TextOverflow.ellipsis,
-                              text: TextSpan(
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black),
-                                  text: content.favorite_movie),
-                            ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.only(left: 20),
+                            child: Text('Favorite Movie',
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey[600])),
                           ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Container(
-                      padding: EdgeInsets.only(left: 20),
-                      child: Text('Favorite Category',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey[600])),
-                    ),
-                    Container(
-                      width: 120,
-                      child: FutureBuilder(
-                          future: DatabaseServices(args.id)
-                              .getFriendInfo(uid: args.id),
-                          builder: (BuildContext context,
-                              AsyncSnapshot<UserDetails> snapshot) {
-                            if (!snapshot.hasData)
-                              return Text('Waiting...',
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold));
-                            UserDetails content = snapshot.data;
-                            return Text('${content.favorite_category}',
-                                textAlign: TextAlign.left,
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold));
-                          }),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Container(
-                      padding: EdgeInsets.only(left: 20),
-                      child: Text('Followers',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey[600])),
-                    ),
-                    Container(
-                      width: 120,
-                      child: FutureBuilder(
-                          future: followers,
-                          builder: (BuildContext context,
-                              AsyncSnapshot<List> snapshot) {
-                            if (!snapshot.hasData)
-                              return Text('0',
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold));
-                            List<FollowerDetails> content = snapshot.data;
-                            return Text('${content.length}',
-                                textAlign: TextAlign.left,
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold));
-                          }),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Container(
-                      padding: EdgeInsets.only(left: 20),
-                      child: Text('Friends',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey[600])),
-                    ),
-                    Container(
-                      width: 120,
-                      child: FutureBuilder(
-                          future: DatabaseServices(args.id).getFriends(),
-                          builder: (BuildContext context,
-                              AsyncSnapshot<List> snapshot) {
-                            if (!snapshot.hasData)
-                              return Text('0',
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold));
-                            List<FollowerDetails> content = snapshot.data;
-                            return Text('${content.length}',
-                                textAlign: TextAlign.left,
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold));
-                          }),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Container(
-                      padding: EdgeInsets.only(left: 20),
-                      child: Text('Reviewed movies',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey[600])),
-                    ),
-                    Container(
-                      width: 120,
-                      child: FutureBuilder(
-                          future: reviewlist,
-                          builder: (BuildContext context,
-                              AsyncSnapshot<List> snapshot) {
-                            if (!snapshot.hasData)
-                              return Text(
-                                '0',
-                                textAlign: TextAlign.left,
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                          FutureBuilder(
+                            future: DatabaseServices(args.id)
+                                .getFriendInfo(uid: args.id),
+                            builder: (BuildContext context,
+                                AsyncSnapshot<UserDetails> snapshot) {
+                              if (!snapshot.hasData)
+                                return Text('Waiting',
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey[600]));
+                              UserDetails content = snapshot.data;
+                              return FlatButton(
+                                onPressed: () {
+                                  showDialog(
+                                      context: context,
+                                      child: new AlertDialog(
+                                        content:
+                                            new Text(content.favorite_movie),
+                                      ));
+                                },
+                                child: Container(
+                                  width: 105,
+                                  child: RichText(
+                                    overflow: TextOverflow.ellipsis,
+                                    text: TextSpan(
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                        text: content.favorite_movie),
+                                  ),
                                 ),
                               );
-                            List<ReviewDetails> content = snapshot.data;
-                            return Text(
-                              '${content.length}',
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            );
-                          }),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Container(
-                      padding: EdgeInsets.only(left: 20),
-                      child: Text('Category most watched',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey[600])),
-                    ),
-                    Container(
-                      width: 120,
-                      child: FutureBuilder(
-                          future: reviewlist,
-                          builder: (BuildContext context,
-                              AsyncSnapshot<List> snapshot) {
-                            if (!snapshot.hasData)
-                              return Text(
-                                'Waiting',
-                                textAlign: TextAlign.left,
+                            },
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.only(left: 20),
+                            child: Text('Favorite Category',
                                 style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              );
-                            List<ReviewDetails> content = snapshot.data;
-                            List<String> movieList = content
-                                .map((review) => (review.movie_id))
-                                .toList();
-                            return FutureBuilder(
-                              future: _getMostWatched(movieList),
-                              builder: (BuildContext context,
-                                  AsyncSnapshot<String> mostWatched) {
-                                if (!mostWatched.hasData)
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey[600])),
+                          ),
+                          Container(
+                            width: 120,
+                            child: FutureBuilder(
+                                future: DatabaseServices(args.id)
+                                    .getFriendInfo(uid: args.id),
+                                builder: (BuildContext context,
+                                    AsyncSnapshot<UserDetails> snapshot) {
+                                  if (!snapshot.hasData)
+                                    return Text('Waiting...',
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold));
+                                  UserDetails content = snapshot.data;
+                                  return Text('${content.favorite_category}',
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold));
+                                }),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.only(left: 20),
+                            child: Text('Followers',
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey[600])),
+                          ),
+                          Container(
+                            width: 120,
+                            child: FutureBuilder(
+                                future: followers,
+                                builder: (BuildContext context,
+                                    AsyncSnapshot<List> snapshot) {
+                                  if (!snapshot.hasData)
+                                    return Text('0',
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold));
+                                  List<FollowerDetails> content = snapshot.data;
+                                  return Text('${content.length}',
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold));
+                                }),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.only(left: 20),
+                            child: Text('Friends',
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey[600])),
+                          ),
+                          Container(
+                            width: 120,
+                            child: FutureBuilder(
+                                future: DatabaseServices(args.id).getFriends(),
+                                builder: (BuildContext context,
+                                    AsyncSnapshot<List> snapshot) {
+                                  if (!snapshot.hasData)
+                                    return Text('0',
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold));
+                                  List<FollowerDetails> content = snapshot.data;
+                                  return Text('${content.length}',
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold));
+                                }),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.only(left: 20),
+                            child: Text('Reviewed movies',
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey[600])),
+                          ),
+                          Container(
+                            width: 120,
+                            child: FutureBuilder(
+                                future: reviewlist,
+                                builder: (BuildContext context,
+                                    AsyncSnapshot<List> snapshot) {
+                                  if (!snapshot.hasData)
+                                    return Text(
+                                      '0',
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    );
+                                  List<ReviewDetails> content = snapshot.data;
                                   return Text(
-                                    'Waiting',
+                                    '${content.length}',
                                     textAlign: TextAlign.left,
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   );
-                                return Text(
-                                  '${mostWatched.data}',
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
+                                }),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.only(left: 20),
+                            child: Text('Category most watched',
+                                style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
-                                  ),
-                                );
-                              },
-                            );
-                          }),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Container(
-                      padding: EdgeInsets.only(left: 20),
-                      child: Text('Gender',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey[600])),
-                    ),
-                    Container(
-                      width: 120,
-                      child: FutureBuilder(
-                          future: DatabaseServices(args.id)
-                              .getFriendInfo(uid: args.id),
-                          builder: (BuildContext context,
-                              AsyncSnapshot<UserDetails> snapshot) {
-                            if (!snapshot.hasData)
-                              return Text('Waiting...',
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold));
-                            UserDetails content = snapshot.data;
-                            return Text('${content.gender}',
-                                textAlign: TextAlign.left,
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold));
-                          }),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Container(
-                      padding: EdgeInsets.only(left: 20),
-                      child: Text('Date of birth',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey[600])),
-                    ),
-                    Container(
-                      width: 120,
-                      child: FutureBuilder(
-                        future: DatabaseServices(args.id)
-                            .getFriendInfo(uid: args.id),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<UserDetails> snapshot) {
-                          if (!snapshot.hasData)
-                            return Text('Waiting...',
-                                textAlign: TextAlign.left,
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold));
-                          UserDetails content = snapshot.data;
-                          return Text('${getTimeText(content.dob)}',
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold));
-                        },
+                                    color: Colors.grey[600])),
+                          ),
+                          Container(
+                            width: 120,
+                            child: FutureBuilder(
+                                future: reviewlist,
+                                builder: (BuildContext context,
+                                    AsyncSnapshot<List> snapshot) {
+                                  if (!snapshot.hasData)
+                                    return Text(
+                                      'Waiting',
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    );
+                                  List<ReviewDetails> content = snapshot.data;
+                                  List<String> movieList = content
+                                      .map((review) => (review.movie_id))
+                                      .toList();
+                                  return FutureBuilder(
+                                    future: _getMostWatched(movieList),
+                                    builder: (BuildContext context,
+                                        AsyncSnapshot<String> mostWatched) {
+                                      if (!mostWatched.hasData)
+                                        return Text(
+                                          'Waiting',
+                                          textAlign: TextAlign.left,
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        );
+                                      return Text(
+                                        '${mostWatched.data}',
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      );
+                                    },
+                                  );
+                                }),
+                          ),
+                        ],
                       ),
-                    )
-                  ],
-                ),
-              ],
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.only(left: 20),
+                            child: Text('Gender',
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey[600])),
+                          ),
+                          Container(
+                            width: 120,
+                            child: FutureBuilder(
+                                future: DatabaseServices(args.id)
+                                    .getFriendInfo(uid: args.id),
+                                builder: (BuildContext context,
+                                    AsyncSnapshot<UserDetails> snapshot) {
+                                  if (!snapshot.hasData)
+                                    return Text('Waiting...',
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold));
+                                  UserDetails content = snapshot.data;
+                                  return Text('${content.gender}',
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold));
+                                }),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.only(left: 20),
+                            child: Text('Date of birth',
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey[600])),
+                          ),
+                          Container(
+                            width: 120,
+                            child: FutureBuilder(
+                              future: DatabaseServices(args.id)
+                                  .getFriendInfo(uid: args.id),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<UserDetails> snapshot) {
+                                if (!snapshot.hasData)
+                                  return Text('Waiting...',
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold));
+                                UserDetails content = snapshot.data;
+                                return Text('${getTimeText(content.dob)}',
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold));
+                              },
+                            ),
+                          )
+                        ],
+                      ),
+                    ],
             );
           }
         },

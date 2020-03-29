@@ -76,4 +76,9 @@ class Authentication {
   Future<FirebaseUser> get user {
     return _auth.currentUser();
   }
+
+  Future deleteUser({String uid}) async {
+    FirebaseUser user = await _auth.currentUser();
+    return user.delete();
+  }
 }

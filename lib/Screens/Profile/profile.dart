@@ -67,7 +67,13 @@ class _ProfileState extends State<Profile> {
             onPressed: () {
               Navigator.of(context).pushNamed('/chats');
             },
-          )
+          ),
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: (){
+              Navigator.of(context).pushNamed('/settings');
+            },
+          ),
         ],
       ),
       body: StreamBuilder(

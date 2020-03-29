@@ -11,6 +11,7 @@ import 'package:template/Screens/Home/homepage.dart';
 import 'package:template/Screens/Profile/followers.dart';
 import 'package:template/Screens/Profile/otherProfile.dart';
 import 'package:template/Screens/Profile/profile.dart';
+import 'package:template/Screens/Profile/settings.dart';
 import 'package:template/Screens/WatchList/watchlist.dart';
 import 'package:template/loginScreen2.dart';
 
@@ -94,7 +95,8 @@ class _MainAppState extends State<MainApp> {
                   return new ReviewScreen(movieID: null);
                 case '/seereview':
                   return new SeeReviewScreen();
-
+                case '/settings':
+                  return new Settings();
                 default:
                   return null;
               }
@@ -116,6 +118,9 @@ class _MainAppState extends State<MainApp> {
                       Curves.linear, animation, secondaryAnimation, child);
                 case '/chatMessages':
                   return effectMap[PageTransitionType.slideUp](
+                      Curves.linear, animation, secondaryAnimation, child);
+                case '/settings':
+                  return effectMap[PageTransitionType.slideInLeft](
                       Curves.linear, animation, secondaryAnimation, child);
                 default:
                   return effectMap[PageTransitionType.fadeIn](
