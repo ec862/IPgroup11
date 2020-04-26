@@ -1032,7 +1032,9 @@ class DatabaseServices implements BaseDatabase {
   Future setFriendRequests(
       {@required int number, @required String theirUID}) async {
     try {
-      if (number == -1) {
+      int reqNumb = await getFriendReqNumb();
+
+      if (reqNumb > 0 && number == -1) {
         return await _usersCollection.document(theirUID).updateData(
           {'friend_requests': FieldValue.increment(-1)},
         ).whenComplete(() {});
